@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>猜词游戏</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>猜词游戏</h1>
+            <button class="info-btn" id="info-btn">玩法简介</button>
+        </header>
+
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-label">已猜</span>
+                <span class="stat-value current" id="attempts">0</span>
+                <span class="stat-label">次</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">已猜对</span>
+                <span class="stat-value count" id="correct-count">0</span>
+                <span class="stat-label">个词语</span>
+            </div>
+        </div>
+
+        <div class="sort-bar">
+            <span class="sort-label">排序：</span>
+            <button class="sort-btn active" data-sort="similarity">按相似度</button>
+            <button class="sort-btn" data-sort="time">按时间</button>
+        </div>
+        <div class="history" id="history">
+            <div class="history-placeholder">开始猜测吧！</div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" placeholder="任意输入一个词汇" id="guess-input" autocomplete="off">
+            <button class="guess-btn" id="guess-btn">猜测</button>
+        </div>
+
+        <button class="reset-btn" id="reset-btn">新游戏</button>
+    </div>
+
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <h2>玩法简介</h2>
+            <ol>
+                <li>你拥有无限次机会来猜出目标中文词语。</li>
+                <li>每次猜测后，你会看到本次猜测的关联度数值。</li>
+                <li>系统给出的百分比代表你每次猜测词语和目标词语的关联程度，数值越大，关联程度越高。</li>
+                <li>猜中一个词语后，会自动切换为下一个目标词语。</li>
+                <li>"已猜对词语数量"记录你累计猜中的不同词语总数。</li>
+                <li>点击"新游戏"按钮可重置所有进度。</li>
+            </ol>
+            <button class="close-btn" id="close-modal">知道了</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
