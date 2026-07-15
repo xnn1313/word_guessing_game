@@ -1,7 +1,18 @@
 <view class="history-list" wx:if="{{items.length}}">
   <view class="history-row {{item.latest ? 'latest' : ''}}" wx:for="{{items}}" wx:key="_index">
-    <text class="history-word">{{item.word}}</text>
-    <text class="history-value tone-{{item.tone}}">{{item.displaySimilarity}}</text>
+    <view class="word-wrap">
+      <text class="history-word">{{item.word}}</text>
+      <text class="latest-mark" wx:if="{{item.latest}}">新</text>
+    </view>
+    <view class="score-wrap">
+      <text class="history-value tone-{{item.tone}}">{{item.displaySimilarity}}</text>
+      <view class="score-track">
+        <view class="score-fill tone-{{item.tone}}" style="width: {{item.similarity}}%"></view>
+      </view>
+    </view>
   </view>
 </view>
-<view class="history-empty" wx:else>{{emptyText}}</view>
+<view class="history-empty" wx:else>
+  <view class="empty-rings"><text></text><text></text><text></text></view>
+  <text>{{emptyText}}</text>
+</view>

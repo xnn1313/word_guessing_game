@@ -1,29 +1,34 @@
 <view class="page-shell profile-page">
-  <view class="profile-card surface" wx:if="{{loggedIn}}">
+  <view class="profile-hero" wx:if="{{loggedIn}}">
     <view class="profile-avatar">{{avatarText}}</view>
     <view class="profile-info">
       <text class="profile-name">{{username}}</text>
-      <text class="profile-state">进度已自动保存</text>
+      <view class="profile-state"><text></text>进度已自动保存</view>
     </view>
+    <view class="profile-mark">词</view>
   </view>
 
-  <view class="profile-card surface guest" wx:else>
+  <view class="profile-hero guest" wx:else>
     <view class="profile-avatar">?</view>
     <view class="profile-info">
       <text class="profile-name">尚未登录</text>
-      <text class="profile-state">登录后可查看完整记录</text>
+      <text class="guest-note">登录后可查看完整记录</text>
     </view>
+    <view class="profile-mark">词</view>
   </view>
 
-  <view class="progress-panel surface" wx:if="{{loggedIn}}">
+  <view class="progress-panel" wx:if="{{loggedIn}}">
     <view class="progress-label-row">
-      <text class="section-title">分类闯关</text>
-      <text class="progress-number">{{totalStars}} / {{maxStars}} 星</text>
+      <view>
+        <text class="section-title">分类闯关进度</text>
+        <text class="progress-note">13 个分类 · 260 关</text>
+      </view>
+      <view class="progress-number"><text>{{totalStars}}</text> / {{maxStars}} 星</view>
     </view>
     <view class="progress-track">
       <view class="progress-fill" style="width: {{maxStars ? totalStars / maxStars * 100 : 0}}%"></view>
     </view>
-    <view class="progress-note">13 个分类 · 260 关 · 每关最高 3 星</view>
+    <view class="progress-legend"><text>刚刚开始</text><text>全部完成</text></view>
   </view>
 
   <button class="primary-button profile-action" wx:if="{{!loggedIn}}" bindtap="goLogin">登录 / 注册</button>

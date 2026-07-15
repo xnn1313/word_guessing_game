@@ -56,7 +56,7 @@ Page({
     this.setData({
       categories: this.data.categories.map((category: any) => ({
         ...category,
-        expanded: category.id === id ? !category.expanded : category.expanded,
+        expanded: category.id === id ? !category.expanded : false,
       })),
     });
   },

@@ -19,7 +19,14 @@ function decoratePlayers(players: BattlePlayer[]): any[] {
     empty: false,
   }));
   while (result.length < 2) {
-    result.push({ empty: true, username: "等待好友", attempts: 0, displayBest: "0.00%", roleText: "尚未加入" });
+    result.push({
+      empty: true,
+      username: "等待好友",
+      attempts: 0,
+      best_similarity: 0,
+      displayBest: "0.00%",
+      roleText: "尚未加入",
+    });
   }
   return result;
 }

@@ -1,5 +1,5 @@
 <view class="page-shell level-page" wx:if="{{!loading && level}}">
-  <view class="level-heading surface">
+  <view class="level-heading">
     <view class="level-icon">{{level.category_emoji}}</view>
     <view class="level-copy">
       <text class="level-category">{{level.category_name}} · 第 {{level.order}} 关</text>
@@ -8,12 +8,15 @@
     <view class="difficulty-badge difficulty-{{level.difficulty}}">{{level.difficulty_label}}</view>
   </view>
 
-  <view class="level-stats">
-    <view><text>本关已猜</text><text class="stat-number">{{attempts}}</text><text class="stat-unit">次</text></view>
-    <view><text>累计星级</text><text class="stat-number">{{totalStars}}</text><text class="stat-unit">星</text></view>
+  <view class="level-summary">
+    <view><text>本关已猜</text><text class="summary-number">{{attempts}}</text><text class="summary-unit">次</text></view>
+    <view class="summary-rule"></view>
+    <view><text>累计获得</text><text class="summary-number accent">{{totalStars}}</text><text class="summary-unit">星</text></view>
+    <view class="summary-hint"><text>完成越快</text><text>星级越高</text></view>
   </view>
 
-  <view class="complete-panel surface" wx:if="{{completed}}">
+  <view class="complete-panel" wx:if="{{completed}}">
+    <view class="complete-emblem">✓</view>
     <text class="complete-title">闯关成功</text>
     <text class="complete-answer">{{resultText}}</text>
     <text class="complete-stars">{{earnedStars === 3 ? '★★★' : earnedStars === 2 ? '★★☆' : '★☆☆'}}</text>
@@ -22,25 +25,25 @@
   </view>
 
   <block wx:else>
-    <view class="history-panel surface">
+    <view class="history-panel">
       <view class="history-title-row">
         <text class="section-title">我的猜测</text>
         <text>最新在前</text>
       </view>
       <scroll-view class="history-scroll" scroll-y enhanced show-scrollbar="{{false}}">
-        <guess-history items="{{history}}" empty-text="输入一个相关词开始挑战" />
+        <guess-history items="{{history}}" empty-text="输入一个相关词，开始挑战" />
       </scroll-view>
     </view>
 
     <view class="result-note" wx:if="{{resultText}}">{{resultText}}</view>
 
-    <view class="guess-panel surface">
+    <view class="guess-dock">
       <view class="guess-row">
         <input class="text-input" value="{{guess}}" maxlength="20" placeholder="输入你的猜测" confirm-type="send" bindinput="onGuessInput" bindconfirm="submitGuess" />
         <button class="guess-button" loading="{{submitting}}" disabled="{{submitting || !guess}}" bindtap="submitGuess">提交</button>
       </view>
       <view class="level-actions">
-        <button bindtap="revealAnswer">查看答案 / 重试</button>
+        <button bindtap="revealAnswer">查看答案并重试</button>
         <button bindtap="retry">重新开始本关</button>
       </view>
     </view>

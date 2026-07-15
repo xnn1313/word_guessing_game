@@ -1,80 +1,111 @@
 .auth-page {
-  background:
-    radial-gradient(circle at 50% -10%, rgba(116, 104, 223, 0.16), transparent 38%),
-    #f4f6fb;
+  padding-top: 24rpx;
 }
 
 .auth-intro {
   display: flex;
   align-items: center;
-  flex-direction: column;
-  padding: 38rpx 20rpx 44rpx;
-  text-align: center;
+  min-height: 224rpx;
+  padding: 34rpx 30rpx;
+  border-radius: 30rpx;
+  background: #17343b;
+  color: #ffffff;
+  box-shadow: 0 16rpx 34rpx rgba(23, 52, 59, 0.16);
 }
 
 .auth-mark {
   display: grid;
-  width: 112rpx;
-  height: 112rpx;
-  margin-bottom: 24rpx;
+  width: 92rpx;
+  height: 104rpx;
+  flex: 0 0 auto;
   place-items: center;
-  border-radius: 32rpx;
-  background: linear-gradient(135deg, #7468df, #5b78c7);
-  color: #ffffff;
-  font-size: 52rpx;
-  font-weight: 800;
-  box-shadow: 0 16rpx 34rpx rgba(91, 120, 199, 0.25);
+  border-radius: 22rpx;
+  background: #ffc857;
+  color: #233637;
+  font-size: 45rpx;
+  font-weight: 850;
+  transform: rotate(-5deg);
+}
+
+.auth-intro > view:last-child {
+  min-width: 0;
+  margin-left: 26rpx;
+}
+
+.auth-title {
+  font-size: 37rpx;
+  font-weight: 820;
+}
+
+.auth-subtitle {
+  margin-top: 11rpx;
+  color: #adc3bf;
+  font-size: 21rpx;
+  line-height: 1.55;
 }
 
 .auth-panel {
-  padding: 28rpx;
+  margin-top: 22rpx;
+  padding: 26rpx;
+  border: 2rpx solid #dce7e3;
+  border-radius: 24rpx;
+  background: #ffffff;
 }
 
 .auth-tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8rpx;
+  gap: 6rpx;
   margin-bottom: 28rpx;
-  padding: 8rpx;
-  border-radius: 22rpx;
-  background: #f0f3f8;
+  padding: 6rpx;
+  border-radius: 18rpx;
+  background: #edf3f1;
 }
 
 .auth-tab {
-  height: 68rpx;
-  border-radius: 18rpx;
-  color: #7c8494;
-  font-size: 27rpx;
-  line-height: 68rpx;
+  height: 62rpx;
+  border-radius: 14rpx;
+  color: #74837f;
+  font-size: 25rpx;
+  line-height: 62rpx;
 }
 
 .auth-tab.active {
   background: #ffffff;
-  color: #4d69b3;
-  font-weight: 700;
-  box-shadow: 0 5rpx 16rpx rgba(58, 73, 106, 0.08);
+  color: #08735c;
+  font-weight: 770;
+  box-shadow: 0 4rpx 12rpx rgba(30, 68, 60, 0.08);
 }
 
 .field + .field {
-  margin-top: 24rpx;
+  margin-top: 22rpx;
 }
 
 .field-label {
   display: block;
-  margin-bottom: 12rpx;
-  color: #4f586b;
-  font-size: 25rpx;
-  font-weight: 650;
+  margin-bottom: 10rpx;
+  color: #3d514d;
+  font-size: 23rpx;
+  font-weight: 690;
 }
 
 .submit-button {
-  margin-top: 34rpx;
+  margin-top: 30rpx;
 }
 
 .auth-footnote {
-  padding: 28rpx 36rpx;
-  color: #9299a8;
-  font-size: 22rpx;
-  line-height: 1.6;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  padding: 26rpx;
+  color: #899692;
+  font-size: 20rpx;
+}
+
+.auth-footnote text {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: #12a37f;
 }

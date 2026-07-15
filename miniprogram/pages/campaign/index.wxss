@@ -1,53 +1,89 @@
-.campaign-header {
+.campaign-page {
+  padding-top: 22rpx;
+}
+
+.campaign-progress {
+  margin-top: 24rpx;
+  padding: 24rpx 26rpx;
+  border-radius: 24rpx;
+  background: #17343b;
+  color: #ffffff;
+}
+
+.progress-copy {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 22rpx;
+  gap: 18rpx;
 }
 
-.star-total {
-  flex: 0 0 auto;
-  margin-top: 8rpx;
-  color: #8f6d2a;
-  font-size: 22rpx;
-  font-weight: 650;
+.progress-copy view {
+  color: #b4cbc6;
+  font-size: 21rpx;
 }
 
-.star-total text {
-  color: #4f70bd;
-  font-size: 31rpx;
-  font-weight: 780;
+.progress-copy view text {
+  color: #ffc857;
+  font-size: 37rpx;
+  font-weight: 840;
+}
+
+.progress-copy > text {
+  color: #9fb8b3;
+  font-size: 20rpx;
+}
+
+.progress-track {
+  height: 12rpx;
+  margin-top: 20rpx;
+  overflow: hidden;
+  border-radius: 12rpx;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.progress-fill {
+  min-width: 4rpx;
+  height: 100%;
+  border-radius: 12rpx;
+  background: #ffc857;
 }
 
 .category-list {
   display: flex;
   flex-direction: column;
-  gap: 18rpx;
-  margin-top: 28rpx;
+  gap: 12rpx;
+  margin-top: 20rpx;
 }
 
 .category {
   overflow: hidden;
+  border: 2rpx solid #dce7e3;
+  border-radius: 22rpx;
+  background: #ffffff;
 }
 
 .category-header {
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 128rpx;
-  padding: 22rpx 24rpx;
+  min-height: 116rpx;
+  padding: 18rpx 20rpx;
   text-align: left;
+}
+
+.category-header.expanded {
+  background: #f8fbfa;
 }
 
 .category-emoji {
   display: grid;
-  width: 72rpx;
-  height: 72rpx;
+  width: 68rpx;
+  height: 68rpx;
   flex: 0 0 auto;
   place-items: center;
-  border-radius: 22rpx;
-  background: #f1f4fb;
-  font-size: 36rpx;
+  border-radius: 18rpx;
+  background: #e5f5ef;
+  font-size: 34rpx;
 }
 
 .category-copy {
@@ -55,22 +91,38 @@
   min-width: 0;
   flex: 1;
   flex-direction: column;
-  margin-left: 18rpx;
+  margin-left: 17rpx;
 }
 
 .category-name {
-  color: #303b53;
-  font-size: 29rpx;
-  font-weight: 720;
+  color: #203633;
+  font-size: 28rpx;
+  font-weight: 770;
 }
 
 .category-description {
   overflow: hidden;
-  margin-top: 6rpx;
-  color: #8c94a4;
-  font-size: 21rpx;
+  margin-top: 4rpx;
+  color: #83918d;
+  font-size: 20rpx;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.category-track {
+  width: 150rpx;
+  height: 6rpx;
+  margin-top: 9rpx;
+  overflow: hidden;
+  border-radius: 6rpx;
+  background: #e7eeeb;
+}
+
+.category-track view {
+  min-width: 3rpx;
+  height: 100%;
+  border-radius: 6rpx;
+  background: #12a37f;
 }
 
 .category-right {
@@ -78,19 +130,19 @@
   flex: 0 0 auto;
   align-items: flex-end;
   flex-direction: column;
-  margin-left: 14rpx;
+  margin-left: 12rpx;
 }
 
 .category-stars {
-  color: #627aba;
-  font-size: 21rpx;
-  font-weight: 650;
+  color: #4f746b;
+  font-size: 19rpx;
+  font-weight: 700;
 }
 
 .category-chevron {
-  margin-top: 6rpx;
-  color: #a3aab7;
-  font-size: 30rpx;
+  margin-top: 4rpx;
+  color: #85938f;
+  font-size: 29rpx;
   transition: transform 0.2s ease;
 }
 
@@ -99,62 +151,67 @@
 }
 
 .level-area {
-  padding: 0 20rpx 24rpx;
-  border-top: 2rpx solid #f0f2f6;
+  padding: 0 18rpx 20rpx;
+  border-top: 2rpx solid #e9efed;
+  background: #ffffff;
 }
 
 .difficulty-line {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 18rpx 4rpx;
-  color: #949baa;
-  font-size: 20rpx;
+  justify-content: center;
+  gap: 14rpx;
+  padding: 16rpx 4rpx;
+  color: #8b9894;
+  font-size: 18rpx;
 }
 
 .difficulty-dots {
   display: flex;
-  gap: 9rpx;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 240rpx;
 }
 
 .difficulty-dots view {
-  width: 11rpx;
-  height: 11rpx;
+  width: 10rpx;
+  height: 10rpx;
   border-radius: 50%;
-  background: #65a778;
+  background: #57ad85;
 }
 
-.difficulty-dots view:nth-child(2) { background: #91a85c; }
-.difficulty-dots view:nth-child(3) { background: #cca04b; }
-.difficulty-dots view:nth-child(4) { background: #d77b48; }
-.difficulty-dots view:nth-child(5) { background: #c95a5e; }
+.difficulty-dots view:nth-child(2) { background: #94ad59; }
+.difficulty-dots view:nth-child(3) { background: #d2a543; }
+.difficulty-dots view:nth-child(4) { background: #d77a43; }
+.difficulty-dots view:nth-child(5) { background: #d45b61; }
 
 .level-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12rpx;
+  gap: 10rpx;
 }
 
 .level-button {
-  min-height: 112rpx;
-  padding: 12rpx 4rpx;
-  border: 2rpx solid #dfe7f5;
+  min-height: 100rpx;
+  padding: 10rpx 3rpx;
+  border: 2rpx solid #d7e5df;
   border-top-width: 5rpx;
-  border-radius: 18rpx;
-  background: #fbfcff;
-  line-height: 1.25;
+  border-radius: 16rpx;
+  background: #fbfdfc;
+  line-height: 1.15;
 }
 
-.level-button.difficulty-1 { border-top-color: #65a778; }
-.level-button.difficulty-2 { border-top-color: #91a85c; }
-.level-button.difficulty-3 { border-top-color: #cca04b; }
-.level-button.difficulty-4 { border-top-color: #d77b48; }
-.level-button.difficulty-5 { border-top-color: #c95a5e; }
+.level-button.difficulty-1 { border-top-color: #57ad85; }
+.level-button.difficulty-2 { border-top-color: #94ad59; }
+.level-button.difficulty-3 { border-top-color: #d2a543; }
+.level-button.difficulty-4 { border-top-color: #d77a43; }
+.level-button.difficulty-5 { border-top-color: #d45b61; }
 
 .level-button.locked {
-  border-color: #e7e9ee;
-  background: #f4f5f7;
-  color: #a9aeb8;
+  border-color: #e2e8e6;
+  background: #f2f5f4;
+  color: #a1aaa7;
 }
 
 .level-number,
@@ -164,26 +221,26 @@
 }
 
 .level-number {
-  color: #3d4a64;
-  font-size: 27rpx;
-  font-weight: 750;
+  color: #283d3a;
+  font-size: 26rpx;
+  font-weight: 820;
 }
 
 .level-label {
-  margin-top: 4rpx;
-  color: #7d8799;
-  font-size: 18rpx;
+  margin-top: 3rpx;
+  color: #788884;
+  font-size: 17rpx;
 }
 
 .level-stars {
   margin-top: 5rpx;
-  color: #d09a38;
-  font-size: 17rpx;
+  color: #d79a2c;
+  font-size: 15rpx;
   letter-spacing: -1rpx;
 }
 
 .locked .level-number,
 .locked .level-label,
 .locked .level-stars {
-  color: #a9aeb8;
+  color: #a1aaa7;
 }

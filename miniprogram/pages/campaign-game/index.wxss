@@ -1,18 +1,28 @@
+.level-page {
+  display: flex;
+  height: 100vh;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: 20rpx;
+  padding-bottom: calc(22rpx + env(safe-area-inset-bottom));
+}
+
 .level-heading {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
-  padding: 24rpx;
 }
 
 .level-icon {
   display: grid;
-  width: 78rpx;
-  height: 78rpx;
+  width: 68rpx;
+  height: 68rpx;
   flex: 0 0 auto;
   place-items: center;
-  border-radius: 22rpx;
-  background: #f1f4fb;
-  font-size: 38rpx;
+  border-radius: 18rpx;
+  background: #e3f5ef;
+  font-size: 34rpx;
 }
 
 .level-copy {
@@ -20,175 +30,220 @@
   min-width: 0;
   flex: 1;
   flex-direction: column;
-  margin-left: 18rpx;
+  margin-left: 16rpx;
 }
 
 .level-category {
-  color: #7e8798;
-  font-size: 22rpx;
+  color: #768681;
+  font-size: 20rpx;
 }
 
 .level-name {
-  margin-top: 6rpx;
-  color: #303b53;
+  margin-top: 4rpx;
+  color: #203633;
   font-size: 30rpx;
-  font-weight: 730;
+  font-weight: 790;
 }
 
 .difficulty-badge {
-  margin-left: 14rpx;
-  padding: 9rpx 14rpx;
-  border-radius: 14rpx;
-  background: #edf6ef;
-  color: #4d8c61;
-  font-size: 20rpx;
-  font-weight: 700;
+  margin-left: 12rpx;
+  padding: 8rpx 13rpx;
+  border-radius: 12rpx;
+  background: #def4eb;
+  color: #18765e;
+  font-size: 18rpx;
+  font-weight: 750;
 }
 
-.difficulty-badge.difficulty-3 { background: #fff5df; color: #a97922; }
-.difficulty-badge.difficulty-4 { background: #fff0e8; color: #b76838; }
-.difficulty-badge.difficulty-5 { background: #ffebed; color: #b84f55; }
+.difficulty-badge.difficulty-3 { background: #fff0d1; color: #9d681d; }
+.difficulty-badge.difficulty-4 { background: #ffeadf; color: #aa5e36; }
+.difficulty-badge.difficulty-5 { background: #ffe3e5; color: #ad484e; }
 
-.level-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16rpx;
+.level-summary {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  min-height: 106rpx;
   margin-top: 18rpx;
-}
-
-.level-stats view {
-  padding: 20rpx 24rpx;
+  padding: 16rpx 22rpx;
   border-radius: 22rpx;
-  background: #eaf0ff;
-  color: #657089;
+  background: #17343b;
+  color: #ffffff;
 }
 
-.level-stats view:last-child {
-  background: #edf8f1;
+.level-summary > view {
+  display: flex;
+  align-items: baseline;
+  color: #9fb8b3;
+  font-size: 18rpx;
 }
 
-.level-stats text {
+.level-summary .summary-number {
+  margin-left: 10rpx;
+  color: #ffffff;
+  font-size: 38rpx;
+  font-weight: 830;
+}
+
+.level-summary .summary-number.accent {
+  color: #ffc857;
+}
+
+.summary-unit {
+  margin-left: 4rpx;
+  color: #b4c9c5;
+  font-size: 18rpx;
+}
+
+.summary-rule {
+  width: 2rpx;
+  height: 48rpx;
+  margin: 0 18rpx;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.summary-hint {
+  margin-left: auto;
+  color: #8fa9a4;
+  font-size: 17rpx;
+  line-height: 1.5;
+  text-align: right;
+}
+
+.summary-hint text {
   display: block;
-  margin-bottom: 4rpx;
-  font-size: 21rpx;
-}
-
-.level-stats .stat-number {
-  color: #5575c3;
-  font-size: 42rpx;
-  font-weight: 780;
-}
-
-.level-stats view:last-child .stat-number {
-  color: #388d62;
-}
-
-.level-stats .stat-unit {
-  margin-left: 7rpx;
-  font-size: 20rpx;
 }
 
 .history-panel {
-  margin-top: 18rpx;
-  padding: 24rpx;
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  margin-top: 14rpx;
+  padding: 19rpx 22rpx 8rpx;
+  border: 2rpx solid #dce7e3;
+  border-radius: 22rpx;
+  background: #ffffff;
 }
 
 .history-title-row {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: space-between;
 }
 
 .history-title-row > text:last-child {
-  color: #9aa1af;
-  font-size: 21rpx;
+  color: #8d9a96;
+  font-size: 19rpx;
 }
 
 .history-scroll {
-  height: 520rpx;
-  margin-top: 20rpx;
+  height: auto;
+  min-height: 0;
+  flex: 1;
+  margin-top: 9rpx;
 }
 
 .result-note {
-  margin-top: 16rpx;
-  padding: 18rpx 22rpx;
-  border-radius: 18rpx;
-  background: #fff5e8;
-  color: #a26d27;
-  font-size: 24rpx;
+  flex: 0 0 auto;
+  margin-top: 11rpx;
+  padding: 15rpx 20rpx;
+  border-radius: 15rpx;
+  background: #fff0d8;
+  color: #96601f;
+  font-size: 21rpx;
   text-align: center;
 }
 
-.guess-panel {
-  margin-top: 16rpx;
-  padding: 22rpx;
+.guess-dock {
+  flex: 0 0 auto;
+  padding-top: 13rpx;
+  background: #f3f7f5;
 }
 
 .guess-row {
   display: flex;
-  gap: 12rpx;
+  gap: 11rpx;
 }
 
 .guess-row .text-input {
   min-width: 0;
   flex: 1;
+  background: #ffffff;
 }
 
 .guess-button {
-  width: 116rpx;
-  height: 88rpx;
-  border-radius: 24rpx;
-  background: linear-gradient(135deg, #7468df, #5b78c7);
+  width: 112rpx;
+  height: 86rpx;
+  border-radius: 20rpx;
+  background: #12a37f;
   color: #ffffff;
-  font-size: 27rpx;
-  font-weight: 700;
-  line-height: 88rpx;
+  font-size: 25rpx;
+  font-weight: 770;
+  line-height: 86rpx;
+  box-shadow: 0 8rpx 18rpx rgba(18, 163, 127, 0.18);
 }
 
 .guess-button[disabled] {
-  opacity: 0.45;
+  opacity: 0.4;
+  box-shadow: none;
 }
 
 .level-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 20rpx;
-  padding: 0 6rpx;
+  margin-top: 12rpx;
+  padding: 0 4rpx;
 }
 
 .level-actions button,
 .retry-button {
-  color: #627bb8;
-  font-size: 22rpx;
+  color: #277d69;
+  font-size: 20rpx;
   line-height: 1.5;
 }
 
 .complete-panel {
   display: flex;
   align-items: center;
+  justify-content: center;
+  min-height: 0;
+  flex: 1;
   flex-direction: column;
-  margin-top: 22rpx;
-  padding: 50rpx 34rpx 34rpx;
   text-align: center;
 }
 
+.complete-emblem {
+  display: grid;
+  width: 104rpx;
+  height: 104rpx;
+  place-items: center;
+  border-radius: 50%;
+  background: #dff6ed;
+  color: #0b8666;
+  font-size: 48rpx;
+  font-weight: 850;
+}
+
 .complete-title {
-  color: #337e57;
+  margin-top: 24rpx;
+  color: #173d36;
   font-size: 38rpx;
-  font-weight: 780;
+  font-weight: 820;
 }
 
 .complete-answer {
-  margin-top: 14rpx;
-  color: #667084;
-  font-size: 25rpx;
+  margin-top: 10rpx;
+  color: #6e7e79;
+  font-size: 23rpx;
 }
 
 .complete-stars {
-  margin: 24rpx 0 32rpx;
-  color: #e5aa35;
-  font-size: 58rpx;
-  letter-spacing: 8rpx;
+  margin: 22rpx 0 32rpx;
+  color: #e3a22d;
+  font-size: 54rpx;
+  letter-spacing: 7rpx;
 }
 
 .complete-panel .primary-button {
@@ -196,5 +251,14 @@
 }
 
 .retry-button {
-  margin-top: 24rpx;
+  margin-top: 20rpx;
+}
+
+@media (max-height: 650px) {
+  .level-summary {
+    min-height: 92rpx;
+    margin-top: 13rpx;
+    padding-top: 12rpx;
+    padding-bottom: 12rpx;
+  }
 }

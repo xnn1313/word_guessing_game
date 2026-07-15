@@ -11,9 +11,9 @@
   ],
   "window": {
     "navigationBarTitleText": "猜词游戏",
-    "navigationBarBackgroundColor": "#f4f6fb",
+    "navigationBarBackgroundColor": "#f3f7f5",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#f4f6fb",
+    "backgroundColor": "#f3f7f5",
     "backgroundTextStyle": "dark"
   },
   "style": "v2",

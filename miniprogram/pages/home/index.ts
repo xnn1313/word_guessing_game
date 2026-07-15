@@ -4,12 +4,14 @@ Page({
   data: {
     loggedIn: false,
     username: "",
+    avatarText: "?",
   },
 
   onShow() {
     this.setData({
       loggedIn: isLoggedIn(),
       username: getUsername(),
+      avatarText: getUsername().slice(0, 1) || "?",
     });
   },
 

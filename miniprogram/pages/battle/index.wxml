@@ -1,26 +1,38 @@
 <view class="page-shell battle-lobby">
   <view class="page-title">双人竞速</view>
-  <view class="page-subtitle">两个人面对同一个隐藏词，90 秒内先猜中者获胜。</view>
+  <view class="page-subtitle">同一个隐藏词，90 秒内率先猜中者获胜。</view>
 
-  <view class="battle-visual surface">
-    <view class="player-orb left">你</view>
-    <view class="versus">VS</view>
-    <view class="player-orb right">友</view>
+  <view class="battle-visual">
+    <view class="player-side left">
+      <view class="player-orb">你</view>
+      <text>我的进度</text>
+    </view>
+    <view class="versus">
+      <text>VS</text>
+      <view>90 秒</view>
+    </view>
+    <view class="player-side right">
+      <view class="player-orb">友</view>
+      <text>好友进度</text>
+    </view>
     <view class="battle-line"></view>
   </view>
 
-  <button class="primary-button create-button" loading="{{creating}}" disabled="{{creating || checking}}" bindtap="createRoom">创建双人房间</button>
+  <button class="primary-button create-button" loading="{{creating}}" disabled="{{creating || checking}}" bindtap="createRoom">创建房间，邀请好友</button>
 
-  <view class="join-divider"><text></text><view>加入好友房间</view><text></text></view>
+  <view class="join-heading">
+    <text>已有房间码？</text>
+    <text>输入好友发来的 6 位代码</text>
+  </view>
 
-  <view class="join-panel surface">
-    <input class="room-input" value="{{joinCode}}" maxlength="6" placeholder="六位房间码" bindinput="onCodeInput" confirm-type="done" bindconfirm="joinRoom" />
-    <button class="secondary-button" loading="{{joining}}" disabled="{{joining || joinCode.length !== 6}}" bindtap="joinRoom">加入比赛</button>
+  <view class="join-panel">
+    <input class="room-input" value="{{joinCode}}" maxlength="6" placeholder="房间码" bindinput="onCodeInput" confirm-type="done" bindconfirm="joinRoom" />
+    <button class="join-button" loading="{{joining}}" disabled="{{joining || joinCode.length !== 6}}" bindtap="joinRoom">加入</button>
   </view>
 
   <view class="battle-rules">
-    <view><text>1</text><view>两人到齐后，由房主开始比赛</view></view>
-    <view><text>2</text><view>只同步次数和最高相似度，不泄露猜词</view></view>
-    <view><text>3</text><view>结束后双方确认，即可原房间再战</view></view>
+    <view><text>01</text><view><text>等待好友</text><text>两人到齐后，由房主开始比赛</text></view></view>
+    <view><text>02</text><view><text>实时追赶</text><text>同步双方次数和最高相似度</text></view></view>
+    <view><text>03</text><view><text>原房再战</text><text>比赛结束后可直接再来一局</text></view></view>
   </view>
 </view>
