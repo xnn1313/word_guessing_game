@@ -1,0 +1,10 @@
+.venv/
+**/__pycache__/
+*.pyc
+backend/.env
+backend/word_guessing_game.db*
+miniprogram/project.private.config.json
+miniprogram/node_modules/
+miniprogram/miniprogram_npm/
+word-guessing-miniprogram-dev.zip
+backend/app.log

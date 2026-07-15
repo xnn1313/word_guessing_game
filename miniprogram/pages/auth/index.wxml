@@ -1,0 +1,29 @@
+<view class="page-shell auth-page">
+  <view class="auth-intro">
+    <view class="auth-mark">词</view>
+    <view class="page-title">保存你的进度</view>
+    <view class="page-subtitle">登录后同步经典记录、闯关星级和双人题目历史。</view>
+  </view>
+
+  <view class="auth-panel surface">
+    <view class="auth-tabs">
+      <button class="auth-tab {{mode === 'login' ? 'active' : ''}}" data-mode="login" bindtap="switchMode">登录</button>
+      <button class="auth-tab {{mode === 'register' ? 'active' : ''}}" data-mode="register" bindtap="switchMode">注册</button>
+    </view>
+
+    <view class="field">
+      <text class="field-label">用户名</text>
+      <input class="text-input" value="{{username}}" maxlength="24" placeholder="2–24 个字符" bindinput="onUsernameInput" />
+    </view>
+    <view class="field">
+      <text class="field-label">密码</text>
+      <input class="text-input" value="{{password}}" password maxlength="128" placeholder="至少 6 个字符" bindinput="onPasswordInput" confirm-type="done" bindconfirm="submit" />
+    </view>
+
+    <button class="primary-button submit-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submit">
+      {{mode === 'login' ? '登录并恢复存档' : '注册并开始游戏'}}
+    </button>
+  </view>
+
+  <view class="auth-footnote">开发版暂时使用原有账号；接入 AppID 后可升级为微信快捷登录。</view>
+</view>

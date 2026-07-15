@@ -1,0 +1,80 @@
+.auth-page {
+  background:
+    radial-gradient(circle at 50% -10%, rgba(116, 104, 223, 0.16), transparent 38%),
+    #f4f6fb;
+}
+
+.auth-intro {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 38rpx 20rpx 44rpx;
+  text-align: center;
+}
+
+.auth-mark {
+  display: grid;
+  width: 112rpx;
+  height: 112rpx;
+  margin-bottom: 24rpx;
+  place-items: center;
+  border-radius: 32rpx;
+  background: linear-gradient(135deg, #7468df, #5b78c7);
+  color: #ffffff;
+  font-size: 52rpx;
+  font-weight: 800;
+  box-shadow: 0 16rpx 34rpx rgba(91, 120, 199, 0.25);
+}
+
+.auth-panel {
+  padding: 28rpx;
+}
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8rpx;
+  margin-bottom: 28rpx;
+  padding: 8rpx;
+  border-radius: 22rpx;
+  background: #f0f3f8;
+}
+
+.auth-tab {
+  height: 68rpx;
+  border-radius: 18rpx;
+  color: #7c8494;
+  font-size: 27rpx;
+  line-height: 68rpx;
+}
+
+.auth-tab.active {
+  background: #ffffff;
+  color: #4d69b3;
+  font-weight: 700;
+  box-shadow: 0 5rpx 16rpx rgba(58, 73, 106, 0.08);
+}
+
+.field + .field {
+  margin-top: 24rpx;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 12rpx;
+  color: #4f586b;
+  font-size: 25rpx;
+  font-weight: 650;
+}
+
+.submit-button {
+  margin-top: 34rpx;
+}
+
+.auth-footnote {
+  padding: 28rpx 36rpx;
+  color: #9299a8;
+  font-size: 22rpx;
+  line-height: 1.6;
+  text-align: center;
+}

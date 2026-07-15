@@ -1,0 +1,7 @@
+<view class="history-list" wx:if="{{items.length}}">
+  <view class="history-row {{item.latest ? 'latest' : ''}}" wx:for="{{items}}" wx:key="_index">
+    <text class="history-word">{{item.word}}</text>
+    <text class="history-value tone-{{item.tone}}">{{item.displaySimilarity}}</text>
+  </view>
+</view>
+<view class="history-empty" wx:else>{{emptyText}}</view>

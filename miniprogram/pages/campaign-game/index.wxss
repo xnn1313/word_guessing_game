@@ -1,0 +1,200 @@
+.level-heading {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+}
+
+.level-icon {
+  display: grid;
+  width: 78rpx;
+  height: 78rpx;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 22rpx;
+  background: #f1f4fb;
+  font-size: 38rpx;
+}
+
+.level-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  margin-left: 18rpx;
+}
+
+.level-category {
+  color: #7e8798;
+  font-size: 22rpx;
+}
+
+.level-name {
+  margin-top: 6rpx;
+  color: #303b53;
+  font-size: 30rpx;
+  font-weight: 730;
+}
+
+.difficulty-badge {
+  margin-left: 14rpx;
+  padding: 9rpx 14rpx;
+  border-radius: 14rpx;
+  background: #edf6ef;
+  color: #4d8c61;
+  font-size: 20rpx;
+  font-weight: 700;
+}
+
+.difficulty-badge.difficulty-3 { background: #fff5df; color: #a97922; }
+.difficulty-badge.difficulty-4 { background: #fff0e8; color: #b76838; }
+.difficulty-badge.difficulty-5 { background: #ffebed; color: #b84f55; }
+
+.level-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+  margin-top: 18rpx;
+}
+
+.level-stats view {
+  padding: 20rpx 24rpx;
+  border-radius: 22rpx;
+  background: #eaf0ff;
+  color: #657089;
+}
+
+.level-stats view:last-child {
+  background: #edf8f1;
+}
+
+.level-stats text {
+  display: block;
+  margin-bottom: 4rpx;
+  font-size: 21rpx;
+}
+
+.level-stats .stat-number {
+  color: #5575c3;
+  font-size: 42rpx;
+  font-weight: 780;
+}
+
+.level-stats view:last-child .stat-number {
+  color: #388d62;
+}
+
+.level-stats .stat-unit {
+  margin-left: 7rpx;
+  font-size: 20rpx;
+}
+
+.history-panel {
+  margin-top: 18rpx;
+  padding: 24rpx;
+}
+
+.history-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.history-title-row > text:last-child {
+  color: #9aa1af;
+  font-size: 21rpx;
+}
+
+.history-scroll {
+  height: 520rpx;
+  margin-top: 20rpx;
+}
+
+.result-note {
+  margin-top: 16rpx;
+  padding: 18rpx 22rpx;
+  border-radius: 18rpx;
+  background: #fff5e8;
+  color: #a26d27;
+  font-size: 24rpx;
+  text-align: center;
+}
+
+.guess-panel {
+  margin-top: 16rpx;
+  padding: 22rpx;
+}
+
+.guess-row {
+  display: flex;
+  gap: 12rpx;
+}
+
+.guess-row .text-input {
+  min-width: 0;
+  flex: 1;
+}
+
+.guess-button {
+  width: 116rpx;
+  height: 88rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #7468df, #5b78c7);
+  color: #ffffff;
+  font-size: 27rpx;
+  font-weight: 700;
+  line-height: 88rpx;
+}
+
+.guess-button[disabled] {
+  opacity: 0.45;
+}
+
+.level-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20rpx;
+  padding: 0 6rpx;
+}
+
+.level-actions button,
+.retry-button {
+  color: #627bb8;
+  font-size: 22rpx;
+  line-height: 1.5;
+}
+
+.complete-panel {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 22rpx;
+  padding: 50rpx 34rpx 34rpx;
+  text-align: center;
+}
+
+.complete-title {
+  color: #337e57;
+  font-size: 38rpx;
+  font-weight: 780;
+}
+
+.complete-answer {
+  margin-top: 14rpx;
+  color: #667084;
+  font-size: 25rpx;
+}
+
+.complete-stars {
+  margin: 24rpx 0 32rpx;
+  color: #e5aa35;
+  font-size: 58rpx;
+  letter-spacing: 8rpx;
+}
+
+.complete-panel .primary-button {
+  width: 100%;
+}
+
+.retry-button {
+  margin-top: 24rpx;
+}

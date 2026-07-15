@@ -1,0 +1,91 @@
+.profile-page {
+  background:
+    radial-gradient(circle at 92% 0, rgba(91, 120, 199, 0.12), transparent 34%),
+    #f4f6fb;
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+}
+
+.profile-avatar {
+  display: grid;
+  width: 102rpx;
+  height: 102rpx;
+  place-items: center;
+  border-radius: 30rpx;
+  background: linear-gradient(135deg, #7468df, #5b78c7);
+  color: #ffffff;
+  font-size: 42rpx;
+  font-weight: 800;
+}
+
+.guest .profile-avatar {
+  background: #e7eaf1;
+  color: #7c8494;
+}
+
+.profile-info {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  margin-left: 24rpx;
+}
+
+.profile-name {
+  overflow: hidden;
+  font-size: 34rpx;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-state {
+  margin-top: 8rpx;
+  color: #748f7e;
+  font-size: 24rpx;
+}
+
+.progress-panel {
+  margin-top: 24rpx;
+  padding: 30rpx;
+}
+
+.progress-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.progress-number {
+  color: #5872b8;
+  font-size: 25rpx;
+  font-weight: 700;
+}
+
+.progress-track {
+  height: 16rpx;
+  margin-top: 28rpx;
+  overflow: hidden;
+  border-radius: 8rpx;
+  background: #e9edf5;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 8rpx;
+  background: linear-gradient(90deg, #7468df, #5b8def);
+}
+
+.progress-note {
+  margin-top: 18rpx;
+  color: #9299a8;
+  font-size: 23rpx;
+}
+
+.profile-action {
+  margin-top: 30rpx;
+}

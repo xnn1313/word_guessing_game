@@ -1,0 +1,56 @@
+<view class="page-shell home-page">
+  <view class="home-header">
+    <view>
+      <view class="page-title">猜词游戏</view>
+      <view class="page-subtitle">输入一个词，根据关联度一步步靠近答案。</view>
+    </view>
+    <button class="account-button" bindtap="openProfile">
+      <text class="account-dot {{loggedIn ? 'online' : ''}}"></text>
+      <text>{{loggedIn ? username : '登录'}}</text>
+    </button>
+  </view>
+
+  <view class="hero surface">
+    <view class="hero-orbit orbit-one"></view>
+    <view class="hero-orbit orbit-two"></view>
+    <view class="hero-word">词</view>
+    <view class="hero-copy">
+      <text class="hero-title">今天能几次猜中？</text>
+      <text class="hero-note">语义越接近，百分比越高</text>
+    </view>
+  </view>
+
+  <view class="mode-list">
+    <button class="mode-row classic" bindtap="openClassic">
+      <view class="mode-icon">猜</view>
+      <view class="mode-copy">
+        <text class="mode-title">经典猜词</text>
+        <text class="mode-description">无限尝试，沿着相似度寻找答案</text>
+      </view>
+      <text class="mode-arrow">›</text>
+    </button>
+
+    <button class="mode-row campaign" bindtap="openCampaign">
+      <view class="mode-icon">关</view>
+      <view class="mode-copy">
+        <text class="mode-title">分类闯关</text>
+        <text class="mode-description">13 个分类、260 关，难度逐步提升</text>
+      </view>
+      <text class="mode-arrow">›</text>
+    </button>
+
+    <button class="mode-row battle" bindtap="openBattle">
+      <view class="mode-icon">竞</view>
+      <view class="mode-copy">
+        <text class="mode-title">双人竞速</text>
+        <text class="mode-description">邀请好友，90 秒内抢先猜中</text>
+      </view>
+      <text class="mode-arrow">›</text>
+    </button>
+  </view>
+
+  <view class="save-hint {{loggedIn ? 'saved' : ''}}">
+    <text class="save-dot"></text>
+    <text>{{loggedIn ? '账号进度已自动保存' : '登录后可保存闯关和双人记录'}}</text>
+  </view>
+</view>

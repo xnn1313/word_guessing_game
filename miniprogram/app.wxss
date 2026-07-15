@@ -1,0 +1,133 @@
+page {
+  --color-bg: #f4f6fb;
+  --color-surface: #ffffff;
+  --color-primary: #5b78c7;
+  --color-primary-dark: #405fae;
+  --color-purple: #7468df;
+  --color-text: #27334d;
+  --color-muted: #7d879c;
+  --color-border: #e7ebf3;
+  --color-success: #369064;
+  --color-warning: #c9822a;
+  --color-danger: #c9545b;
+  min-height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 28rpx;
+}
+
+view,
+text,
+button,
+input,
+scroll-view {
+  box-sizing: border-box;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  line-height: 1.4;
+}
+
+button::after {
+  border: none;
+}
+
+.page-shell {
+  min-height: 100vh;
+  padding: 32rpx 28rpx calc(48rpx + env(safe-area-inset-bottom));
+}
+
+.surface {
+  border: 2rpx solid var(--color-border);
+  border-radius: 30rpx;
+  background: var(--color-surface);
+  box-shadow: 0 12rpx 36rpx rgba(43, 57, 88, 0.07);
+}
+
+.page-title {
+  font-size: 48rpx;
+  font-weight: 750;
+  letter-spacing: 2rpx;
+}
+
+.page-subtitle {
+  margin-top: 10rpx;
+  color: var(--color-muted);
+  font-size: 26rpx;
+  line-height: 1.65;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.primary-button,
+.secondary-button,
+.danger-button {
+  min-height: 88rpx;
+  border-radius: 24rpx;
+  font-size: 29rpx;
+  font-weight: 700;
+  line-height: 88rpx;
+  text-align: center;
+}
+
+.primary-button {
+  background: linear-gradient(135deg, var(--color-purple), var(--color-primary));
+  color: #ffffff;
+  box-shadow: 0 10rpx 24rpx rgba(91, 120, 199, 0.24);
+}
+
+.secondary-button {
+  border: 2rpx solid #cad5ee;
+  background: #f7f9ff;
+  color: var(--color-primary-dark);
+}
+
+.danger-button {
+  border: 2rpx solid #f0d6d8;
+  background: #fff8f8;
+  color: var(--color-danger);
+}
+
+.primary-button[disabled],
+.secondary-button[disabled],
+.danger-button[disabled] {
+  opacity: 0.45;
+}
+
+.text-input {
+  width: 100%;
+  height: 88rpx;
+  padding: 0 28rpx;
+  border: 2rpx solid var(--color-border);
+  border-radius: 24rpx;
+  background: #ffffff;
+  color: var(--color-text);
+  font-size: 30rpx;
+}
+
+.text-input:focus {
+  border-color: #91a7df;
+}
+
+.empty-state {
+  padding: 60rpx 24rpx;
+  color: #a2a9b7;
+  font-size: 26rpx;
+  text-align: center;
+}
+
+.loading-state {
+  padding: 120rpx 24rpx;
+  color: var(--color-muted);
+  text-align: center;
+}

@@ -1,0 +1,46 @@
+<view class="page-shell game-page">
+  <view class="game-heading">
+    <view>
+      <view class="page-title">经典猜词</view>
+      <view class="page-subtitle">根据关联度不断缩小答案范围</view>
+    </view>
+    <view class="live-dot"><text></text>进行中</view>
+  </view>
+
+  <view class="stat-grid">
+    <view class="stat-cell surface">
+      <text class="stat-label">本轮已猜</text>
+      <view><text class="stat-value primary">{{attempts}}</text><text class="stat-unit">次</text></view>
+    </view>
+    <view class="stat-cell surface">
+      <text class="stat-label">累计猜中</text>
+      <view><text class="stat-value success">{{correctCount}}</text><text class="stat-unit">词</text></view>
+    </view>
+  </view>
+
+  <view class="history-panel surface">
+    <view class="history-toolbar">
+      <text class="section-title">猜测记录</text>
+      <view class="sort-control">
+        <button class="sort-button {{sortMode === 'time' ? 'active' : ''}}" data-sort="time" bindtap="switchSort">最新</button>
+        <button class="sort-button {{sortMode === 'similarity' ? 'active' : ''}}" data-sort="similarity" bindtap="switchSort">相似度</button>
+      </view>
+    </view>
+    <scroll-view class="history-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+      <guess-history items="{{history}}" empty-text="开始猜测吧" />
+    </scroll-view>
+  </view>
+
+  <view class="result-banner {{resultSuccess ? 'success' : ''}}" wx:if="{{resultText}}">{{resultText}}</view>
+
+  <view class="guess-panel surface">
+    <view class="guess-row">
+      <input class="text-input guess-input" value="{{guess}}" maxlength="20" placeholder="输入任意中文词语" confirm-type="send" bindinput="onGuessInput" bindconfirm="submitGuess" />
+      <button class="submit-guess" loading="{{submitting}}" disabled="{{submitting || !guess}}" bindtap="submitGuess">猜</button>
+    </view>
+    <view class="game-actions">
+      <button class="action-text" bindtap="revealAnswer">查看答案 / 换题</button>
+      <button class="action-text danger" bindtap="resetGame">重置游戏</button>
+    </view>
+  </view>
+</view>

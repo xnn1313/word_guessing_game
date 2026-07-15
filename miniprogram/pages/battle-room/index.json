@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "双人房间",
+  "enableShareAppMessage": true,
+  "usingComponents": {
+    "guess-history": "/components/guess-history/index"
+  }
+}

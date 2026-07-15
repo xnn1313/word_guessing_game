@@ -1,0 +1,64 @@
+<view class="page-shell room-page" wx:if="{{state}}">
+  <view class="room-bar surface">
+    <button class="room-code" bindtap="copyCode">
+      <text>房间码</text>
+      <view>{{code}}</view>
+    </button>
+    <view class="room-status status-{{state.state}}">{{statusText}}</view>
+    <button class="leave-button" bindtap="leaveRoom">离开</button>
+  </view>
+
+  <view class="score-grid">
+    <view class="player-card surface {{player.is_self ? 'self' : ''}} {{player.empty ? 'empty' : ''}}" wx:for="{{players}}" wx:key="username" wx:for-item="player">
+      <view class="player-name">{{player.is_winner ? '🏆 ' : ''}}{{player.username}}</view>
+      <view class="player-role">{{player.roleText}}</view>
+      <view class="player-numbers">
+        <view><text>已猜</text><text class="score-number">{{player.attempts}}</text><text class="score-unit">次</text></view>
+        <view><text>最高</text><text class="score-number">{{player.displayBest}}</text></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="waiting-panel surface" wx:if="{{waiting}}">
+    <view class="waiting-rings"><text></text><text></text><text></text></view>
+    <view class="waiting-title">{{players[1].empty ? '等待好友加入' : '双方已到齐'}}</view>
+    <view class="waiting-note">点击房间码可复制，也可以直接分享给好友。</view>
+    <button class="primary-button" wx:if="{{isHost}}" disabled="{{!canStart}}" bindtap="startGame">
+      {{canStart ? '开始 90 秒比赛' : '等待另一名玩家'}}
+    </button>
+    <view class="guest-wait" wx:else>等待房主开始比赛</view>
+  </view>
+
+  <view class="arena surface" wx:if="{{playing}}">
+    <view class="timer-row">
+      <text>剩余时间</text>
+      <view class="timer-value {{timerUrgent ? 'urgent' : ''}}">{{remainingSeconds}}</view>
+      <text>秒</text>
+    </view>
+
+    <view class="guess-row">
+      <input class="text-input" value="{{guess}}" maxlength="20" placeholder="输入你的猜测" confirm-type="send" bindinput="onGuessInput" bindconfirm="submitGuess" />
+      <button class="guess-button" loading="{{submitting}}" disabled="{{submitting || !guess}}" bindtap="submitGuess">提交</button>
+    </view>
+
+    <view class="history-heading"><text class="section-title">我的猜测</text><text>最新在前</text></view>
+    <scroll-view class="battle-history" scroll-y enhanced show-scrollbar="{{false}}">
+      <guess-history items="{{history}}" empty-text="比赛开始了，输入第一个词吧" />
+    </scroll-view>
+  </view>
+
+  <view class="result-panel surface" wx:if="{{finished}}">
+    <view class="result-emblem">{{state.winner_username ? '🏆' : '◇'}}</view>
+    <view class="result-title">{{resultTitle}}</view>
+    <view class="result-answer">{{resultAnswer}}</view>
+    <button class="primary-button rematch-button" disabled="{{rematchDisabled}}" bindtap="requestRematch">{{rematchLabel}}</button>
+    <view class="result-history">
+      <view class="history-heading"><text class="section-title">本局我的猜测</text><text>最新在前</text></view>
+      <scroll-view class="battle-history finished-history" scroll-y enhanced show-scrollbar="{{false}}">
+        <guess-history items="{{history}}" empty-text="本局没有提交猜测" />
+      </scroll-view>
+    </view>
+  </view>
+</view>
+
+<view class="loading-state" wx:else>正在连接房间…</view>

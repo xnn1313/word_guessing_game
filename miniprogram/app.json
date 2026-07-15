@@ -1,0 +1,22 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/auth/index",
+    "pages/classic/index",
+    "pages/campaign/index",
+    "pages/campaign-game/index",
+    "pages/battle/index",
+    "pages/battle-room/index",
+    "pages/profile/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "猜词游戏",
+    "navigationBarBackgroundColor": "#f4f6fb",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f4f6fb",
+    "backgroundTextStyle": "dark"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

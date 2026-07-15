@@ -8,7 +8,10 @@ def load_words():
     path = os.path.join(os.path.dirname(__file__), config.WORD_BANK_FILE)
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
-    return data["words"]
+
+    # 闯关词库同时进入相似度校准和经典模式候选池。
+    import campaign
+    return list(dict.fromkeys(data["words"] + campaign.get_all_targets()))
 
 
 def get_random_target(exclude=None):

@@ -1,0 +1,13 @@
+{
+  "name": "word-guessing-miniprogram",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "validate": "node scripts/validate-project.mjs",
+    "check": "npm run typecheck && npm run validate"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

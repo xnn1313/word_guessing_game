@@ -1,0 +1,31 @@
+<view class="page-shell profile-page">
+  <view class="profile-card surface" wx:if="{{loggedIn}}">
+    <view class="profile-avatar">{{avatarText}}</view>
+    <view class="profile-info">
+      <text class="profile-name">{{username}}</text>
+      <text class="profile-state">进度已自动保存</text>
+    </view>
+  </view>
+
+  <view class="profile-card surface guest" wx:else>
+    <view class="profile-avatar">?</view>
+    <view class="profile-info">
+      <text class="profile-name">尚未登录</text>
+      <text class="profile-state">登录后可查看完整记录</text>
+    </view>
+  </view>
+
+  <view class="progress-panel surface" wx:if="{{loggedIn}}">
+    <view class="progress-label-row">
+      <text class="section-title">分类闯关</text>
+      <text class="progress-number">{{totalStars}} / {{maxStars}} 星</text>
+    </view>
+    <view class="progress-track">
+      <view class="progress-fill" style="width: {{maxStars ? totalStars / maxStars * 100 : 0}}%"></view>
+    </view>
+    <view class="progress-note">13 个分类 · 260 关 · 每关最高 3 星</view>
+  </view>
+
+  <button class="primary-button profile-action" wx:if="{{!loggedIn}}" bindtap="goLogin">登录 / 注册</button>
+  <button class="danger-button profile-action" wx:else bindtap="logout">退出登录</button>
+</view>

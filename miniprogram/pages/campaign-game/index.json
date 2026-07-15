@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "关卡挑战",
+  "usingComponents": {
+    "guess-history": "/components/guess-history/index"
+  }
+}

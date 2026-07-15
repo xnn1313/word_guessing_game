@@ -1,0 +1,292 @@
+.room-page {
+  padding-top: 24rpx;
+}
+
+.room-bar {
+  display: flex;
+  align-items: center;
+  padding: 18rpx 20rpx;
+}
+
+.room-code {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: flex-start;
+  flex-direction: column;
+  text-align: left;
+}
+
+.room-code text {
+  color: #979eac;
+  font-size: 18rpx;
+}
+
+.room-code view {
+  margin-top: 3rpx;
+  color: #405b9c;
+  font-size: 35rpx;
+  font-weight: 800;
+  letter-spacing: 7rpx;
+}
+
+.room-status {
+  margin: 0 16rpx;
+  padding: 9rpx 14rpx;
+  border-radius: 14rpx;
+  background: #fff3d9;
+  color: #9b6d1f;
+  font-size: 20rpx;
+  font-weight: 700;
+}
+
+.room-status.status-playing {
+  background: #eaf7ef;
+  color: #347d56;
+}
+
+.room-status.status-finished {
+  background: #eef1f7;
+  color: #667084;
+}
+
+.leave-button {
+  color: #b75c63;
+  font-size: 22rpx;
+}
+
+.score-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14rpx;
+  margin-top: 16rpx;
+}
+
+.player-card {
+  min-width: 0;
+  padding: 20rpx;
+}
+
+.player-card.self {
+  border-color: #9eb2e2;
+  background: #f7f9ff;
+}
+
+.player-card.empty {
+  border-style: dashed;
+  box-shadow: none;
+}
+
+.player-name {
+  overflow: hidden;
+  color: #354058;
+  font-size: 27rpx;
+  font-weight: 730;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-role {
+  overflow: hidden;
+  min-height: 34rpx;
+  margin-top: 4rpx;
+  color: #8d95a5;
+  font-size: 18rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-numbers {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 10rpx;
+  margin-top: 18rpx;
+}
+
+.player-numbers view {
+  min-width: 0;
+}
+
+.player-numbers text {
+  display: block;
+  margin-bottom: 3rpx;
+  color: #9299a7;
+  font-size: 18rpx;
+}
+
+.player-numbers .score-number {
+  color: #5371bb;
+  font-size: 28rpx;
+  font-weight: 780;
+}
+
+.player-numbers .score-unit {
+  margin-left: 4rpx;
+  color: #9299a7;
+  font-size: 17rpx;
+}
+
+.waiting-panel {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 18rpx;
+  padding: 52rpx 30rpx 30rpx;
+  text-align: center;
+}
+
+.waiting-rings {
+  display: flex;
+  gap: 14rpx;
+}
+
+.waiting-rings text {
+  width: 18rpx;
+  height: 18rpx;
+  border-radius: 50%;
+  background: #7890d2;
+  opacity: 0.35;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.waiting-rings text:nth-child(2) { animation-delay: 0.2s; }
+.waiting-rings text:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulse {
+  50% { opacity: 1; transform: translateY(-6rpx); }
+}
+
+.waiting-title {
+  margin-top: 24rpx;
+  font-size: 32rpx;
+  font-weight: 750;
+}
+
+.waiting-note {
+  margin: 12rpx 0 30rpx;
+  color: #8b93a3;
+  font-size: 23rpx;
+  line-height: 1.55;
+}
+
+.waiting-panel .primary-button {
+  width: 100%;
+}
+
+.guest-wait {
+  color: #7181a7;
+  font-size: 24rpx;
+}
+
+.arena,
+.result-panel {
+  margin-top: 18rpx;
+  padding: 24rpx;
+}
+
+.timer-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10rpx;
+  color: #8b93a3;
+  font-size: 21rpx;
+}
+
+.timer-value {
+  color: #526fbb;
+  font-size: 54rpx;
+  font-weight: 820;
+}
+
+.timer-value.urgent {
+  color: #ca565d;
+}
+
+.guess-row {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+
+.guess-row .text-input {
+  min-width: 0;
+  flex: 1;
+}
+
+.guess-button {
+  width: 116rpx;
+  height: 88rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #7468df, #5b78c7);
+  color: #ffffff;
+  font-size: 27rpx;
+  font-weight: 700;
+  line-height: 88rpx;
+}
+
+.guess-button[disabled] {
+  opacity: 0.45;
+}
+
+.history-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24rpx;
+}
+
+.history-heading > text:last-child {
+  color: #9aa1ae;
+  font-size: 20rpx;
+}
+
+.battle-history {
+  height: 420rpx;
+  margin-top: 16rpx;
+}
+
+.result-panel {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.result-emblem {
+  display: grid;
+  width: 92rpx;
+  height: 92rpx;
+  place-items: center;
+  border-radius: 28rpx;
+  background: #edf3ff;
+  font-size: 42rpx;
+}
+
+.result-title {
+  margin-top: 20rpx;
+  color: #34405a;
+  font-size: 34rpx;
+  font-weight: 780;
+}
+
+.result-answer {
+  margin-top: 10rpx;
+  color: #6f788a;
+  font-size: 26rpx;
+}
+
+.rematch-button {
+  width: 100%;
+  margin-top: 28rpx;
+}
+
+.result-history {
+  width: 100%;
+  margin-top: 8rpx;
+  text-align: left;
+}
+
+.finished-history {
+  height: 300rpx;
+}

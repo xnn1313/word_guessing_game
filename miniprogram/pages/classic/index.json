@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "经典猜词",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "guess-history": "/components/guess-history/index"
+  }
+}

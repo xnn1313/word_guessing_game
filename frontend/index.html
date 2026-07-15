@@ -4,43 +4,141 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>猜词游戏</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260713-rematch">
 </head>
 <body>
-    <div class="game-container">
+    <div class="game-container" id="game-container">
         <header>
             <h1>猜词游戏</h1>
-            <button class="info-btn" id="info-btn">玩法简介</button>
+            <div class="header-actions">
+                <button class="auth-btn" id="auth-btn">登录 / 注册</button>
+                <div class="user-menu" id="user-menu" hidden>
+                    <span class="username" id="username"></span>
+                    <button class="logout-btn" id="logout-btn">退出</button>
+                </div>
+                <button class="info-btn" id="info-btn">玩法简介</button>
+            </div>
         </header>
 
-        <div class="stats">
-            <div class="stat-item">
-                <span class="stat-label">已猜</span>
-                <span class="stat-value current" id="attempts">0</span>
-                <span class="stat-label">次</span>
+        <div class="save-status guest" id="save-status">
+            <span class="save-status-dot"></span>
+            <span id="save-status-text">试玩模式：当前进度不会保存</span>
+        </div>
+
+        <div class="mode-switch" role="tablist" aria-label="游戏模式">
+            <button class="mode-btn active" id="classic-mode-btn" data-mode="classic" role="tab">经典猜词</button>
+            <button class="mode-btn" id="campaign-mode-btn" data-mode="campaign" role="tab">分类闯关</button>
+            <button class="mode-btn" id="battle-mode-btn" data-mode="battle" role="tab">双人竞速</button>
+        </div>
+
+        <section class="campaign-panel" id="campaign-panel" hidden>
+            <div class="campaign-heading">
+                <div>
+                    <span class="campaign-kicker">分类闯关</span>
+                    <h2>选择你的挑战</h2>
+                </div>
+                <div class="campaign-total"><span id="campaign-total-stars">0</span>/<span id="campaign-max-stars">780</span> ⭐</div>
             </div>
-            <div class="stat-item">
-                <span class="stat-label">已猜对</span>
-                <span class="stat-value count" id="correct-count">0</span>
-                <span class="stat-label">个词语</span>
+            <p class="campaign-intro">每个分类 20 关，每 4 关提升一档难度；通关即可解锁下一关。</p>
+            <div class="campaign-categories" id="campaign-categories"></div>
+        </section>
+
+        <section class="battle-panel" id="battle-panel" hidden>
+            <div id="battle-home">
+                <div class="battle-hero">
+                    <span class="battle-icon">⚔️</span>
+                    <h2>双人在线竞速</h2>
+                    <p>邀请一位好友，同时猜同一个隐藏词。先猜中者获胜。</p>
+                </div>
+                <button class="battle-primary-btn" id="create-battle-btn">创建双人房间</button>
+                <div class="battle-divider"><span>或者加入好友房间</span></div>
+                <div class="battle-join-row">
+                    <input id="battle-join-code" type="text" maxlength="6" autocomplete="off" placeholder="输入六位房间码" aria-label="六位房间码">
+                    <button id="join-battle-btn">加入</button>
+                </div>
             </div>
-        </div>
 
-        <div class="sort-bar">
-            <span class="sort-label">排序：</span>
-            <button class="sort-btn active" data-sort="similarity">按相似度</button>
-            <button class="sort-btn" data-sort="time">按时间</button>
-        </div>
-        <div class="history" id="history">
-            <div class="history-placeholder">开始猜测吧！</div>
-        </div>
+            <div id="battle-room" hidden>
+                <div class="battle-room-header">
+                    <div>
+                        <span class="battle-room-label">房间码</span>
+                        <strong id="battle-room-code">------</strong>
+                    </div>
+                    <span class="battle-status-badge" id="battle-status-text">等待玩家</span>
+                    <button class="battle-leave-btn" id="battle-leave-btn">离开</button>
+                </div>
 
-        <div class="input-area">
-            <input type="text" placeholder="任意输入一个词汇" id="guess-input" autocomplete="off">
-            <button class="guess-btn" id="guess-btn">猜测</button>
-        </div>
+                <div class="battle-live-grid waiting" id="battle-live-grid">
+                    <div class="battle-sidebar">
+                        <div class="battle-section-title">实时比分</div>
+                        <div class="battle-player-list" id="battle-player-list"></div>
 
-        <button class="reset-btn" id="reset-btn">新游戏</button>
+                        <div class="battle-waiting" id="battle-waiting-actions">
+                            <p>把房间码发给好友，两人到齐后由房主开始。</p>
+                            <button class="battle-primary-btn" id="battle-start-btn">等待另一名玩家</button>
+                        </div>
+                    </div>
+
+                    <div class="battle-arena" id="battle-arena" hidden>
+                        <div class="battle-timer" id="battle-timer-wrap"><span>剩余时间</span><strong id="battle-timer">90</strong><span>秒</span></div>
+                        <div class="battle-result" id="battle-result" hidden></div>
+                        <button class="battle-rematch-btn" id="battle-rematch-btn" hidden>再来一局</button>
+                        <div class="battle-input-row" id="battle-input-row">
+                            <input id="battle-input" type="text" autocomplete="off" placeholder="输入你的猜测">
+                            <button id="battle-guess-btn">提交</button>
+                        </div>
+                        <div class="battle-section-title">我的猜测 · 最新在前</div>
+                        <div class="battle-history" id="battle-history">
+                            <div class="history-placeholder">比赛开始后，这里显示你的猜测记录。</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="game-panel">
+            <div class="level-context" id="level-context" hidden>
+                <button class="back-levels-btn" id="back-levels-btn">← 返回选关</button>
+                <div class="level-context-title">
+                    <span id="level-category"></span>
+                    <strong id="level-name"></strong>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">已猜</span>
+                    <span class="stat-value current" id="attempts">0</span>
+                    <span class="stat-label">次</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label" id="secondary-stat-label">已猜对</span>
+                    <span class="stat-value count" id="correct-count">0</span>
+                    <span class="stat-label" id="secondary-stat-suffix">个词语</span>
+                </div>
+            </div>
+
+            <div class="sort-bar">
+                <span class="sort-label">排序：</span>
+                <button class="sort-btn active" data-sort="similarity">按相似度</button>
+                <button class="sort-btn" data-sort="time">按时间</button>
+            </div>
+            <div class="history" id="history">
+                <div class="history-placeholder">开始猜测吧！</div>
+            </div>
+
+            <div class="round-result" id="round-result" role="status" aria-live="polite"></div>
+
+            <div class="input-area">
+                <input type="text" placeholder="任意输入一个词汇" id="guess-input" autocomplete="off">
+                <button class="guess-btn" id="guess-btn">猜测</button>
+            </div>
+
+            <div class="game-actions">
+                <button class="reveal-btn" id="reveal-btn">查看答案 / 跳过本轮</button>
+                <button class="reset-btn" id="reset-btn">新游戏</button>
+            </div>
+        </section>
     </div>
 
     <div class="modal-overlay" id="modal-overlay">
@@ -53,11 +151,33 @@
                 <li>猜中一个词语后，会自动切换为下一个目标词语。</li>
                 <li>"已猜对词语数量"记录你累计猜中的不同词语总数。</li>
                 <li>点击"新游戏"按钮可重置所有进度。</li>
+                <li>分类闯关需要登录，共 13 个分类、260 关；完成当前关卡后会解锁下一关。</li>
+                <li>5 次内猜中得三星，10 次内得二星，其余得一星；重复挑战只保留更好成绩。</li>
+                <li>双人竞速需要两名登录玩家，房主创建房间后分享六位房间码，90 秒内先猜中者获胜；结束后双方确认“再来一局”即可自动换词再战。</li>
             </ol>
             <button class="close-btn" id="close-modal">知道了</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <div class="modal-overlay" id="auth-modal-overlay">
+        <div class="modal auth-modal">
+            <button class="modal-x" id="close-auth-modal" aria-label="关闭">×</button>
+            <h2>登录并保存进度</h2>
+            <p class="auth-description">注册后，猜词历史和游戏进度会自动保存。</p>
+            <form id="auth-form">
+                <label for="auth-username">用户名</label>
+                <input id="auth-username" name="username" type="text" minlength="2" maxlength="24" autocomplete="username" required placeholder="2–24 个字符">
+                <label for="auth-password">密码</label>
+                <input id="auth-password" name="password" type="password" minlength="6" maxlength="128" autocomplete="current-password" required placeholder="至少 6 个字符">
+                <div class="auth-error" id="auth-error" role="alert"></div>
+                <div class="auth-form-actions">
+                    <button class="auth-submit" id="login-btn" type="submit">登录</button>
+                    <button class="auth-register" id="register-btn" type="button">注册新账号</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js?v=20260713-rematch"></script>
 </body>
 </html>
