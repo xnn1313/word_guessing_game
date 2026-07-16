@@ -1,0 +1,526 @@
+openapi: 3.0.3
+info:
+  title: 益智游戏平台 API
+  version: puzzle-api-v1
+  description: 每日数独、成语填字、记忆翻牌和游戏大厅接口。成功直接返回 JSON，失败返回 Error。
+servers:
+  - url: /api
+security:
+  - {}
+  - bearerAuth: []
+paths:
+  /games/overview:
+    get:
+      summary: 游戏大厅汇总
+      responses:
+        '200':
+          description: 当前服务端日期和四款游戏概览
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GamesOverview'
+  /sudoku/puzzle:
+    get:
+      summary: 获取每日或练习数独
+      parameters:
+        - $ref: '#/components/parameters/ModeDailyPractice'
+        - $ref: '#/components/parameters/Difficulty'
+      responses:
+        '200':
+          description: 不包含完整答案的数独题目
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SudokuPuzzle'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /sudoku/save:
+    post:
+      summary: 保存数独云端进度
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SudokuSaveRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/Saved'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /sudoku/hint:
+    post:
+      summary: 获取一个数独提示
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SudokuHintRequest'
+      responses:
+        '200':
+          description: 一个尚未正确填写的格子
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [index, row, column, value, hints_used, remaining_hints]
+                properties:
+                  index: {type: integer, example: 10}
+                  row: {type: integer, example: 1}
+                  column: {type: integer, example: 1}
+                  value: {type: integer, example: 7}
+                  hints_used: {type: integer, example: 1}
+                  remaining_hints: {type: integer, example: 2}
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /sudoku/submit:
+    post:
+      summary: 校验并完成数独
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SudokuSubmitRequest'
+      responses:
+        '200':
+          description: 正确完成或幂等返回原结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Completion'
+        '422':
+          description: 答案不完整或不正确，不返回解答
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncorrectCells'
+  /idiom/catalog:
+    get:
+      summary: 获取成语关卡目录
+      responses:
+        '200':
+          description: 游客仅解锁每个分类第一关
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdiomCatalog'
+  /idiom/puzzle:
+    get:
+      summary: 获取每日或指定成语关卡
+      parameters:
+        - name: mode
+          in: query
+          required: true
+          schema: {type: string, enum: [daily, level]}
+        - $ref: '#/components/parameters/DifficultyOptional'
+        - name: level_id
+          in: query
+          schema: {type: string, maxLength: 80, example: idiom-001}
+      responses:
+        '200':
+          description: 不包含完整答案的交叉填字布局
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdiomPuzzle'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /idiom/save:
+    post:
+      summary: 保存成语填字云端进度
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdiomSaveRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/Saved'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /idiom/hint:
+    post:
+      summary: 揭示一个成语文字
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdiomHintRequest'
+      responses:
+        '200':
+          description: 提示文字和坐标
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  row: {type: integer, example: 0}
+                  column: {type: integer, example: 2}
+                  value: {type: string, example: 点}
+                  hints_used: {type: integer, example: 1}
+                  remaining_hints: {type: integer, example: 2}
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /idiom/submit:
+    post:
+      summary: 校验并完成成语题
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdiomSubmitRequest'
+      responses:
+        '200':
+          description: 正确完成或幂等返回原结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Completion'
+        '422':
+          description: 有未填或错误文字
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncorrectCells'
+  /memory/board:
+    get:
+      summary: 获取每日或练习翻牌布局
+      parameters:
+        - $ref: '#/components/parameters/ModeDailyPractice'
+        - $ref: '#/components/parameters/Difficulty'
+        - name: theme
+          in: query
+          schema: {type: string, enum: [classic, fruit, animal], default: classic}
+      responses:
+        '200':
+          description: 每个 face_key 恰好出现两次
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemoryBoard'
+  /memory/save:
+    post:
+      summary: 保存翻牌云端进度
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemoryProgressRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/Saved'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /memory/submit:
+    post:
+      summary: 保存翻牌完成结果
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemoryProgressRequest'
+      responses:
+        '200':
+          description: 正确完成或幂等返回原结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Completion'
+        '422':
+          description: 仍有未匹配牌面
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  correct: {type: boolean, example: false}
+                  status: {type: string, example: incorrect}
+                  unmatched_count: {type: integer, example: 2}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque-token
+  parameters:
+    ModeDailyPractice:
+      name: mode
+      in: query
+      required: true
+      schema: {type: string, enum: [daily, practice]}
+    Difficulty:
+      name: difficulty
+      in: query
+      required: true
+      schema: {type: string, enum: [easy, medium, hard]}
+    DifficultyOptional:
+      name: difficulty
+      in: query
+      required: false
+      schema: {type: string, enum: [easy, medium, hard]}
+  responses:
+    Saved:
+      description: 云端进度已保存
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [saved, run_id, updated_at]
+            properties:
+              saved: {type: boolean, example: true}
+              run_id: {type: string, example: run_f9c4a03e}
+              updated_at: {type: string, format: date-time, example: '2026-07-16T09:32:10Z'}
+    BadRequest:
+      description: 参数或内容格式错误
+      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
+    Unauthorized:
+      description: 未登录或 Token 失效
+      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
+    Forbidden:
+      description: 未解锁或提示次数已用完
+      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
+    NotFound:
+      description: 题目或运行记录不存在
+      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
+    Conflict:
+      description: 运行记录状态冲突
+      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
+  schemas:
+    Error:
+      type: object
+      required: [error, code]
+      properties:
+        error: {type: string, example: 题目不存在}
+        code: {type: string, example: PUZZLE_NOT_FOUND}
+    GamesOverview:
+      type: object
+      required: [server_date, summary, games]
+      properties:
+        server_date: {type: string, format: date, example: '2026-07-16'}
+        summary:
+          type: object
+          properties:
+            available_games: {type: integer, example: 4}
+            completed_today: {type: integer, example: 1}
+            total_stars: {type: integer, example: 36}
+            last_game_key: {type: string, nullable: true, enum: [word, sudoku, idiom, memory]}
+        games:
+          type: array
+          items:
+            type: object
+            properties:
+              key: {type: string, enum: [word, sudoku, idiom, memory]}
+              title: {type: string}
+              availability: {type: string, enum: [available, coming_soon, maintenance]}
+              progress_text: {type: string}
+              progress_percent: {type: number}
+              best_score: {type: integer, nullable: true}
+              daily_completed: {type: boolean}
+              last_played_at: {type: string, format: date-time, nullable: true}
+    SudokuPuzzle:
+      type: object
+      required: [puzzle_id, mode, difficulty, givens, run_id, saved_state, limits]
+      properties:
+        puzzle_id: {type: string, example: sdk-medium-000128}
+        mode: {type: string, enum: [daily, practice]}
+        puzzle_date: {type: string, format: date, nullable: true}
+        difficulty: {type: string, enum: [easy, medium, hard]}
+        givens: {type: string, minLength: 81, maxLength: 81}
+        run_id: {type: string, nullable: true}
+        saved_state:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/SudokuState'
+        limits:
+          type: object
+          properties:
+            max_hints: {type: integer, example: 3}
+    SudokuState:
+      type: object
+      properties:
+        grid: {type: string, minLength: 81, maxLength: 81}
+        notes:
+          type: object
+          additionalProperties:
+            type: array
+            maxItems: 9
+            items: {type: integer, minimum: 1, maximum: 9}
+        elapsed_seconds: {type: integer, minimum: 0}
+        hints_used: {type: integer, minimum: 0, maximum: 3}
+        mistakes: {type: integer, minimum: 0}
+    SudokuSaveRequest:
+      allOf:
+        - $ref: '#/components/schemas/SudokuState'
+        - type: object
+          required: [run_id, puzzle_id, grid, elapsed_seconds, mistakes]
+          properties:
+            run_id: {type: string}
+            puzzle_id: {type: string}
+    SudokuHintRequest:
+      type: object
+      required: [puzzle_id, grid]
+      properties:
+        run_id: {type: string, nullable: true}
+        puzzle_id: {type: string}
+        grid: {type: string, minLength: 81, maxLength: 81}
+    SudokuSubmitRequest:
+      allOf:
+        - $ref: '#/components/schemas/SudokuHintRequest'
+        - type: object
+          required: [elapsed_seconds, mistakes]
+          properties:
+            elapsed_seconds: {type: integer, minimum: 0}
+            mistakes: {type: integer, minimum: 0}
+            hints_used: {type: integer, minimum: 0, description: 游客展示用；登录用户以服务端累计值为准}
+    IdiomCatalog:
+      type: object
+      properties:
+        total_stars: {type: integer}
+        max_stars: {type: integer, example: 180}
+        categories:
+          type: array
+          items:
+            type: object
+            properties:
+              id: {type: string}
+              name: {type: string}
+              description: {type: string}
+              completed_levels: {type: integer}
+              total_levels: {type: integer, example: 20}
+              levels:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: {type: string, example: idiom-001}
+                    order: {type: integer}
+                    title: {type: string}
+                    difficulty: {type: string}
+                    unlocked: {type: boolean}
+                    stars: {type: integer}
+                    best_score: {type: integer, nullable: true}
+    IdiomPuzzle:
+      type: object
+      properties:
+        puzzle_id: {type: string}
+        mode: {type: string, enum: [daily, level]}
+        puzzle_date: {type: string, format: date, nullable: true}
+        title: {type: string}
+        difficulty: {type: string}
+        size: {type: integer, example: 4}
+        cells:
+          type: array
+          items:
+            type: object
+            properties:
+              row: {type: integer}
+              column: {type: integer}
+              type: {type: string, enum: [fixed, input]}
+              value: {type: string, description: 仅固定格返回}
+        entries: {type: array, items: {type: object}}
+        character_bank: {type: array, items: {type: string}}
+        run_id: {type: string, nullable: true}
+        saved_state: {type: object, nullable: true}
+        limits: {type: object}
+    IdiomSaveRequest:
+      type: object
+      required: [run_id, puzzle_id, grid, elapsed_seconds, mistakes]
+      properties:
+        run_id: {type: string}
+        puzzle_id: {type: string}
+        grid: {type: array, maxItems: 32, items: {type: string, maxLength: 1}}
+        elapsed_seconds: {type: integer, minimum: 0}
+        mistakes: {type: integer, minimum: 0}
+    IdiomHintRequest:
+      type: object
+      required: [puzzle_id, grid]
+      properties:
+        run_id: {type: string, nullable: true}
+        puzzle_id: {type: string}
+        grid: {type: array, maxItems: 32, items: {type: string, maxLength: 1}}
+        entry_id: {type: string, nullable: true}
+    IdiomSubmitRequest:
+      allOf:
+        - $ref: '#/components/schemas/IdiomHintRequest'
+        - type: object
+          required: [elapsed_seconds, mistakes]
+          properties:
+            elapsed_seconds: {type: integer, minimum: 0}
+            mistakes: {type: integer, minimum: 0}
+            hints_used: {type: integer, minimum: 0}
+    MemoryBoard:
+      type: object
+      properties:
+        board_id: {type: string}
+        mode: {type: string, enum: [daily, practice]}
+        puzzle_date: {type: string, format: date, nullable: true}
+        difficulty: {type: string}
+        theme: {type: string}
+        rows: {type: integer}
+        columns: {type: integer}
+        cards:
+          type: array
+          items:
+            type: object
+            properties:
+              position: {type: integer}
+              face_key: {type: string}
+              display: {type: string}
+        run_id: {type: string, nullable: true}
+        saved_state: {type: object, nullable: true}
+    MemoryProgressRequest:
+      type: object
+      required: [board_id, matched_positions, moves, elapsed_seconds]
+      properties:
+        run_id: {type: string, nullable: true}
+        board_id: {type: string, maxLength: 120}
+        matched_positions:
+          type: array
+          maxItems: 30
+          uniqueItems: true
+          items: {type: integer, minimum: 0}
+        moves: {type: integer, minimum: 0}
+        elapsed_seconds: {type: integer, minimum: 0}
+    IncorrectCells:
+      type: object
+      required: [correct, status, invalid_cells]
+      properties:
+        correct: {type: boolean, example: false}
+        status: {type: string, example: incorrect}
+        invalid_cells: {type: array, items: {type: integer}}
+    Completion:
+      type: object
+      required: [correct, status, result]
+      properties:
+        correct: {type: boolean, example: true}
+        status: {type: string, example: completed}
+        result:
+          type: object
+          properties:
+            score: {type: integer, example: 920}
+            stars: {type: integer, minimum: 1, maximum: 3}
+            elapsed_seconds: {type: integer}
+            mistakes: {type: integer}
+            hints_used: {type: integer}
+            moves: {type: integer}
+            earned_stars: {type: integer}
+            total_stars: {type: integer}
+            next_level_id: {type: string, nullable: true}
+            is_new_best: {type: boolean}

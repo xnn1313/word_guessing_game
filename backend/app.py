@@ -11,6 +11,7 @@ import game_manager
 import storage
 import campaign
 import multiplayer
+import puzzle_api
 
 # 修复 Windows 下 stdout 中文编码问题
 if sys.stdout.encoding != "utf-8":
@@ -72,6 +73,9 @@ def get_current_user():
             flask_session.clear()
     g.current_user = user
     return g.current_user
+
+
+puzzle_api.register_puzzle_routes(app, get_current_user)
 
 
 def create_runtime_game(saved_state=None):

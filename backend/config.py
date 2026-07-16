@@ -29,3 +29,12 @@ WORD_NOT_IN_BANK_VALUE = 0.0
 AUTO_NEW_ROUND_ON_CORRECT = True
 WORD_BANK_FILE = "words.json"
 AVOID_REPEAT_TARGET = True
+
+# Puzzle game scoring and safety limits. Keep these server-side so clients
+# cannot award their own score or stars.
+PUZZLE_MAX_HINTS = 3
+PUZZLE_MAX_ELAPSED_SECONDS = 7 * 24 * 60 * 60
+SUDOKU_BASE_SCORES = {"easy": 1000, "medium": 1500, "hard": 2000}
+SUDOKU_THREE_STAR_SECONDS = {"easy": 600, "medium": 900, "hard": 1500}
+IDIOM_BASE_SCORE = 1000
+MEMORY_BASE_SCORE = 1000
