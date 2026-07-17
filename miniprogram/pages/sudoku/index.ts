@@ -6,17 +6,24 @@ import type {
   SudokuPuzzleResponse,
   SudokuSavedState,
 } from "../../types/api";
-import { isLoggedIn } from "../../utils/auth";
+import { getToken, getUsername, isLoggedIn } from "../../utils/auth";
+import type { CloudPuzzleShadowToken } from "../../utils/puzzle-storage";
 import {
+  clearCloudPuzzleShadow,
   clearGuestPuzzleDefinition,
   clearGuestPuzzleState,
+  confirmCloudPuzzleShadow,
+  failCloudPuzzleShadowRequest,
   loadGuestPuzzleDefinition,
   loadGuestPuzzleState,
+  markCloudPuzzleShadowInFlight,
+  resolveCloudPuzzleState,
   saveGuestPuzzleDefinition,
   saveGuestPuzzleState,
+  stageCloudPuzzleShadow,
 } from "../../utils/puzzle-storage";
 import { LatestTaskQueue } from "../../utils/latest-task-queue";
-import { request, showRequestError } from "../../utils/request";
+import { ApiError, request, showRequestError } from "../../utils/request";
 
 let clockTimer: any = null;
 let saveTimer: any = null;
@@ -26,6 +33,9 @@ interface SudokuSaveTask {
   silent: boolean;
   puzzleId: string;
   runId: string;
+  cloudShadow: CloudPuzzleShadowToken<SudokuSavedState> | null;
+  authToken: string;
+  accountUsername: string;
   state: SudokuSavedState;
 }
 
@@ -35,19 +45,31 @@ const sudokuSaveQueue = new LatestTaskQueue<SudokuSaveTask>(
       saveGuestPuzzleState("sudoku", task.puzzleId, task.state);
       return;
     }
-    if (!task.runId) return;
-    await request("/sudoku/save", {
-      method: "POST",
-      authenticated: true,
-      data: {
-        run_id: task.runId,
-        puzzle_id: task.puzzleId,
-        grid: task.state.grid,
-        notes: task.state.notes,
-        elapsed_seconds: task.state.elapsed_seconds,
-        mistakes: task.state.mistakes,
-      },
-    });
+    if (task.authToken !== getToken() || task.accountUsername !== String(getUsername() || "").trim()) {
+      throw new Error("登录账号已变更，已停止旧账号的数独云存档");
+    }
+    if (!task.runId) throw new Error("数独云存档缺少运行标识");
+    markCloudPuzzleShadowInFlight(task.cloudShadow);
+    try {
+      await request("/sudoku/save", {
+        method: "POST",
+        authenticated: true,
+        data: {
+          run_id: task.runId,
+          puzzle_id: task.puzzleId,
+          grid: task.state.grid,
+          notes: task.state.notes,
+          elapsed_seconds: task.state.elapsed_seconds,
+          mistakes: task.state.mistakes,
+        },
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.statusCode >= 400 && error.statusCode < 500) {
+        failCloudPuzzleShadowRequest(task.cloudShadow);
+      }
+      throw error;
+    }
+    confirmCloudPuzzleShadow(task.cloudShadow);
   },
   (error, task) => {
     if (!task.silent) showRequestError(error, "数独进度保存失败");
@@ -74,6 +96,7 @@ Page({
     puzzleDate: "",
     givens: "",
     runId: "",
+    cloudSavedState: null as SudokuSavedState | null,
     grid: [] as string[],
     notes: {} as Record<string, number[]>,
     cells: [] as any[],
@@ -112,14 +135,14 @@ Page({
 
   onHide() {
     stopClock();
-    void this.flushSave();
+    void this.flushSave().catch((error) => showRequestError(error, "数独进度保存失败，本地备份已保留"));
   },
 
   onUnload() {
     stopClock();
     if (saveTimer) clearTimeout(saveTimer);
     saveTimer = null;
-    void this.flushSave();
+    void this.flushSave().catch((error) => showRequestError(error, "数独进度保存失败，本地备份已保留"));
   },
 
   startClock() {
@@ -151,10 +174,13 @@ Page({
           saveGuestPuzzleDefinition("sudoku", guestSlot, payload);
         }
       }
-      const local = !isLoggedIn()
+      const loggedIn = isLoggedIn();
+      const local = !loggedIn
         ? loadGuestPuzzleState<SudokuSavedState>("sudoku", payload.puzzle_id)
         : null;
-      const saved = payload.saved_state || local;
+      const saved = loggedIn
+        ? resolveCloudPuzzleState("sudoku", payload.puzzle_id, payload.saved_state)
+        : local;
       const validSavedGrid =
         saved?.grid && saved.grid.length === 81 ? saved.grid : payload.givens;
       const grid = validSavedGrid.split("");
@@ -163,6 +189,7 @@ Page({
         puzzleDate: payload.puzzle_date || "",
         givens: payload.givens,
         runId: payload.run_id || "",
+        cloudSavedState: payload.saved_state,
         grid,
         notes: saved?.notes || {},
         selectedIndex: -1,
@@ -254,7 +281,12 @@ Page({
     if (this.data.loading || this.data.submitting || this.data.hinting) return;
     const mode = event.currentTarget.dataset.value as "daily" | "practice";
     if (mode === this.data.mode) return;
-    await this.flushSave();
+    try {
+      await this.flushSave();
+    } catch (error) {
+      showRequestError(error, "数独进度未同步，已取消切换");
+      return;
+    }
     this.setData({ mode }, () => this.loadPuzzle());
   },
 
@@ -262,14 +294,20 @@ Page({
     if (this.data.loading || this.data.submitting || this.data.hinting) return;
     const difficulty = event.currentTarget.dataset.value as PuzzleDifficulty;
     if (difficulty === this.data.difficulty) return;
-    await this.flushSave();
+    try {
+      await this.flushSave();
+    } catch (error) {
+      showRequestError(error, "数独进度未同步，已取消切换");
+      return;
+    }
     this.setData({ difficulty }, () => this.loadPuzzle());
   },
 
   queueSave() {
     if (!this.data.puzzleId || this.data.completed) return;
     if (saveTimer) clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => this.saveProgress(true), 500);
+    const task = this.createSaveTask(true);
+    if (task) saveTimer = setTimeout(() => sudokuSaveQueue.enqueue(task), 500);
   },
 
   async flushSave() {
@@ -294,11 +332,20 @@ Page({
       hints_used: this.data.hintsUsed,
       mistakes: this.data.mistakes,
     };
+    const authToken = getToken();
+    const accountUsername = String(getUsername() || "").trim();
+    const loggedIn = Boolean(authToken);
+    const cloudShadow = loggedIn
+      ? stageCloudPuzzleShadow("sudoku", this.data.puzzleId, state, this.data.cloudSavedState)
+      : null;
     return {
-      loggedIn: isLoggedIn(),
+      loggedIn,
       silent,
       puzzleId: this.data.puzzleId,
       runId: this.data.runId,
+      cloudShadow,
+      authToken,
+      accountUsername,
       state,
     };
   },
@@ -371,6 +418,7 @@ Page({
         return;
       }
       stopClock();
+      clearCloudPuzzleShadow("sudoku", this.data.puzzleId);
       if (!isLoggedIn()) {
         clearGuestPuzzleState("sudoku", this.data.puzzleId);
         if (this.data.mode === "practice") {

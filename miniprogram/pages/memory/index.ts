@@ -1,36 +1,73 @@
 import type {
   MemoryBoardResponse,
   MemorySavedState,
+  MemoryTheme,
   PuzzleCompletionResult,
   PuzzleDifficulty,
   PuzzleSubmitResponse,
 } from "../../types/api";
-import { isLoggedIn } from "../../utils/auth";
+import { getToken, getUsername, isLoggedIn } from "../../utils/auth";
+import type { CloudPuzzleShadowToken } from "../../utils/puzzle-storage";
 import {
+  clearCloudPuzzleShadow,
   clearGuestPuzzleDefinition,
   clearGuestPuzzleState,
+  confirmCloudPuzzleShadow,
+  failCloudPuzzleShadowRequest,
   loadGuestPuzzleDefinition,
   loadGuestPuzzleState,
+  markCloudPuzzleShadowInFlight,
+  resolveCloudPuzzleState,
   saveGuestPuzzleDefinition,
   saveGuestPuzzleState,
+  stageCloudPuzzleShadow,
 } from "../../utils/puzzle-storage";
 import { LatestTaskQueue } from "../../utils/latest-task-queue";
-import { request, showRequestError } from "../../utils/request";
+import { ApiError, request, showRequestError } from "../../utils/request";
 
 let clockTimer: any = null;
 let saveTimer: any = null;
 let resolveTimer: any = null;
 
-type MemoryTheme = "classic" | "fruit" | "animal";
-
 const MEMORY_LEVEL_KEY = "memory_level_progress_v1";
-const MEMORY_LEVEL_COUNT = 18;
-const MEMORY_LEVEL_THEMES: MemoryTheme[] = ["classic", "fruit", "animal"];
+const MEMORY_THEME_OPTIONS: Array<{ value: MemoryTheme; label: string }> = [
+  { value: "classic", label: "符号" },
+  { value: "fruit", label: "水果" },
+  { value: "animal", label: "动物" },
+  { value: "transport", label: "交通" },
+  { value: "food", label: "美食" },
+  { value: "weather", label: "天气" },
+  { value: "sport", label: "运动" },
+  { value: "ocean", label: "海洋" },
+  { value: "space", label: "太空" },
+  { value: "place", label: "建筑" },
+  { value: "music", label: "音乐" },
+  { value: "culture", label: "国风" },
+];
+// v1 存档直接以关卡号保存星级，前 18 关的难度与主题映射不能重排。
+const LEGACY_LEVEL_THEMES: MemoryTheme[] = ["classic", "fruit", "animal"];
+const EXPANDED_LEVEL_THEMES = MEMORY_THEME_OPTIONS.slice(3).map((item) => item.value);
+const LEGACY_LEVEL_COUNT = 18;
+const MEMORY_LEVEL_COUNT = LEGACY_LEVEL_COUNT + EXPANDED_LEVEL_THEMES.length * 3;
+
+function themeLabel(theme: MemoryTheme): string {
+  return MEMORY_THEME_OPTIONS.find((item) => item.value === theme)?.label || theme;
+}
 
 function levelConfig(level: number): { difficulty: PuzzleDifficulty; theme: MemoryTheme } {
   const safeLevel = Math.min(MEMORY_LEVEL_COUNT, Math.max(1, Number(level) || 1));
-  const difficulty: PuzzleDifficulty = safeLevel <= 6 ? "easy" : safeLevel <= 12 ? "medium" : "hard";
-  return { difficulty, theme: MEMORY_LEVEL_THEMES[(safeLevel - 1) % MEMORY_LEVEL_THEMES.length] };
+  if (safeLevel <= LEGACY_LEVEL_COUNT) {
+    const difficulty: PuzzleDifficulty = safeLevel <= 6 ? "easy" : safeLevel <= 12 ? "medium" : "hard";
+    return { difficulty, theme: LEGACY_LEVEL_THEMES[(safeLevel - 1) % LEGACY_LEVEL_THEMES.length] };
+  }
+  const expandedIndex = safeLevel - LEGACY_LEVEL_COUNT - 1;
+  const themeCount = EXPANDED_LEVEL_THEMES.length;
+  const difficulty: PuzzleDifficulty = expandedIndex < themeCount
+    ? "easy"
+    : expandedIndex < themeCount * 2
+      ? "medium"
+      : "hard";
+  return { difficulty, theme: EXPANDED_LEVEL_THEMES[expandedIndex % themeCount] };
 }
 
 function loadLevelProgress(): Record<string, number> {
@@ -53,7 +90,7 @@ function buildLevelOptions(selectedLevel: number) {
       stars,
       unlocked,
       selected: level === selectedLevel,
-      detail: stars ? "★".repeat(stars) : config.difficulty === "easy" ? "入门" : config.difficulty === "medium" ? "进阶" : "挑战",
+      detail: stars ? "★".repeat(stars) : themeLabel(config.theme),
     };
   });
 }
@@ -63,6 +100,9 @@ interface MemorySaveTask {
   silent: boolean;
   boardId: string;
   runId: string;
+  cloudShadow: CloudPuzzleShadowToken<MemorySavedState> | null;
+  authToken: string;
+  accountUsername: string;
   state: MemorySavedState;
 }
 
@@ -72,18 +112,30 @@ const memorySaveQueue = new LatestTaskQueue<MemorySaveTask>(
       saveGuestPuzzleState("memory", task.boardId, task.state);
       return;
     }
-    if (!task.runId) return;
-    await request("/memory/save", {
-      method: "POST",
-      authenticated: true,
-      data: {
-        run_id: task.runId,
-        board_id: task.boardId,
-        matched_positions: task.state.matched_positions,
-        moves: task.state.moves,
-        elapsed_seconds: task.state.elapsed_seconds,
-      },
-    });
+    if (task.authToken !== getToken() || task.accountUsername !== String(getUsername() || "").trim()) {
+      throw new Error("登录账号已变更，已停止旧账号的翻牌云存档");
+    }
+    if (!task.runId) throw new Error("翻牌云存档缺少运行标识");
+    markCloudPuzzleShadowInFlight(task.cloudShadow);
+    try {
+      await request("/memory/save", {
+        method: "POST",
+        authenticated: true,
+        data: {
+          run_id: task.runId,
+          board_id: task.boardId,
+          matched_positions: task.state.matched_positions,
+          moves: task.state.moves,
+          elapsed_seconds: task.state.elapsed_seconds,
+        },
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.statusCode >= 400 && error.statusCode < 500) {
+        failCloudPuzzleShadowRequest(task.cloudShadow);
+      }
+      throw error;
+    }
+    confirmCloudPuzzleShadow(task.cloudShadow);
   },
   (error, task) => {
     if (!task.silent) showRequestError(error, "翻牌进度保存失败");
@@ -112,12 +164,14 @@ Page({
     mode: "daily" as "daily" | "practice",
     difficulty: "easy" as PuzzleDifficulty,
     theme: "fruit" as MemoryTheme,
+    themeLabel: themeLabel("fruit"),
     selectedLevel: 1,
     levelCount: MEMORY_LEVEL_COUNT,
     levelOptions: buildLevelOptions(1),
     board: null as MemoryBoardResponse | null,
     boardId: "",
     runId: "",
+    cloudSavedState: null as MemorySavedState | null,
     cards: [] as any[],
     matchedPositions: [] as number[],
     flippedPositions: [] as number[],
@@ -138,11 +192,7 @@ Page({
       { value: "medium", label: "中等 4×5" },
       { value: "hard", label: "困难 5×6" },
     ],
-    themeOptions: [
-      { value: "classic", label: "符号" },
-      { value: "fruit", label: "水果" },
-      { value: "animal", label: "动物" },
-    ],
+    themeOptions: MEMORY_THEME_OPTIONS,
   },
 
   onLoad() {
@@ -156,14 +206,14 @@ Page({
   onHide() {
     // 配对动画需要继续收尾，否则切回页面后会一直停在 resolving 状态。
     stopClock();
-    void this.flushSave();
+    void this.flushSave().catch((error) => showRequestError(error, "翻牌进度保存失败，本地备份已保留"));
   },
 
   onUnload() {
     stopAllTimers();
     if (saveTimer) clearTimeout(saveTimer);
     saveTimer = null;
-    void this.flushSave();
+    void this.flushSave().catch((error) => showRequestError(error, "翻牌进度保存失败，本地备份已保留"));
   },
 
   startClock() {
@@ -195,14 +245,18 @@ Page({
           saveGuestPuzzleDefinition("memory", guestSlot, board);
         }
       }
-      const local = !isLoggedIn()
+      const loggedIn = isLoggedIn();
+      const local = !loggedIn
         ? loadGuestPuzzleState<MemorySavedState>("memory", board.board_id)
         : null;
-      const saved = board.saved_state || local;
+      const saved = loggedIn
+        ? resolveCloudPuzzleState("memory", board.board_id, board.saved_state)
+        : local;
       this.setData({
         board,
         boardId: board.board_id,
         runId: board.run_id || "",
+        cloudSavedState: board.saved_state,
         matchedPositions: [...(saved?.matched_positions || [])],
         flippedPositions: [],
         firstPosition: -1,
@@ -236,10 +290,17 @@ Page({
     if (this.data.loading || this.data.submitting || this.data.resolving) return;
     const mode = event.currentTarget.dataset.value as "daily" | "practice";
     if (mode === this.data.mode) return;
-    await this.flushSave();
+    try {
+      await this.flushSave();
+    } catch (error) {
+      showRequestError(error, "翻牌进度未同步，已取消切换");
+      return;
+    }
     const config = mode === "practice" ? levelConfig(this.data.selectedLevel) : null;
     this.setData(
-      config ? { mode, difficulty: config.difficulty, theme: config.theme } : { mode },
+      config
+        ? { mode, difficulty: config.difficulty, theme: config.theme, themeLabel: themeLabel(config.theme) }
+        : { mode },
       () => this.loadBoard(),
     );
   },
@@ -253,31 +314,47 @@ Page({
       return;
     }
     if (level === this.data.selectedLevel && this.data.mode === "practice") return;
-    await this.flushSave();
+    try {
+      await this.flushSave();
+    } catch (error) {
+      showRequestError(error, "翻牌进度未同步，已取消切换");
+      return;
+    }
     const config = levelConfig(level);
     this.setData({
       mode: "practice",
       selectedLevel: level,
       difficulty: config.difficulty,
       theme: config.theme,
+      themeLabel: themeLabel(config.theme),
       levelOptions: buildLevelOptions(level),
-    }, () => this.loadBoard(true));
+    }, () => this.loadBoard());
   },
 
   async switchDifficulty(event: any) {
     if (this.data.loading || this.data.submitting || this.data.resolving) return;
     const difficulty = event.currentTarget.dataset.value as PuzzleDifficulty;
     if (difficulty === this.data.difficulty) return;
-    await this.flushSave();
+    try {
+      await this.flushSave();
+    } catch (error) {
+      showRequestError(error, "翻牌进度未同步，已取消切换");
+      return;
+    }
     this.setData({ difficulty }, () => this.loadBoard());
   },
 
   async switchTheme(event: any) {
     if (this.data.loading || this.data.submitting || this.data.resolving) return;
-    const theme = event.currentTarget.dataset.value as "classic" | "fruit" | "animal";
+    const theme = event.currentTarget.dataset.value as MemoryTheme;
     if (theme === this.data.theme) return;
-    await this.flushSave();
-    this.setData({ theme }, () => this.loadBoard());
+    try {
+      await this.flushSave();
+    } catch (error) {
+      showRequestError(error, "翻牌进度未同步，已取消切换");
+      return;
+    }
+    this.setData({ theme, themeLabel: themeLabel(theme) }, () => this.loadBoard());
   },
 
   flipCard(event: any) {
@@ -320,7 +397,8 @@ Page({
   queueSave() {
     if (!this.data.board || this.data.completed) return;
     if (saveTimer) clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => this.saveProgress(true), 500);
+    const task = this.createSaveTask(true);
+    if (task) saveTimer = setTimeout(() => memorySaveQueue.enqueue(task), 500);
   },
 
   async flushSave() {
@@ -338,11 +416,20 @@ Page({
       moves: this.data.moves,
       elapsed_seconds: this.data.elapsedSeconds,
     };
+    const authToken = getToken();
+    const accountUsername = String(getUsername() || "").trim();
+    const loggedIn = Boolean(authToken);
+    const cloudShadow = loggedIn
+      ? stageCloudPuzzleShadow("memory", this.data.boardId, state, this.data.cloudSavedState)
+      : null;
     return {
-      loggedIn: isLoggedIn(),
+      loggedIn,
       silent,
       boardId: this.data.boardId,
       runId: this.data.runId,
+      cloudShadow,
+      authToken,
+      accountUsername,
       state,
     };
   },
@@ -375,6 +462,7 @@ Page({
         return;
       }
       stopAllTimers();
+      clearCloudPuzzleShadow("memory", this.data.boardId);
       if (!isLoggedIn()) {
         clearGuestPuzzleState("memory", this.data.boardId);
         if (this.data.mode === "practice") {
@@ -404,7 +492,12 @@ Page({
     if (this.data.loading || this.data.submitting) return;
     if (this.data.mode === "daily") {
       const config = levelConfig(this.data.selectedLevel);
-      this.setData({ mode: "practice", difficulty: config.difficulty, theme: config.theme }, () => this.loadBoard(true));
+      this.setData({
+        mode: "practice",
+        difficulty: config.difficulty,
+        theme: config.theme,
+        themeLabel: themeLabel(config.theme),
+      }, () => this.loadBoard());
     } else {
       this.loadBoard(true);
     }
@@ -423,8 +516,9 @@ Page({
       selectedLevel: next,
       difficulty: config.difficulty,
       theme: config.theme,
+      themeLabel: themeLabel(config.theme),
       levelOptions: buildLevelOptions(next),
-    }, () => this.loadBoard(true));
+    }, () => this.loadBoard());
   },
 });
 

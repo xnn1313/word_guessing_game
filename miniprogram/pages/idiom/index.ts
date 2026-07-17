@@ -8,16 +8,23 @@ import type {
   PuzzleHintResponse,
   PuzzleSubmitResponse,
 } from "../../types/api";
-import { isLoggedIn } from "../../utils/auth";
+import { getToken, getUsername, isLoggedIn } from "../../utils/auth";
+import type { CloudPuzzleShadowToken } from "../../utils/puzzle-storage";
 import {
+  clearCloudPuzzleShadow,
   clearGuestPuzzleState,
+  confirmCloudPuzzleShadow,
+  failCloudPuzzleShadowRequest,
   getGuestIdiomProgress,
   loadGuestPuzzleState,
+  markCloudPuzzleShadowInFlight,
+  resolveCloudPuzzleState,
   saveGuestIdiomResult,
   saveGuestPuzzleState,
+  stageCloudPuzzleShadow,
 } from "../../utils/puzzle-storage";
 import { LatestTaskQueue } from "../../utils/latest-task-queue";
-import { request, showRequestError } from "../../utils/request";
+import { ApiError, request, showRequestError } from "../../utils/request";
 
 let clockTimer: any = null;
 let saveTimer: any = null;
@@ -27,6 +34,9 @@ interface IdiomSaveTask {
   silent: boolean;
   puzzleId: string;
   runId: string;
+  cloudShadow: CloudPuzzleShadowToken<IdiomSavedState> | null;
+  authToken: string;
+  accountUsername: string;
   state: IdiomSavedState;
 }
 
@@ -36,18 +46,30 @@ const idiomSaveQueue = new LatestTaskQueue<IdiomSaveTask>(
       saveGuestPuzzleState("idiom", task.puzzleId, task.state);
       return;
     }
-    if (!task.runId) return;
-    await request("/idiom/save", {
-      method: "POST",
-      authenticated: true,
-      data: {
-        run_id: task.runId,
-        puzzle_id: task.puzzleId,
-        grid: task.state.grid,
-        elapsed_seconds: task.state.elapsed_seconds,
-        mistakes: task.state.mistakes,
-      },
-    });
+    if (task.authToken !== getToken() || task.accountUsername !== String(getUsername() || "").trim()) {
+      throw new Error("登录账号已变更，已停止旧账号的成语云存档");
+    }
+    if (!task.runId) throw new Error("成语云存档缺少运行标识");
+    markCloudPuzzleShadowInFlight(task.cloudShadow);
+    try {
+      await request("/idiom/save", {
+        method: "POST",
+        authenticated: true,
+        data: {
+          run_id: task.runId,
+          puzzle_id: task.puzzleId,
+          grid: task.state.grid,
+          elapsed_seconds: task.state.elapsed_seconds,
+          mistakes: task.state.mistakes,
+        },
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.statusCode >= 400 && error.statusCode < 500) {
+        failCloudPuzzleShadowRequest(task.cloudShadow);
+      }
+      throw error;
+    }
+    confirmCloudPuzzleShadow(task.cloudShadow);
   },
   (error, task) => {
     if (!task.silent) showRequestError(error, "成语进度保存失败");
@@ -80,7 +102,7 @@ Page({
     loading: true,
     categories: [] as any[],
     totalStars: 0,
-    maxStars: 180,
+    maxStars: 0,
     dailyDifficulty: "medium" as PuzzleDifficulty,
     dailyOptions: [
       { value: "easy", label: "简单" },
@@ -90,6 +112,7 @@ Page({
     puzzle: null as IdiomPuzzleResponse | null,
     puzzleMode: "level" as "daily" | "level",
     runId: "",
+    cloudSavedState: null as IdiomSavedState | null,
     grid: [] as string[],
     cells: [] as any[],
     entries: [] as IdiomEntry[],
@@ -118,14 +141,14 @@ Page({
 
   onHide() {
     stopClock();
-    void this.flushSave();
+    void this.flushSave().catch((error) => showRequestError(error, "成语进度保存失败，本地备份已保留"));
   },
 
   onUnload() {
     stopClock();
     if (saveTimer) clearTimeout(saveTimer);
     saveTimer = null;
-    void this.flushSave();
+    void this.flushSave().catch((error) => showRequestError(error, "成语进度保存失败，本地备份已保留"));
   },
 
   startClock() {
@@ -218,10 +241,13 @@ Page({
     this.setData({ loading: true, completed: false, result: null, invalidCells: [] });
     try {
       const puzzle = await request<IdiomPuzzleResponse>(path);
-      const local = !isLoggedIn()
+      const loggedIn = isLoggedIn();
+      const local = !loggedIn
         ? loadGuestPuzzleState<IdiomSavedState>("idiom", puzzle.puzzle_id)
         : null;
-      const saved = puzzle.saved_state || local;
+      const saved = loggedIn
+        ? resolveCloudPuzzleState("idiom", puzzle.puzzle_id, puzzle.saved_state)
+        : local;
       const initialGrid = saved?.grid?.length === puzzle.cells.length
         ? saved.grid
         : puzzle.cells.map((cell) => cell.value || "");
@@ -230,6 +256,7 @@ Page({
         puzzle,
         puzzleMode: puzzle.mode,
         runId: puzzle.run_id || "",
+        cloudSavedState: puzzle.saved_state,
         grid: [...initialGrid],
         entries: puzzle.entries,
         characterBank: puzzle.character_bank,
@@ -346,7 +373,8 @@ Page({
   queueSave() {
     if (!this.data.puzzle || this.data.completed) return;
     if (saveTimer) clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => this.saveProgress(true), 500);
+    const task = this.createSaveTask(true);
+    if (task) saveTimer = setTimeout(() => idiomSaveQueue.enqueue(task), 500);
   },
 
   async flushSave() {
@@ -365,11 +393,20 @@ Page({
       hints_used: this.data.hintsUsed,
       mistakes: this.data.mistakes,
     };
+    const authToken = getToken();
+    const accountUsername = String(getUsername() || "").trim();
+    const loggedIn = Boolean(authToken);
+    const cloudShadow = loggedIn
+      ? stageCloudPuzzleShadow("idiom", this.data.puzzle.puzzle_id, state, this.data.cloudSavedState)
+      : null;
     return {
-      loggedIn: isLoggedIn(),
+      loggedIn,
       silent,
       puzzleId: this.data.puzzle.puzzle_id,
       runId: this.data.runId,
+      cloudShadow,
+      authToken,
+      accountUsername,
       state,
     };
   },
@@ -443,6 +480,7 @@ Page({
         return;
       }
       stopClock();
+      clearCloudPuzzleShadow("idiom", this.data.puzzle.puzzle_id);
       const result = response.result || null;
       if (!isLoggedIn()) {
         clearGuestPuzzleState("idiom", this.data.puzzle.puzzle_id);
@@ -472,7 +510,13 @@ Page({
   async backToCatalog() {
     if (this.data.submitting || this.data.hinting) return;
     stopClock();
-    await this.flushSave();
+    try {
+      await this.flushSave();
+    } catch (error) {
+      showRequestError(error, "成语进度未同步，已留在当前关卡");
+      this.startClock();
+      return;
+    }
     this.setData({ view: "catalog", puzzle: null, completed: false, result: null });
     this.loadCatalog();
   },

@@ -460,7 +460,7 @@ CREATE TABLE IF NOT EXISTS daily_puzzles (
 ```json
 {
   "total_stars": 8,
-  "max_stars": 180,
+  "max_stars": 3360,
   "categories": [
     {
       "id": "basic",
@@ -844,7 +844,7 @@ score = max(100, 1000 - (moves-pair_count)*35 - elapsed_seconds*2)
 
 后台需要提供：
 
-- 每种难度至少 100 道题作为首版库存。
+- 内置每种难度 100 道，外部冻结题库再提供每种难度 1000 道。
 - 每道题必须经过求解器验证唯一解。
 - 提供一个离线导入或生成脚本。
 - 运行时接口不得现场生成复杂数独，避免响应时间不稳定。
@@ -866,16 +866,17 @@ score = max(100, 1000 - (moves-pair_count)*35 - elapsed_seconds*2)
 
 - 只收录标准四字成语。
 - 释义、拼音和用字必须人工或权威来源复核。
-- 首版至少准备 60 个可玩的交叉填字关卡。
+- 内置提供 120 个交叉填字关卡；外部冻结词库去重后再组成 1000 关。
 - 使用离线脚本组题，生成后保存布局，不在请求期间动态搜索布局。
 
 ### 11.3 记忆翻牌
 
-首版主题建议：
+当前主题：
 
 - `classic`：几何符号。
 - `fruit`：水果 Emoji。
 - `animal`：动物 Emoji。
+- `transport`、`food`、`weather`、`sport`、`ocean`、`space`、`place`、`music`、`culture`：扩展主题。
 
 后台返回稳定的 `face_key`，展示资源由小程序按照 key 映射。
 

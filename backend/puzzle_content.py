@@ -151,7 +151,23 @@ IDIOM_CATEGORY_NAMES = {
     "growth": ("奋进成长", "在坚持与行动中积累前进力量"),
     "relations": ("人情相处", "从待人接物中读懂真诚与分寸"),
     "stories": ("典故纵横", "沿着历史故事解锁成语来历"),
+    "curated-01": ("词库精选一", "从高频成语开始，逐步提升填字难度"),
+    "curated-02": ("词库精选二", "精选常用表达，完成一百道递进关卡"),
+    "curated-03": ("词库精选三", "扩展成语储备，在交叉线索中稳步进阶"),
+    "curated-04": ("词库精选四", "结合释义与拼音，挑战更丰富的词汇"),
+    "curated-05": ("词库精选五", "由易到难掌握更多常见成语"),
+    "curated-06": ("词库精选六", "继续积累词汇，训练联想与辨析能力"),
+    "curated-07": ("词库精选七", "进入进阶题组，寻找更隐蔽的交叉点"),
+    "curated-08": ("词库精选八", "挑战中高难释义与相近表达"),
+    "curated-09": ("词库精选九", "在复杂线索中巩固成语知识"),
+    "curated-10": ("词库精选十", "完成终章挑战，检验综合词汇能力"),
 }
+
+# Published puzzle ids are immutable. Each boundary freezes the partner search
+# pool for that release, so appending a later content batch cannot change an
+# existing idiom-xxx layout. Add a new boundary when a new built-in batch is
+# appended; never edit or remove an earlier value.
+IDIOM_LAYOUT_COHORT_ENDS = (60, 120)
 
 
 def count_sudoku_solutions(puzzle, limit=2):
@@ -273,10 +289,13 @@ def _sudoku_transform(puzzle, solution, difficulty, index):
 
 def _idiom_layout(index):
     word, definition, category = IDIOMS[index]
+    cohort_end = next((end for end in IDIOM_LAYOUT_COHORT_ENDS if index < end), None)
+    if cohort_end is None or cohort_end > len(IDIOMS):
+        raise ValueError(f"成语 {word} 未配置稳定的布局批次")
     partner_index = None
     shared = None
-    for offset in range(1, len(IDIOMS)):
-        candidate_index = (index + offset) % len(IDIOMS)
+    for offset in range(1, cohort_end):
+        candidate_index = (index + offset) % cohort_end
         candidate_word = IDIOMS[candidate_index][0]
         common = next((character for character in word if character in candidate_word), None)
         if common:
@@ -350,11 +369,7 @@ def seed_puzzle_catalogs(connection):
                 """
                 INSERT INTO sudoku_puzzles (id, difficulty, puzzle, solution)
                 VALUES (?, ?, ?, ?)
-                ON CONFLICT(id) DO UPDATE SET
-                    difficulty = excluded.difficulty,
-                    puzzle = excluded.puzzle,
-                    solution = excluded.solution,
-                    is_active = 1
+                ON CONFLICT(id) DO NOTHING
                 """,
                 (
                     f"sdk-{difficulty}-{index + 1:06d}",
@@ -378,17 +393,7 @@ def seed_puzzle_catalogs(connection):
                 id, level_order, category, difficulty, title, size,
                 layout_json, clues_json, solution_json
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT(id) DO UPDATE SET
-                level_order = excluded.level_order,
-                category = excluded.category,
-                difficulty = excluded.difficulty,
-                title = excluded.title,
-                size = excluded.size,
-                layout_json = excluded.layout_json,
-                clues_json = excluded.clues_json,
-                solution_json = excluded.solution_json,
-                is_daily_enabled = 1,
-                is_active = 1
+            ON CONFLICT(id) DO NOTHING
             """,
             (
                 f"idiom-{index + 1:03d}",

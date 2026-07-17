@@ -35,6 +35,60 @@ MEMORY_THEMES = {
         ("bear", "🐻"), ("koala", "🐨"), ("frog", "🐸"), ("penguin", "🐧"),
         ("owl", "🦉"), ("whale", "🐳"), ("dolphin", "🐬"),
     ],
+    "transport": [
+        ("car", "🚗"), ("taxi", "🚕"), ("bus", "🚌"), ("trolleybus", "🚎"),
+        ("racing_car", "🏎️"), ("police_car", "🚓"), ("ambulance", "🚑"),
+        ("fire_engine", "🚒"), ("minibus", "🚐"), ("truck", "🚚"), ("tractor", "🚜"),
+        ("scooter", "🛵"), ("bicycle", "🚲"), ("airplane", "✈️"), ("helicopter", "🚁"),
+    ],
+    "food": [
+        ("burger", "🍔"), ("fries", "🍟"), ("pizza", "🍕"), ("hotdog", "🌭"),
+        ("sandwich", "🥪"), ("taco", "🌮"), ("burrito", "🌯"), ("popcorn", "🍿"),
+        ("rice", "🍚"), ("ramen", "🍜"), ("sushi", "🍣"), ("dumpling", "🥟"),
+        ("cookie", "🍪"), ("cake", "🍰"), ("candy", "🍬"),
+    ],
+    "weather": [
+        ("sunny", "☀️"), ("partly_cloudy", "🌤️"), ("cloudy", "☁️"),
+        ("rain", "🌧️"), ("storm", "⛈️"), ("snow", "🌨️"), ("wind", "🌬️"),
+        ("tornado", "🌪️"), ("fog", "🌫️"), ("rainbow", "🌈"), ("umbrella", "☂️"),
+        ("snowman", "☃️"), ("comet", "☄️"), ("droplet", "💧"), ("lightning", "⚡"),
+    ],
+    "sport": [
+        ("soccer", "⚽"), ("basketball", "🏀"), ("football", "🏈"), ("baseball", "⚾"),
+        ("softball", "🥎"), ("tennis", "🎾"), ("volleyball", "🏐"), ("rugby", "🏉"),
+        ("billiards", "🎱"), ("ping_pong", "🏓"), ("badminton", "🏸"), ("hockey", "🏒"),
+        ("cricket", "🏏"), ("ski", "🎿"), ("boxing", "🥊"),
+    ],
+    "ocean": [
+        ("fish", "🐟"), ("tropical_fish", "🐠"), ("blowfish", "🐡"), ("shark", "🦈"),
+        ("octopus", "🐙"), ("shell", "🐚"), ("coral", "🪸"), ("crab", "🦀"),
+        ("lobster", "🦞"), ("shrimp", "🦐"), ("squid", "🦑"), ("whale", "🐋"),
+        ("dolphin", "🐬"), ("seal", "🦭"), ("jellyfish", "🪼"),
+    ],
+    "space": [
+        ("rocket", "🚀"), ("flying_saucer", "🛸"), ("satellite", "🛰️"),
+        ("crescent_moon", "🌙"), ("full_moon", "🌕"), ("earth", "🌍"), ("sun_face", "🌞"),
+        ("star", "⭐"), ("comet", "☄️"), ("telescope", "🔭"), ("astronaut", "🧑‍🚀"),
+        ("alien", "👽"), ("galaxy", "🌌"), ("ringed_planet", "🪐"), ("black_hole", "⚫"),
+    ],
+    "place": [
+        ("house", "🏠"), ("office", "🏢"), ("hospital", "🏥"), ("bank", "🏦"),
+        ("hotel", "🏨"), ("school", "🏫"), ("factory", "🏭"), ("castle", "🏰"),
+        ("shrine", "⛩️"), ("church", "⛪"), ("mosque", "🕌"), ("tent", "⛺"),
+        ("stadium", "🏟️"), ("station", "🚉"), ("tower", "🗼"),
+    ],
+    "music": [
+        ("microphone", "🎤"), ("headphones", "🎧"), ("radio", "📻"), ("saxophone", "🎷"),
+        ("accordion", "🪗"), ("guitar", "🎸"), ("keyboard", "🎹"), ("trumpet", "🎺"),
+        ("violin", "🎻"), ("drum", "🥁"), ("maracas", "🪇"), ("flute", "🪈"),
+        ("notes", "🎶"), ("score", "🎼"), ("bell", "🔔"),
+    ],
+    "culture": [
+        ("lantern", "🏮"), ("fan", "🪭"), ("firecracker", "🧨"), ("mahjong", "🀄"),
+        ("tea", "🍵"), ("dumpling", "🥟"), ("mooncake", "🥮"), ("dragon", "🐉"),
+        ("lion", "🦁"), ("bamboo", "🎋"), ("knot", "🪢"), ("opera", "🎭"),
+        ("scroll", "📜"), ("pagoda", "🏯"), ("kite", "🪁"),
+    ],
 }
 
 MEMORY_DIMENSIONS = {
@@ -416,6 +470,8 @@ def idiom_catalog(user):
     categories = []
     for category_id, (name, description) in IDIOM_CATEGORY_NAMES.items():
         category_puzzles = [item for item in puzzles if item["category"] == category_id]
+        if not category_puzzles:
+            continue
         levels = []
         for puzzle in category_puzzles:
             result = progress.get(puzzle["id"], {})
@@ -667,12 +723,16 @@ def get_memory(user, mode, difficulty, theme="classic", fresh=False):
             "memory", date, daily_key, f"memory-{date}-{difficulty}-{theme}"
         )
     else:
+        if user and fresh:
+            storage.abandon_memory_playing_runs(
+                user["id"], mode, difficulty, theme
+            )
         resumed = (
-            storage.get_latest_playing_run(user["id"], "memory", mode, difficulty)
+            storage.get_latest_memory_playing_run(user["id"], mode, difficulty, theme)
             if user and not fresh
             else None
         )
-        if resumed and resumed["state"].get("theme") == theme:
+        if resumed:
             board_id = resumed["puzzle_id"]
         else:
             board_id = f"memory-practice-{difficulty}-{theme}-{secrets.token_hex(6)}"

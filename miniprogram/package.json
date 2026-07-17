@@ -5,7 +5,9 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "validate": "node scripts/validate-project.mjs",
-    "check": "npm run typecheck && npm run validate"
+    "test:queue": "node scripts/test-latest-task-queue.mjs",
+    "test:storage": "node scripts/test-puzzle-storage.mjs",
+    "check": "npm run typecheck && npm run validate && npm run test:queue && npm run test:storage"
   },
   "devDependencies": {
     "typescript": "^5.8.3"

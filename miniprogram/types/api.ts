@@ -116,6 +116,19 @@ export interface BattleState {
 export type PuzzleGameKey = "word" | "sudoku" | "idiom" | "memory";
 export type PuzzleDifficulty = "easy" | "medium" | "hard";
 export type PuzzleRunMode = "daily" | "practice" | "level";
+export type MemoryTheme =
+  | "classic"
+  | "fruit"
+  | "animal"
+  | "transport"
+  | "food"
+  | "weather"
+  | "sport"
+  | "ocean"
+  | "space"
+  | "place"
+  | "music"
+  | "culture";
 
 export interface GameOverviewItem {
   key: PuzzleGameKey;
@@ -238,7 +251,7 @@ export interface MemoryBoardResponse {
   mode: "daily" | "practice";
   puzzle_date: string | null;
   difficulty: PuzzleDifficulty;
-  theme: "classic" | "fruit" | "animal";
+  theme: MemoryTheme;
   rows: number;
   columns: number;
   cards: MemoryCard[];

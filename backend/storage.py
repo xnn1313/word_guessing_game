@@ -454,6 +454,57 @@ def get_latest_playing_run(user_id, game_key, mode, difficulty=None):
     return _deserialize_run(row)
 
 
+def get_latest_memory_playing_run(user_id, mode, difficulty, theme):
+    """Return the newest unfinished memory run for one exact board theme."""
+    with _connect() as connection:
+        rows = connection.execute(
+            """
+            SELECT * FROM game_runs
+            WHERE user_id = ? AND game_key = 'memory' AND mode = ?
+              AND difficulty = ? AND status = 'playing'
+            ORDER BY updated_at DESC, rowid DESC
+            """,
+            (user_id, mode, difficulty),
+        ).fetchall()
+    for row in rows:
+        run = _deserialize_run(row)
+        if run["state"].get("theme") == theme:
+            return run
+    return None
+
+
+def abandon_memory_playing_runs(user_id, mode, difficulty, theme):
+    """Close unfinished runs superseded by an explicit fresh memory board."""
+    with _connect() as connection:
+        rows = connection.execute(
+            """
+            SELECT id, state_json FROM game_runs
+            WHERE user_id = ? AND game_key = 'memory' AND mode = ?
+              AND difficulty = ? AND status = 'playing'
+            """,
+            (user_id, mode, difficulty),
+        ).fetchall()
+        run_ids = []
+        for row in rows:
+            try:
+                state = json.loads(row["state_json"] or "{}")
+            except (TypeError, ValueError):
+                state = {}
+            if state.get("theme") == theme:
+                run_ids.append(row["id"])
+        if run_ids:
+            timestamp = utc_now_iso()
+            connection.executemany(
+                """
+                UPDATE game_runs
+                SET status = 'abandoned', updated_at = ?
+                WHERE id = ? AND user_id = ? AND status = 'playing'
+                """,
+                [(timestamp, run_id, user_id) for run_id in run_ids],
+            )
+    return len(run_ids)
+
+
 def update_game_run(run_id, user_id, state, elapsed_seconds, hints_used, mistakes):
     now = utc_now_iso()
     serialized = json.dumps(state or {}, ensure_ascii=False, separators=(",", ":"))

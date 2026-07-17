@@ -1,3 +1,5 @@
+import hashlib
+import json
 import os
 import tempfile
 import unittest
@@ -57,6 +59,41 @@ class PuzzleApiTestCase(unittest.TestCase):
         self.assertTrue(
             all(puzzle_content.sudoku_solution_valid(row["puzzle"], row["solution"]) for row in sudoku_rows)
         )
+
+    def test_seed_never_overwrites_published_puzzle_rows(self):
+        with storage._connect() as connection:
+            connection.execute(
+                "UPDATE sudoku_puzzles SET puzzle = ? WHERE id = ?",
+                ("0" * 81, "sdk-easy-000001"),
+            )
+            connection.execute(
+                "UPDATE idiom_puzzles SET title = ? WHERE id = ?",
+                ("已发布内容哨兵", "idiom-010"),
+            )
+
+        storage.init_db()
+
+        with storage._connect() as connection:
+            sudoku = connection.execute(
+                "SELECT puzzle FROM sudoku_puzzles WHERE id = ?", ("sdk-easy-000001",)
+            ).fetchone()
+            idiom = connection.execute(
+                "SELECT title FROM idiom_puzzles WHERE id = ?", ("idiom-010",)
+            ).fetchone()
+        self.assertEqual(sudoku["puzzle"], "0" * 81)
+        self.assertEqual(idiom["title"], "已发布内容哨兵")
+
+    def test_builtin_idiom_layout_release_signatures_are_stable(self):
+        expected = {
+            60: "085f5de37bb898ae5580721ad7eeafb87f3f6eef5cd88ad3d5ab90ed331adb63",
+            120: "f64b2770c3d387b47ec80592bbf792e5783a716d760f937cb0402aa55317c09f",
+        }
+        for count, signature in expected.items():
+            layouts = [puzzle_content._idiom_layout(index) for index in range(count)]
+            payload = json.dumps(
+                layouts, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+            ).encode("utf-8")
+            self.assertEqual(hashlib.sha256(payload).hexdigest(), signature)
 
     def test_guest_overview_and_cloud_save_authentication(self):
         overview = self.client.get("/api/games/overview")
@@ -361,6 +398,54 @@ class PuzzleApiTestCase(unittest.TestCase):
         self.assertEqual(resumed["board_id"], first["board_id"])
         self.assertNotEqual(fresh["board_id"], first["board_id"])
         self.assertNotEqual(fresh["cards"], first["cards"])
+        with storage._connect() as connection:
+            previous_status = connection.execute(
+                "SELECT status FROM game_runs WHERE id = ?", (first["run_id"],)
+            ).fetchone()["status"]
+            fresh_status = connection.execute(
+                "SELECT status FROM game_runs WHERE id = ?", (fresh["run_id"],)
+            ).fetchone()["status"]
+        self.assertEqual(previous_status, "abandoned")
+        self.assertEqual(fresh_status, "playing")
+
+    def test_memory_resume_matches_theme_even_after_playing_another_theme(self):
+        classic = self.client.get(
+            "/api/memory/board?mode=practice&difficulty=easy&theme=classic",
+            headers=self.auth,
+        ).json
+        fruit = self.client.get(
+            "/api/memory/board?mode=practice&difficulty=easy&theme=fruit",
+            headers=self.auth,
+        ).json
+        classic_again = self.client.get(
+            "/api/memory/board?mode=practice&difficulty=easy&theme=classic",
+            headers=self.auth,
+        ).json
+        self.assertNotEqual(fruit["board_id"], classic["board_id"])
+        self.assertEqual(classic_again["board_id"], classic["board_id"])
+        self.assertEqual(classic_again["run_id"], classic["run_id"])
+
+    def test_all_memory_themes_have_unique_faces_and_support_hard_boards(self):
+        self.assertGreaterEqual(len(puzzle_games.MEMORY_THEMES), 12)
+        for theme, faces in puzzle_games.MEMORY_THEMES.items():
+            with self.subTest(theme=theme):
+                face_keys = [face_key for face_key, _ in faces]
+                displays = [display for _, display in faces]
+                self.assertGreaterEqual(len(faces), 15)
+                self.assertEqual(len(face_keys), len(set(face_keys)))
+                self.assertEqual(len(displays), len(set(displays)))
+
+                response = self.client.get(
+                    f"/api/memory/board?mode=practice&difficulty=hard&theme={theme}"
+                )
+                self.assertEqual(response.status_code, 200)
+                cards = response.json["cards"]
+                counts = {}
+                for card in cards:
+                    counts[card["face_key"]] = counts.get(card["face_key"], 0) + 1
+                self.assertEqual(len(cards), 30)
+                self.assertEqual(len(counts), 15)
+                self.assertEqual(set(counts.values()), {2})
 
 
 if __name__ == "__main__":

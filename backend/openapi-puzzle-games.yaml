@@ -203,7 +203,10 @@ paths:
         - $ref: '#/components/parameters/Difficulty'
         - name: theme
           in: query
-          schema: {type: string, enum: [classic, fruit, animal], default: classic}
+          schema:
+            type: string
+            enum: [classic, fruit, animal, transport, food, weather, sport, ocean, space, place, music, culture]
+            default: classic
       responses:
         '200':
           description: 每个 face_key 恰好出现两次

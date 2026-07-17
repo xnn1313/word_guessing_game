@@ -18,14 +18,20 @@
 }
 
 .theme-bar {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: inline-flex;
+  min-width: 100%;
+  margin-top: 0;
+  border-radius: 8rpx 8rpx 18rpx 18rpx;
+}
+
+.theme-scroll {
+  width: 100%;
   margin-top: 8rpx;
   border-radius: 8rpx 8rpx 18rpx 18rpx;
 }
 
 .mode-bar button,
 .theme-bar button {
-  width: 100%;
   min-width: 0;
   max-width: 100%;
   min-height: 62rpx;
@@ -33,6 +39,13 @@
   color: var(--color-muted);
   font-size: 20rpx;
   line-height: 62rpx;
+}
+
+.mode-bar button { width: 100%; }
+
+.theme-bar button {
+  width: 108rpx;
+  flex: 0 0 108rpx;
 }
 
 .mode-bar button.active,
