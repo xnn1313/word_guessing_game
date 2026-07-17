@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>猜词游戏</title>
-    <link rel="stylesheet" href="style.css?v=20260713-rematch">
+    <title>脑力游乐场</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css?v=20260718-web-sync">
+    <link rel="stylesheet" href="puzzle-games.css?v=20260718-web-sync">
 </head>
 <body>
     <div class="game-container" id="game-container">
         <header>
-            <h1>猜词游戏</h1>
+            <h1>脑力游乐场</h1>
             <div class="header-actions">
                 <button class="auth-btn" id="auth-btn">登录 / 注册</button>
                 <div class="user-menu" id="user-menu" hidden>
@@ -22,9 +24,18 @@
 
         <div class="save-status guest" id="save-status">
             <span class="save-status-dot"></span>
-            <span id="save-status-text">试玩模式：当前进度不会保存</span>
+            <span id="save-status-text">试玩模式：进度仅保存在当前浏览器</span>
         </div>
 
+        <nav class="game-switcher" id="game-switcher" aria-label="选择游戏">
+            <button class="game-switch-btn active" data-game="word" type="button"><span>词</span>猜词</button>
+            <button class="game-switch-btn" data-game="sudoku" type="button"><span>数</span>数独</button>
+            <button class="game-switch-btn" data-game="idiom" type="button"><span>成</span>成语</button>
+            <button class="game-switch-btn" data-game="memory" type="button"><span>记</span>翻牌</button>
+            <button class="game-switch-btn" data-game="word-search" type="button"><span>寻</span>字阵</button>
+        </nav>
+
+        <div id="word-game-shell">
         <div class="mode-switch" role="tablist" aria-label="游戏模式">
             <button class="mode-btn active" id="classic-mode-btn" data-mode="classic" role="tab">经典猜词</button>
             <button class="mode-btn" id="campaign-mode-btn" data-mode="campaign" role="tab">分类闯关</button>
@@ -139,6 +150,9 @@
                 <button class="reset-btn" id="reset-btn">新游戏</button>
             </div>
         </section>
+        </div>
+
+        <main id="puzzle-games-root" hidden aria-live="polite"></main>
     </div>
 
     <div class="modal-overlay" id="modal-overlay">
@@ -154,6 +168,8 @@
                 <li>分类闯关需要登录，共 13 个分类、260 关；完成当前关卡后会解锁下一关。</li>
                 <li>5 次内猜中得三星，10 次内得二星，其余得一星；重复挑战只保留更好成绩。</li>
                 <li>双人竞速需要两名登录玩家，房主创建房间后分享六位房间码，90 秒内先猜中者获胜；结束后双方确认“再来一局”即可自动换词再战。</li>
+                <li>数独、成语填字和记忆翻牌支持每日挑战、自由练习及登录云存档。</li>
+                <li>字阵寻踪需要沿横、竖或斜线找出隐藏词语；同一道字阵中的路径可以交叉，但不能拐弯。</li>
             </ol>
             <button class="close-btn" id="close-modal">知道了</button>
         </div>
@@ -178,6 +194,11 @@
         </div>
     </div>
 
-    <script src="script.js?v=20260713-rematch"></script>
+    <script src="script.js?v=20260718-web-sync"></script>
+    <script src="puzzle-games.js?v=20260718-web-sync"></script>
+    <script src="sudoku-web.js?v=20260718-web-sync"></script>
+    <script src="idiom-web.js?v=20260718-web-sync"></script>
+    <script src="memory-web.js?v=20260718-web-sync"></script>
+    <script src="word-search-web.js?v=20260718-web-sync"></script>
 </body>
 </html>

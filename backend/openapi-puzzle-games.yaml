@@ -2,11 +2,12 @@ openapi: 3.0.3
 info:
   title: 益智游戏平台 API
   version: puzzle-api-v1
-  description: 每日数独、成语填字、记忆翻牌和游戏大厅接口。成功直接返回 JSON，失败返回 Error。
+  description: 每日数独、成语填字、记忆翻牌、字阵寻踪和游戏大厅接口。成功直接返回 JSON，失败返回 Error。
 servers:
   - url: /api
 security:
   - {}
+  - cookieAuth: []
   - bearerAuth: []
 paths:
   /games/overview:
@@ -256,8 +257,125 @@ paths:
                   correct: {type: boolean, example: false}
                   status: {type: string, example: incorrect}
                   unmatched_count: {type: integer, example: 2}
+  /word-search/themes:
+    get:
+      summary: 获取字阵主题和难度目录
+      security: []
+      responses:
+        '200':
+          description: 可选主题及每个难度的字阵尺寸、目标词数
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WordSearchCatalog'
+  /word-search/board:
+    get:
+      summary: 获取每日或练习字阵
+      description: >-
+        返回字符网格与线索，不返回目标词、答案或放置路径。board_id 是服务端签名的不透明标识，
+        客户端不得修改或自行构造。游客练习局需在恢复时原样传回 board_id；登录用户会自动恢复同模式、难度和主题的最新未完成局。
+      parameters:
+        - $ref: '#/components/parameters/ModeDailyPractice'
+        - $ref: '#/components/parameters/Difficulty'
+        - $ref: '#/components/parameters/WordSearchTheme'
+        - name: board_id
+          in: query
+          required: false
+          description: 恢复指定字阵时传入；其中的模式、难度和主题必须与查询参数一致
+          schema: {type: string, maxLength: 160, example: ws1.practice.easy.classic.a1b2c3d4e5f60708.1234567890abcdef1234}
+        - name: fresh
+          in: query
+          required: false
+          description: 传 1 可在练习模式强制开始新字阵；登录用户同主题旧的未完成局会标记为 abandoned，每日模式忽略此参数
+          schema: {type: string, enum: ['1']}
+      responses:
+        '200':
+          description: 不含答案的字阵；登录用户附带运行记录和已保存进度
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WordSearchBoard'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /word-search/save:
+    post:
+      summary: 保存字阵云端进度
+      description: >-
+        仅登录用户可用。服务端会根据签名 board_id 重建题目并验证 found_paths，
+        不接受客户端声明的词条 ID。已确认词条、elapsed_seconds 和 mistakes 均不能回退。
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WordSearchProgressRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/Saved'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          description: found_paths 中存在格式合法但不属于本题的路径；此保存接口返回通用 Error 结构
+          content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
+  /word-search/submit:
+    post:
+      summary: 提交字阵路径并在找齐后完成游戏
+      description: >-
+        可用 path 增量提交一条路径，或用 found_paths 提交客户端已保留的全部路径；两者同时存在时 path 会追加到 found_paths。
+        路径可正向或反向，但必须是水平、垂直或对角线上连续且不重复的坐标。登录用户可用 Cookie 或 Bearer Token；游客可不登录提交，
+        但必须在本地保留 board_id 和累积 found_paths，服务端不为游客创建运行记录。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WordSearchSubmitRequest'
+      responses:
+        '200':
+          description: 本次路径正确，返回游戏中状态；找齐时返回完成结果，重复完成提交幂等
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/WordSearchPlaying'
+                  - $ref: '#/components/schemas/WordSearchCompleted'
+        '400':
+          description: 路径格式、坐标连续性、重复词条或其他参数无效
+          content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          description: >-
+            坐标格式合法，但所选直线不是本题的目标词条。返回业务响应而非 Error，
+            且不泄露答案、目标词或正确路径；请求层应保留并处理此响应体。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WordSearchIncorrect'
 components:
   securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session
+      description: 网页端 Flask 签名会话 Cookie；请求需允许携带 credentials
     bearerAuth:
       type: http
       scheme: bearer
@@ -278,6 +396,14 @@ components:
       in: query
       required: false
       schema: {type: string, enum: [easy, medium, hard]}
+    WordSearchTheme:
+      name: theme
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [classic, nature, animals, character, emotion]
+        default: classic
   responses:
     Saved:
       description: 云端进度已保存
@@ -501,6 +627,204 @@ components:
           items: {type: integer, minimum: 0}
         moves: {type: integer, minimum: 0}
         elapsed_seconds: {type: integer, minimum: 0}
+    WordSearchCatalog:
+      type: object
+      required: [themes, difficulties]
+      properties:
+        themes:
+          type: array
+          minItems: 5
+          items:
+            type: object
+            required: [key, title, description]
+            properties:
+              key:
+                type: string
+                enum: [classic, nature, animals, character, emotion]
+              title: {type: string, example: 自然万象}
+              description: {type: string, example: 山水风云、四季草木主题}
+        difficulties:
+          type: array
+          minItems: 3
+          maxItems: 3
+          items:
+            type: object
+            required: [key, rows, columns, word_count]
+            properties:
+              key: {type: string, enum: [easy, medium, hard]}
+              rows: {type: integer, enum: [6, 7, 8]}
+              columns: {type: integer, enum: [6, 7, 8]}
+              word_count: {type: integer, enum: [4, 6, 8]}
+    WordSearchCoordinate:
+      type: object
+      required: [row, column]
+      additionalProperties: false
+      properties:
+        row: {type: integer, minimum: 0, description: 从 0 开始}
+        column: {type: integer, minimum: 0, description: 从 0 开始}
+    WordSearchPath:
+      type: array
+      minItems: 2
+      maxItems: 8
+      description: 水平、垂直或对角线上的连续坐标；正向、反向均可
+      items:
+        $ref: '#/components/schemas/WordSearchCoordinate'
+    WordSearchSavedState:
+      type: object
+      required: [found_entry_ids, found_paths, elapsed_seconds, mistakes]
+      properties:
+        found_entry_ids:
+          type: array
+          maxItems: 8
+          uniqueItems: true
+          readOnly: true
+          items: {type: string, pattern: '^entry-[1-8]$'}
+        found_paths:
+          type: array
+          maxItems: 8
+          items:
+            $ref: '#/components/schemas/WordSearchPath'
+        elapsed_seconds: {type: integer, minimum: 0}
+        mistakes: {type: integer, minimum: 0}
+    WordSearchBoard:
+      type: object
+      required:
+        - board_id
+        - mode
+        - puzzle_date
+        - difficulty
+        - theme
+        - theme_title
+        - rows
+        - columns
+        - word_count
+        - grid
+        - entries
+        - run_id
+        - saved_state
+      properties:
+        board_id:
+          type: string
+          maxLength: 160
+          description: 带 HMAC 签名的不透明题目标识；服务端用它确定性重建题目并验证签名
+        mode: {type: string, enum: [daily, practice]}
+        puzzle_date:
+          type: string
+          format: date
+          nullable: true
+          description: 每日模式为服务端上海时区日期；练习模式为 null
+        difficulty: {type: string, enum: [easy, medium, hard]}
+        theme: {type: string, enum: [classic, nature, animals, character, emotion]}
+        theme_title: {type: string, example: 成语万花筒}
+        rows: {type: integer, enum: [6, 7, 8]}
+        columns: {type: integer, enum: [6, 7, 8]}
+        word_count: {type: integer, enum: [4, 6, 8]}
+        grid:
+          type: array
+          minItems: 6
+          maxItems: 8
+          description: 仅包含单字的矩形网格，尺寸由 rows 和 columns 确定
+          items:
+            type: array
+            minItems: 6
+            maxItems: 8
+            items: {type: string, minLength: 1, maxLength: 1}
+        entries:
+          type: array
+          minItems: 4
+          maxItems: 8
+          description: 线索元数据；不含 word、answer、solution 或 path
+          items:
+            type: object
+            required: [id, clue, length]
+            additionalProperties: false
+            properties:
+              id: {type: string, pattern: '^entry-[1-8]$'}
+              clue: {type: string, maxLength: 180}
+              length: {type: integer, enum: [4]}
+        run_id:
+          type: string
+          nullable: true
+          description: 登录用户的运行记录；游客为 null
+        saved_state:
+          nullable: true
+          description: 登录用户的云端进度；游客为 null
+          allOf:
+            - $ref: '#/components/schemas/WordSearchSavedState'
+    WordSearchProgressRequest:
+      type: object
+      required: [run_id, board_id, found_paths, elapsed_seconds, mistakes]
+      properties:
+        run_id: {type: string, description: 必须属于当前登录用户和 board_id}
+        board_id: {type: string, maxLength: 160}
+        found_paths:
+          type: array
+          maxItems: 8
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/WordSearchPath'
+        elapsed_seconds: {type: integer, minimum: 0}
+        mistakes: {type: integer, minimum: 0, maximum: 10000}
+    WordSearchSubmitRequest:
+      type: object
+      required: [board_id]
+      description: >-
+        通常传 path 或 found_paths 至少一项。游客不传 run_id；登录用户应传回获取字阵时的 run_id。
+      properties:
+        run_id: {type: string, nullable: true}
+        board_id: {type: string, maxLength: 160}
+        path:
+          description: 本次新选中的单条路径，服务端会将其追加至 found_paths
+          allOf:
+            - $ref: '#/components/schemas/WordSearchPath'
+        found_paths:
+          type: array
+          maxItems: 8
+          uniqueItems: true
+          description: 已找到的累积路径；游客端必须自行保留并传回
+          items:
+            $ref: '#/components/schemas/WordSearchPath'
+        elapsed_seconds: {type: integer, minimum: 0, default: 0}
+        mistakes: {type: integer, minimum: 0, maximum: 10000, default: 0}
+    WordSearchPlaying:
+      type: object
+      required: [correct, status, found_entry_ids, found_count, remaining_count]
+      properties:
+        correct: {type: boolean, enum: [true]}
+        status: {type: string, enum: [playing]}
+        found_entry_ids:
+          type: array
+          maxItems: 8
+          uniqueItems: true
+          readOnly: true
+          items: {type: string, pattern: '^entry-[1-8]$'}
+        found_count: {type: integer, minimum: 0, maximum: 8}
+        remaining_count: {type: integer, minimum: 1, maximum: 8}
+    WordSearchIncorrect:
+      type: object
+      required: [correct, status, code, mistakes]
+      additionalProperties: false
+      properties:
+        correct: {type: boolean, enum: [false]}
+        status: {type: string, enum: [incorrect]}
+        code: {type: string, enum: [WORD_NOT_FOUND]}
+        mistakes: {type: integer, minimum: 1}
+    WordSearchCompleted:
+      type: object
+      required: [correct, status, result]
+      properties:
+        correct: {type: boolean, enum: [true]}
+        status: {type: string, enum: [completed]}
+        result:
+          type: object
+          required: [score, stars, elapsed_seconds, mistakes, found_count, is_new_best]
+          properties:
+            score: {type: integer, minimum: 100}
+            stars: {type: integer, minimum: 1, maximum: 3}
+            elapsed_seconds: {type: integer, minimum: 0}
+            mistakes: {type: integer, minimum: 0}
+            found_count: {type: integer, enum: [4, 6, 8]}
+            is_new_best: {type: boolean}
     IncorrectCells:
       type: object
       required: [correct, status, invalid_cells]

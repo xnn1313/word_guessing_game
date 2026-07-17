@@ -16,12 +16,18 @@ let battleSubmitting = false;
 async function fetchJSON(url, options = {}) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 120000);
+    const acceptedStatuses = Array.isArray(options.acceptedStatuses) ? options.acceptedStatuses : [];
+    const fetchOptions = { ...options };
+    delete fetchOptions.acceptedStatuses;
 
     try {
-        const res = await fetch(url, { ...options, signal: controller.signal });
+        const res = await fetch(url, { ...fetchOptions, signal: controller.signal });
         const data = await res.json().catch(() => ({}));
-        if (!res.ok) {
-            throw new Error(data.error || `请求失败（HTTP ${res.status}）`);
+        if (!res.ok && !acceptedStatuses.includes(res.status)) {
+            const error = new Error(data.error || `请求失败（HTTP ${res.status}）`);
+            error.statusCode = res.status;
+            error.data = data;
+            throw error;
         }
         return data;
     } finally {
@@ -498,8 +504,11 @@ function updateAuthUI(username) {
         userMenu.hidden = true;
         document.getElementById("username").textContent = "";
         saveStatus.className = "save-status guest";
-        document.getElementById("save-status-text").textContent = "试玩模式：当前进度不会保存";
+        document.getElementById("save-status-text").textContent = "试玩模式：进度仅保存在当前浏览器";
     }
+    window.dispatchEvent(new CustomEvent("web-auth-changed", {
+        detail: { username: currentUsername },
+    }));
 }
 
 async function bootstrapGame() {
@@ -782,6 +791,18 @@ async function revealAnswer() {
         btn.disabled = false;
     }
 }
+
+window.WebGameBridge = {
+    apiBase: API_BASE,
+    fetchJSON,
+    showToast,
+    getUsername: () => currentUsername,
+    isLoggedIn: () => Boolean(currentUsername),
+    stopWordBackgroundWork: stopBattlePolling,
+    resumeWordSurface: () => {
+        if (currentMode === "battle" && currentUsername) enterBattleMode();
+    },
+};
 
 // Event bindings
 document.addEventListener("DOMContentLoaded", () => {

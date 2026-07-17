@@ -3,6 +3,7 @@
 from flask import jsonify, request, session as flask_session
 
 import puzzle_games
+import word_search
 
 
 MAX_JSON_BYTES = 64 * 1024
@@ -53,6 +54,7 @@ def register_puzzle_routes(app, get_current_user):
             "/api/sudoku/",
             "/api/idiom/",
             "/api/memory/",
+            "/api/word-search/",
         )
         if request.path.startswith(puzzle_prefixes):
             app.logger.error("益智游戏接口发生未处理错误: %s", error)
@@ -153,4 +155,30 @@ def register_puzzle_routes(app, get_current_user):
     @app.route("/api/memory/submit", methods=["POST"])
     def memory_submit():
         result = puzzle_games.submit_memory(resolved_user(), body())
+        return jsonify(result), 200 if result.get("correct") else 422
+
+    @app.route("/api/word-search/themes")
+    def word_search_themes():
+        return jsonify(word_search.themes_catalog())
+
+    @app.route("/api/word-search/board")
+    def word_search_board():
+        return jsonify(
+            word_search.get_board(
+                resolved_user(),
+                request.args.get("mode"),
+                request.args.get("difficulty"),
+                request.args.get("theme", "classic"),
+                request.args.get("board_id"),
+                request.args.get("fresh") == "1",
+            )
+        )
+
+    @app.route("/api/word-search/save", methods=["POST"])
+    def word_search_save():
+        return jsonify(word_search.save_progress(resolved_user(), body()))
+
+    @app.route("/api/word-search/submit", methods=["POST"])
+    def word_search_submit():
+        result = word_search.submit_paths(resolved_user(), body())
         return jsonify(result), 200 if result.get("correct") else 422

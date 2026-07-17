@@ -473,6 +473,57 @@ def get_latest_memory_playing_run(user_id, mode, difficulty, theme):
     return None
 
 
+def get_latest_word_search_playing_run(user_id, mode, difficulty, theme):
+    """Return the newest unfinished word-search run for one exact theme."""
+    with _connect() as connection:
+        rows = connection.execute(
+            """
+            SELECT * FROM game_runs
+            WHERE user_id = ? AND game_key = 'word_search' AND mode = ?
+              AND difficulty = ? AND status = 'playing'
+            ORDER BY updated_at DESC, rowid DESC
+            """,
+            (user_id, mode, difficulty),
+        ).fetchall()
+    for row in rows:
+        run = _deserialize_run(row)
+        if run["state"].get("theme") == theme:
+            return run
+    return None
+
+
+def abandon_word_search_playing_runs(user_id, mode, difficulty, theme):
+    """Close unfinished word-search runs superseded by an explicit fresh board."""
+    with _connect() as connection:
+        rows = connection.execute(
+            """
+            SELECT id, state_json FROM game_runs
+            WHERE user_id = ? AND game_key = 'word_search' AND mode = ?
+              AND difficulty = ? AND status = 'playing'
+            """,
+            (user_id, mode, difficulty),
+        ).fetchall()
+        run_ids = []
+        for row in rows:
+            try:
+                state = json.loads(row["state_json"] or "{}")
+            except (TypeError, ValueError):
+                state = {}
+            if state.get("theme") == theme:
+                run_ids.append(row["id"])
+        if run_ids:
+            timestamp = utc_now_iso()
+            connection.executemany(
+                """
+                UPDATE game_runs
+                SET status = 'abandoned', updated_at = ?
+                WHERE id = ? AND user_id = ? AND status = 'playing'
+                """,
+                [(timestamp, run_id, user_id) for run_id in run_ids],
+            )
+    return len(run_ids)
+
+
 def abandon_memory_playing_runs(user_id, mode, difficulty, theme):
     """Close unfinished runs superseded by an explicit fresh memory board."""
     with _connect() as connection:
