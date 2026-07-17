@@ -1,0 +1,65 @@
+<view class="page-shell memory-page">
+  <view class="page-kicker">MEMORY · 专注训练</view>
+  <view class="page-title">记忆翻牌</view>
+  <view class="page-subtitle">记住牌面位置，用更少步数找出全部配对。</view>
+
+  <view class="mode-bar">
+    <button
+      class="{{mode === item.value ? 'active' : ''}}"
+      wx:for="{{modeOptions}}"
+      wx:key="value"
+      data-value="{{item.value}}"
+      bindtap="switchMode"
+    >{{item.label}}</button>
+  </view>
+
+  <scroll-view class="option-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+    <button
+      class="option-chip {{difficulty === item.value ? 'active' : ''}}"
+      wx:for="{{difficultyOptions}}"
+      wx:key="value"
+      data-value="{{item.value}}"
+      bindtap="switchDifficulty"
+    >{{item.label}}</button>
+  </scroll-view>
+  <view class="theme-bar">
+    <button
+      class="{{theme === item.value ? 'active' : ''}}"
+      wx:for="{{themeOptions}}"
+      wx:key="value"
+      data-value="{{item.value}}"
+      bindtap="switchTheme"
+    >{{item.label}}</button>
+  </view>
+
+  <view class="loading-state" wx:if="{{loading}}">正在洗牌…</view>
+  <block wx:else>
+    <view class="memory-status">
+      <view><text>步数</text><text>{{moves}}</text></view>
+      <view><text>用时</text><text>{{elapsedText}}</text></view>
+      <view><text>配对</text><text>{{matchedPositions.length / 2}} / {{cards.length / 2}}</text></view>
+    </view>
+
+    <view class="memory-board columns-{{board.columns}}">
+      <button
+        class="memory-card {{item.flipped ? 'flipped' : ''}} {{item.matched ? 'matched' : ''}}"
+        wx:for="{{cards}}"
+        wx:key="position"
+        data-position="{{item.position}}"
+        bindtap="flipCard"
+      >
+        <view class="card-back" wx:if="{{!item.flipped}}">✦</view>
+        <view class="card-face" wx:else>{{item.display}}</view>
+      </button>
+    </view>
+
+    <view class="board-note">{{resolving ? '正在核对这一对…' : '点击两张牌，找出相同图案'}}</view>
+
+    <view class="complete-panel surface" wx:if="{{completed && result}}">
+      <view class="complete-title">全部配对完成</view>
+      <view class="complete-stars">{{result.stars === 3 ? '★★★' : result.stars === 2 ? '★★☆' : '★☆☆'}}</view>
+      <view class="complete-detail">{{result.score}} 分 · {{result.moves}} 步 · {{elapsedText}}</view>
+      <button class="primary-button" bindtap="playAgain">再来一局</button>
+    </view>
+  </block>
+</view>

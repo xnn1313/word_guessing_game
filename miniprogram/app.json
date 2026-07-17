@@ -1,6 +1,9 @@
 {
   "pages": [
     "pages/hub/index",
+    "pages/sudoku/index",
+    "pages/idiom/index",
+    "pages/memory/index",
     "pages/home/index",
     "pages/auth/index",
     "pages/classic/index",

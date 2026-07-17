@@ -17,7 +17,7 @@
       <text class="training-note">{{trainingNote}}</text>
     </view>
     <view class="training-ring">
-      <text>1</text>
+      <text>{{availableGames}}</text>
       <text>款可玩</text>
     </view>
   </view>
@@ -32,28 +32,28 @@
       <view class="game-icon word">词</view>
       <view class="game-copy">
         <text class="game-name">猜词实验室</text>
-        <text class="game-description">关联猜词 · 分类闯关 · 好友竞速</text>
-        <view class="game-progress"><view style="width: {{campaignStars ? 34 : 8}}%"></view></view>
+        <text class="game-description">{{wordGame.progress_text}} · 好友竞速</text>
+        <view class="game-progress"><view style="width: {{wordGame.progress_percent}}%"></view></view>
       </view>
       <view class="game-action">→</view>
     </view>
 
-    <view class="game-card upcoming" data-name="每日数独" bindtap="showComingSoon" hover-class="card-pressed">
+    <view class="game-card playable" bindtap="openSudoku" hover-class="card-pressed">
       <view class="game-icon sudoku">▦</view>
-      <view class="game-copy"><text class="game-name">每日数独</text><text class="game-description">数字逻辑 · 三种难度</text></view>
-      <text class="coming-tag">即将上线</text>
+      <view class="game-copy"><text class="game-name">每日数独</text><text class="game-description">{{sudokuGame.progress_text}} · 三种难度</text></view>
+      <view class="game-action">→</view>
     </view>
 
-    <view class="game-card upcoming" data-name="成语填字" bindtap="showComingSoon" hover-class="card-pressed">
+    <view class="game-card playable" bindtap="openIdiom" hover-class="card-pressed">
       <view class="game-icon idiom">成</view>
-      <view class="game-copy"><text class="game-name">成语填字</text><text class="game-description">词汇挑战 · 连续闯关</text></view>
-      <text class="coming-tag">即将上线</text>
+      <view class="game-copy"><text class="game-name">成语填字</text><text class="game-description">{{idiomGame.progress_text}} · 连续闯关</text></view>
+      <view class="game-action">→</view>
     </view>
 
-    <view class="game-card upcoming" data-name="记忆翻牌" bindtap="showComingSoon" hover-class="card-pressed">
+    <view class="game-card playable" bindtap="openMemory" hover-class="card-pressed">
       <view class="game-icon memory">◫</view>
-      <view class="game-copy"><text class="game-name">记忆翻牌</text><text class="game-description">专注训练 · 限时挑战</text></view>
-      <text class="coming-tag planned">计划中</text>
+      <view class="game-copy"><text class="game-name">记忆翻牌</text><text class="game-description">{{memoryGame.progress_text}} · 专注训练</text></view>
+      <view class="game-action">→</view>
     </view>
   </view>
 

@@ -112,3 +112,166 @@ export interface BattleState {
     in_word_bank: boolean;
   };
 }
+
+export type PuzzleGameKey = "word" | "sudoku" | "idiom" | "memory";
+export type PuzzleDifficulty = "easy" | "medium" | "hard";
+export type PuzzleRunMode = "daily" | "practice" | "level";
+
+export interface GameOverviewItem {
+  key: PuzzleGameKey;
+  title: string;
+  availability: "available" | "coming_soon" | "maintenance";
+  progress_text: string;
+  progress_percent: number;
+  best_score: number | null;
+  daily_completed: boolean;
+  last_played_at: string | null;
+}
+
+export interface GamesOverview {
+  server_date: string;
+  summary: {
+    available_games: number;
+    completed_today: number;
+    total_stars: number;
+    last_game_key: PuzzleGameKey | null;
+  };
+  games: GameOverviewItem[];
+}
+
+export interface SudokuSavedState {
+  grid: string;
+  notes: Record<string, number[]>;
+  elapsed_seconds: number;
+  hints_used: number;
+  mistakes: number;
+}
+
+export interface SudokuPuzzleResponse {
+  puzzle_id: string;
+  mode: "daily" | "practice";
+  puzzle_date: string | null;
+  difficulty: PuzzleDifficulty;
+  givens: string;
+  run_id: string | null;
+  saved_state: SudokuSavedState | null;
+  limits: { max_hints: number };
+}
+
+export interface IdiomCell {
+  row: number;
+  column: number;
+  type: "fixed" | "input";
+  value?: string;
+}
+
+export interface IdiomEntry {
+  id: string;
+  direction: "across" | "down";
+  start: { row: number; column: number };
+  length: number;
+  clue: string;
+  pinyin_hint: string;
+}
+
+export interface IdiomLevel {
+  id: string;
+  order: number;
+  title: string;
+  difficulty: PuzzleDifficulty;
+  unlocked: boolean;
+  stars: number;
+  best_score: number | null;
+}
+
+export interface IdiomCategory {
+  id: string;
+  name: string;
+  description: string;
+  completed_levels: number;
+  total_levels: number;
+  levels: IdiomLevel[];
+}
+
+export interface IdiomCatalog {
+  total_stars: number;
+  max_stars: number;
+  categories: IdiomCategory[];
+}
+
+export interface IdiomSavedState {
+  grid: string[];
+  elapsed_seconds: number;
+  hints_used: number;
+  mistakes: number;
+}
+
+export interface IdiomPuzzleResponse {
+  puzzle_id: string;
+  mode: "daily" | "level";
+  puzzle_date: string | null;
+  title: string;
+  difficulty: PuzzleDifficulty;
+  size: number;
+  cells: IdiomCell[];
+  entries: IdiomEntry[];
+  character_bank: string[];
+  run_id: string | null;
+  saved_state: IdiomSavedState | null;
+  limits: { max_hints: number };
+}
+
+export interface MemoryCard {
+  position: number;
+  face_key: string;
+  display: string;
+}
+
+export interface MemorySavedState {
+  matched_positions: number[];
+  moves: number;
+  elapsed_seconds: number;
+}
+
+export interface MemoryBoardResponse {
+  board_id: string;
+  mode: "daily" | "practice";
+  puzzle_date: string | null;
+  difficulty: PuzzleDifficulty;
+  theme: "classic" | "fruit" | "animal";
+  rows: number;
+  columns: number;
+  cards: MemoryCard[];
+  run_id: string | null;
+  saved_state: MemorySavedState | null;
+}
+
+export interface PuzzleHintResponse {
+  index?: number;
+  row: number;
+  column: number;
+  value: string | number;
+  hints_used: number;
+  remaining_hints: number;
+}
+
+export interface PuzzleCompletionResult {
+  score: number;
+  stars: number;
+  elapsed_seconds: number;
+  mistakes?: number;
+  hints_used?: number;
+  moves?: number;
+  earned_stars?: number;
+  total_stars?: number;
+  next_level_id?: string | null;
+  is_new_best: boolean;
+}
+
+export interface PuzzleSubmitResponse {
+  correct: boolean;
+  status: "completed" | "incorrect";
+  invalid_cells?: number[];
+  unmatched_count?: number;
+  result?: PuzzleCompletionResult;
+}

@@ -1,0 +1,70 @@
+<view class="page-shell sudoku-page">
+  <view class="page-kicker">SUDOKU · 数字逻辑</view>
+  <view class="page-title">每日数独</view>
+  <view class="page-subtitle">每一行、每一列、每个九宫格都填入 1–9。</view>
+
+  <view class="option-bar">
+    <button
+      class="option-button {{mode === item.value ? 'active' : ''}}"
+      wx:for="{{modeOptions}}"
+      wx:key="value"
+      data-value="{{item.value}}"
+      bindtap="switchMode"
+    >{{item.label}}</button>
+  </view>
+  <view class="difficulty-bar">
+    <button
+      class="difficulty-button {{difficulty === item.value ? 'active' : ''}}"
+      wx:for="{{difficultyOptions}}"
+      wx:key="value"
+      data-value="{{item.value}}"
+      bindtap="switchDifficulty"
+    >{{item.label}}</button>
+  </view>
+
+  <view class="loading-state" wx:if="{{loading}}">正在准备数独…</view>
+
+  <block wx:else>
+    <view class="game-status">
+      <view><text>用时</text><text>{{elapsedText}}</text></view>
+      <view><text>错误</text><text>{{mistakes}}</text></view>
+      <view><text>提示</text><text>{{hintsUsed}} / {{maxHints}}</text></view>
+    </view>
+
+    <view class="sudoku-board">
+      <button
+        class="sudoku-cell {{item.given ? 'given' : ''}} {{item.selected ? 'selected' : ''}} {{item.invalid ? 'invalid' : ''}} {{item.sameValue ? 'same-value' : ''}} {{item.boxRight ? 'box-right' : ''}} {{item.boxBottom ? 'box-bottom' : ''}}"
+        wx:for="{{cells}}"
+        wx:key="index"
+        data-index="{{item.index}}"
+        bindtap="selectCell"
+      >
+        <text class="cell-value" wx:if="{{item.value}}">{{item.value}}</text>
+        <text class="cell-notes" wx:else>{{item.noteText}}</text>
+      </button>
+    </view>
+
+    <block wx:if="{{!completed}}">
+      <view class="number-pad">
+        <button wx:for="{{digits}}" wx:key="*this" data-value="{{item}}" bindtap="inputDigit">{{item}}</button>
+      </view>
+
+      <view class="tool-row">
+        <button class="tool-button {{noteMode ? 'active' : ''}}" bindtap="toggleNoteMode">候选 {{noteMode ? '开' : '关'}}</button>
+        <button class="tool-button" data-value="0" bindtap="inputDigit">擦除</button>
+        <button class="tool-button" loading="{{hinting}}" disabled="{{hintsUsed >= maxHints}}" bindtap="requestHint">提示</button>
+        <button class="tool-button danger" bindtap="clearInputs">清空</button>
+      </view>
+
+      <button class="primary-button submit-button" loading="{{submitting}}" bindtap="submitPuzzle">检查答案</button>
+    </block>
+
+    <view class="complete-panel surface" wx:if="{{completed && result}}">
+      <view class="complete-mark">✓</view>
+      <view class="complete-title">数独完成</view>
+      <view class="complete-stars">{{result.stars === 3 ? '★★★' : result.stars === 2 ? '★★☆' : '★☆☆'}}</view>
+      <view class="complete-detail">{{result.score}} 分 · 用时 {{elapsedText}}</view>
+      <button class="secondary-button" bindtap="playAgain">再来一局</button>
+    </view>
+  </block>
+</view>
