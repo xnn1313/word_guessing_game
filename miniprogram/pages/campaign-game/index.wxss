@@ -6,6 +6,7 @@
   overflow: hidden;
   padding-top: 20rpx;
   padding-bottom: calc(22rpx + env(safe-area-inset-bottom));
+  background: var(--color-bg);
 }
 
 .level-heading {
@@ -16,12 +17,12 @@
 
 .level-icon {
   display: grid;
-  width: 68rpx;
-  height: 68rpx;
+  width: 72rpx;
+  height: 72rpx;
   flex: 0 0 auto;
   place-items: center;
   border-radius: 18rpx;
-  background: #e3f5ef;
+  background: #ffe3a0;
   font-size: 34rpx;
 }
 
@@ -34,13 +35,14 @@
 }
 
 .level-category {
-  color: #768681;
-  font-size: 20rpx;
+  color: var(--color-muted);
+  font-size: var(--font-caption);
+  font-weight: 620;
 }
 
 .level-name {
-  margin-top: 4rpx;
-  color: #203633;
+  margin-top: 3rpx;
+  color: var(--color-text);
   font-size: 30rpx;
   font-weight: 790;
 }
@@ -48,70 +50,79 @@
 .difficulty-badge {
   margin-left: 12rpx;
   padding: 8rpx 13rpx;
+  border: 2rpx solid #a7d8cb;
   border-radius: 12rpx;
-  background: #def4eb;
-  color: #18765e;
-  font-size: 18rpx;
-  font-weight: 750;
+  background: #e1f5ef;
+  color: var(--color-primary-dark);
+  font-size: var(--font-caption);
+  font-weight: 720;
 }
 
-.difficulty-badge.difficulty-3 { background: #fff0d1; color: #9d681d; }
-.difficulty-badge.difficulty-4 { background: #ffeadf; color: #aa5e36; }
-.difficulty-badge.difficulty-5 { background: #ffe3e5; color: #ad484e; }
+.difficulty-badge.difficulty-3 { border-color: #ebce8e; background: #fff3d0; color: #845a14; }
+.difficulty-badge.difficulty-4 { border-color: #e8b99b; background: #ffeadc; color: #914d28; }
+.difficulty-badge.difficulty-5 { border-color: #e5afb3; background: #ffe4e6; color: #983f46; }
 
 .level-summary {
-  display: flex;
+  position: relative;
+  display: grid;
+  min-height: 108rpx;
   flex: 0 0 auto;
+  grid-template-columns: minmax(0, 1fr) 2rpx minmax(0, 1fr);
+  gap: 20rpx;
   align-items: center;
-  min-height: 106rpx;
   margin-top: 18rpx;
-  padding: 16rpx 22rpx;
-  border-radius: 22rpx;
-  background: #17343b;
+  padding: 16rpx 24rpx 16rpx 30rpx;
+  overflow: hidden;
+  border-radius: 20rpx;
+  background: var(--color-night);
   color: #ffffff;
+  box-shadow: 0 11rpx 25rpx rgba(22, 54, 58, 0.15);
+}
+
+.level-summary::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 7rpx;
+  background: var(--color-primary);
+  content: "";
 }
 
 .level-summary > view {
   display: flex;
+  min-width: 0;
   align-items: baseline;
-  color: #9fb8b3;
-  font-size: 18rpx;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: var(--font-caption);
 }
 
 .level-summary .summary-number {
-  margin-left: 10rpx;
+  margin-left: 9rpx;
   color: #ffffff;
-  font-size: 38rpx;
-  font-weight: 830;
+  font-size: 36rpx;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 
 .level-summary .summary-number.accent {
-  color: #ffc857;
+  color: var(--color-accent);
 }
 
 .summary-unit {
   margin-left: 4rpx;
-  color: #b4c9c5;
-  font-size: 18rpx;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: var(--font-caption);
 }
 
 .summary-rule {
   width: 2rpx;
   height: 48rpx;
-  margin: 0 18rpx;
   background: rgba(255, 255, 255, 0.14);
 }
 
 .summary-hint {
-  margin-left: auto;
-  color: #8fa9a4;
-  font-size: 17rpx;
-  line-height: 1.5;
-  text-align: right;
-}
-
-.summary-hint text {
-  display: block;
+  display: none !important;
 }
 
 .history-panel {
@@ -119,11 +130,12 @@
   min-height: 0;
   flex: 1;
   flex-direction: column;
-  margin-top: 14rpx;
+  margin-top: 18rpx;
   padding: 19rpx 22rpx 8rpx;
-  border: 2rpx solid #dce7e3;
+  border: 2rpx solid var(--color-border);
   border-radius: 22rpx;
-  background: #ffffff;
+  background: var(--color-surface);
+  box-shadow: 0 8rpx 22rpx rgba(22, 54, 58, 0.06);
 }
 
 .history-title-row {
@@ -134,8 +146,8 @@
 }
 
 .history-title-row > text:last-child {
-  color: #8d9a96;
-  font-size: 19rpx;
+  color: var(--color-muted);
+  font-size: var(--font-caption);
 }
 
 .history-scroll {
@@ -148,68 +160,68 @@
 .result-note {
   flex: 0 0 auto;
   margin-top: 11rpx;
-  padding: 15rpx 20rpx;
+  padding: 14rpx 18rpx;
+  border: 2rpx solid #e5bd7d;
   border-radius: 15rpx;
-  background: #fff0d8;
-  color: #96601f;
+  background: #fff5df;
+  color: #8b5b16;
   font-size: 21rpx;
+  font-weight: 650;
   text-align: center;
 }
 
 .guess-dock {
   flex: 0 0 auto;
-  padding-top: 13rpx;
-  background: #f3f7f5;
+  padding-top: 15rpx;
+  background: var(--color-bg);
 }
 
 .guess-row {
-  display: flex;
-  gap: 11rpx;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 142rpx;
+  gap: 14rpx;
 }
 
 .guess-row .text-input {
+  width: 100%;
   min-width: 0;
-  flex: 1;
-  background: #ffffff;
 }
 
 .guess-button {
-  width: 112rpx;
-  height: 86rpx;
-  border-radius: 20rpx;
-  background: #12a37f;
+  display: grid;
+  width: 142rpx;
+  height: var(--control-height);
+  place-items: center;
+  border-radius: 18rpx;
+  background: var(--color-primary);
   color: #ffffff;
-  font-size: 25rpx;
-  font-weight: 770;
-  line-height: 86rpx;
-  box-shadow: 0 8rpx 18rpx rgba(18, 163, 127, 0.18);
-}
-
-.guess-button[disabled] {
-  opacity: 0.4;
-  box-shadow: none;
+  font-size: var(--font-control);
+  font-weight: 760;
+  box-shadow: 0 9rpx 20rpx rgba(15, 143, 130, 0.2);
 }
 
 .level-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 12rpx;
-  padding: 0 4rpx;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14rpx;
+  margin-top: 6rpx;
 }
 
 .level-actions button,
 .retry-button {
-  color: #277d69;
-  font-size: 20rpx;
-  line-height: 1.5;
+  min-height: 76rpx;
+  color: var(--color-primary-dark);
+  font-size: 21rpx;
+  font-weight: 650;
+  line-height: 76rpx;
 }
 
 .complete-panel {
   display: flex;
-  align-items: center;
-  justify-content: center;
   min-height: 0;
   flex: 1;
+  align-items: center;
+  justify-content: center;
   flex-direction: column;
   text-align: center;
 }
@@ -220,29 +232,30 @@
   height: 104rpx;
   place-items: center;
   border-radius: 50%;
-  background: #dff6ed;
-  color: #0b8666;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
   font-size: 48rpx;
   font-weight: 850;
+  box-shadow: 0 12rpx 26rpx rgba(15, 143, 130, 0.16);
 }
 
 .complete-title {
   margin-top: 24rpx;
-  color: #173d36;
-  font-size: 38rpx;
+  color: var(--color-text);
+  font-size: 40rpx;
   font-weight: 820;
 }
 
 .complete-answer {
   margin-top: 10rpx;
-  color: #6e7e79;
+  color: var(--color-muted);
   font-size: 23rpx;
 }
 
 .complete-stars {
-  margin: 22rpx 0 32rpx;
-  color: #e3a22d;
-  font-size: 54rpx;
+  margin: 22rpx 0 30rpx;
+  color: #bc7f18;
+  font-size: 50rpx;
   letter-spacing: 7rpx;
 }
 
@@ -251,170 +264,14 @@
 }
 
 .retry-button {
-  margin-top: 20rpx;
+  margin-top: 10rpx;
 }
 
 @media (max-height: 650px) {
   .level-summary {
-    min-height: 92rpx;
+    min-height: 94rpx;
     margin-top: 13rpx;
-    padding-top: 12rpx;
-    padding-bottom: 12rpx;
+    padding-top: 11rpx;
+    padding-bottom: 11rpx;
   }
-}
-
-/* Visual refresh */
-.level-page {
-  background: var(--color-bg);
-}
-
-.level-page .level-icon {
-  border: 3rpx solid var(--color-ink);
-  border-radius: 16rpx;
-  background: var(--color-accent);
-  box-shadow: 3rpx 3rpx 0 rgba(41, 45, 58, 0.15);
-}
-
-.level-page .level-category {
-  color: var(--color-muted);
-  font-weight: 650;
-}
-
-.level-page .level-name {
-  color: var(--color-text);
-  font-weight: 840;
-}
-
-.level-page .difficulty-badge {
-  border: 2rpx solid var(--color-ink);
-  background: #dcf7ef;
-  color: #176f5a;
-  box-shadow: 2rpx 2rpx 0 rgba(41, 45, 58, 0.12);
-}
-
-.level-page .difficulty-badge.difficulty-3 { background: #fff0be; color: #82590e; }
-.level-page .difficulty-badge.difficulty-4 { background: #ffe0c9; color: #934b24; }
-.level-page .difficulty-badge.difficulty-5 { background: #ffd8dc; color: #9c3d46; }
-
-.level-page .level-summary {
-  border: 3rpx solid var(--color-ink);
-  border-radius: 20rpx;
-  background: var(--color-night);
-  box-shadow: 6rpx 6rpx 0 var(--color-primary);
-}
-
-.level-page .level-summary > view,
-.level-page .summary-unit,
-.level-page .summary-hint {
-  color: #bdc1d3;
-}
-
-.level-page .level-summary .summary-number.accent {
-  color: var(--color-accent);
-}
-
-.level-page .history-panel {
-  margin-top: 20rpx;
-  border: 3rpx solid var(--color-ink);
-  border-radius: 20rpx;
-  background: var(--color-surface);
-  box-shadow: 5rpx 5rpx 0 rgba(41, 45, 58, 0.1);
-}
-
-.level-page .history-title-row > text:last-child {
-  color: var(--color-muted);
-}
-
-.level-page .result-note {
-  border: 2rpx solid #bd7d18;
-  background: #fff0bd;
-  color: #83560e;
-  font-weight: 680;
-}
-
-.level-page .guess-dock {
-  padding-top: 17rpx;
-  background: var(--color-bg);
-}
-
-.level-page .guess-button {
-  border: 3rpx solid var(--color-ink);
-  border-radius: 18rpx;
-  background: var(--color-primary);
-  box-shadow: 5rpx 5rpx 0 var(--color-ink);
-}
-
-.level-page .guess-button:active {
-  box-shadow: 2rpx 2rpx 0 var(--color-ink);
-}
-
-.level-page .level-actions button,
-.level-page .retry-button {
-  color: var(--color-primary-dark);
-  font-weight: 680;
-}
-
-.level-page .complete-emblem {
-  border: 3rpx solid var(--color-ink);
-  background: var(--color-mint);
-  color: var(--color-ink);
-  box-shadow: 7rpx 7rpx 0 var(--color-ink);
-}
-
-.level-page .complete-title {
-  color: var(--color-text);
-  font-size: 42rpx;
-  font-weight: 880;
-}
-
-.level-page .complete-answer {
-  color: var(--color-muted);
-}
-
-.level-page .complete-stars {
-  color: #d98e0b;
-  text-shadow: 3rpx 3rpx 0 #fff0b8;
-}
-
-/* Unified level controls */
-.level-page .level-category,
-.level-page .difficulty-badge {
-  font-size: var(--font-caption);
-}
-
-.level-page .level-name {
-  font-size: 30rpx;
-}
-
-.level-page .history-title-row > text:last-child {
-  font-size: var(--font-caption);
-}
-
-.level-page .guess-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 150rpx;
-  gap: 14rpx;
-}
-
-.level-page .guess-row .text-input {
-  width: 100%;
-  min-width: 0;
-  height: var(--control-height);
-  font-size: 26rpx;
-}
-
-.level-page .guess-button {
-  display: grid;
-  width: 150rpx;
-  min-width: 150rpx;
-  max-width: 150rpx;
-  height: var(--control-height);
-  place-items: center;
-  font-size: var(--font-control);
-  line-height: 1;
-}
-
-.level-page .level-actions button,
-.level-page .retry-button {
-  font-size: 22rpx;
 }

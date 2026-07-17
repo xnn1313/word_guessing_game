@@ -5,11 +5,11 @@
 
 .history-row {
   display: flex;
+  min-height: 82rpx;
   align-items: center;
   justify-content: space-between;
-  min-height: 76rpx;
-  padding: 12rpx 6rpx;
-  border-bottom: 2rpx solid #edf2f0;
+  padding: 13rpx 6rpx;
+  border-bottom: 2rpx solid #e7eeeb;
 }
 
 .history-row:last-child {
@@ -17,12 +17,12 @@
 }
 
 .history-row.latest {
-  margin: 0 -10rpx;
-  padding-right: 16rpx;
-  padding-left: 16rpx;
+  margin: 0 -8rpx;
+  padding-right: 14rpx;
+  padding-left: 14rpx;
   border-bottom-color: transparent;
-  border-radius: 16rpx;
-  background: #e9f8f3;
+  border-radius: 15rpx;
+  background: #e5f5f1;
 }
 
 .word-wrap {
@@ -34,9 +34,9 @@
 
 .history-word {
   overflow: hidden;
-  color: #203735;
+  color: #17383b;
   font-size: 28rpx;
-  font-weight: 650;
+  font-weight: 680;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -49,10 +49,10 @@
   margin-left: 10rpx;
   place-items: center;
   border-radius: 8rpx;
-  background: #12a37f;
+  background: #0f8f82;
   color: #ffffff;
   font-size: 17rpx;
-  font-weight: 750;
+  font-weight: 740;
 }
 
 .score-wrap {
@@ -64,7 +64,7 @@
 .history-value {
   display: block;
   font-size: 24rpx;
-  font-weight: 780;
+  font-weight: 760;
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
@@ -74,133 +74,48 @@
   height: 7rpx;
   margin-top: 7rpx;
   overflow: hidden;
-  border-radius: 7rpx;
-  background: #e8eeec;
+  border-radius: 999rpx;
+  background: #dfe8e5;
 }
 
 .score-fill {
   min-width: 5rpx;
   height: 100%;
-  border-radius: 7rpx;
+  border-radius: inherit;
 }
 
-.history-value.tone-high { color: #0b8865; }
-.history-value.tone-mid { color: #be7726; }
-.history-value.tone-low { color: #cf5b60; }
-.history-value.tone-zero { color: #899592; }
-.score-fill.tone-high { background: #13a77f; }
-.score-fill.tone-mid { background: #e3a13e; }
-.score-fill.tone-low { background: #df7479; }
-.score-fill.tone-zero { background: #aab4b1; }
+.history-value.tone-high { color: #087568; }
+.history-value.tone-mid { color: #9a6615; }
+.history-value.tone-low { color: #bd4c48; }
+.history-value.tone-zero { color: #778986; }
+.score-fill.tone-high { background: #0f8f82; }
+.score-fill.tone-mid { background: #d9a63c; }
+.score-fill.tone-low { background: #df6a65; }
+.score-fill.tone-zero { background: #93a39f; }
 
 .history-empty {
   display: flex;
+  min-height: 220rpx;
   align-items: center;
   justify-content: center;
-  min-height: 230rpx;
   flex-direction: column;
-  color: #8e9c98;
-  font-size: 24rpx;
+  color: #718582;
+  font-size: 23rpx;
+  text-align: center;
 }
 
 .empty-rings {
   display: flex;
   gap: 9rpx;
-  margin-bottom: 22rpx;
+  margin-bottom: 20rpx;
 }
 
 .empty-rings text {
-  width: 22rpx;
-  height: 22rpx;
-  border: 4rpx solid #b7d8ce;
+  width: 20rpx;
+  height: 20rpx;
+  border: 4rpx solid #b5ddd6;
   border-radius: 50%;
 }
 
-.empty-rings text:nth-child(2) {
-  border-color: #55bda0;
-}
-
-.empty-rings text:nth-child(3) {
-  border-color: #159b78;
-}
-
-/* Visual refresh */
-.history-row {
-  border-bottom-color: #e4ded4;
-}
-
-.history-row.latest {
-  border: 2rpx solid #9bd8ce;
-  background: var(--color-primary-soft);
-}
-
-.history-word {
-  color: #242735;
-  font-weight: 720;
-}
-
-.latest-mark {
-  border: 2rpx solid #292d3a;
-  background: var(--color-primary);
-  font-weight: 800;
-  box-shadow: 2rpx 2rpx 0 rgba(41, 45, 58, 0.15);
-}
-
-.score-track {
-  border: 1rpx solid rgba(41, 45, 58, 0.28);
-  background: #e2ddd4;
-}
-
-.history-value.tone-high { color: #16836a; }
-.history-value.tone-mid { color: #b66c13; }
-.history-value.tone-low { color: #d44f5b; }
-.score-fill.tone-high { background: #35c7a5; }
-.score-fill.tone-mid { background: #ffca4b; }
-.score-fill.tone-low { background: #ff7468; }
-
-.history-empty {
-  color: #817f88;
-}
-
-.empty-rings text {
-  border-color: #b5e3da;
-}
-
-.empty-rings text:nth-child(2) {
-  border-color: #58b9aa;
-}
-
-.empty-rings text:nth-child(3) {
-  border-color: var(--color-primary);
-}
-
-.history-row {
-  min-height: 84rpx;
-  padding-top: 14rpx;
-  padding-bottom: 14rpx;
-}
-
-.history-word {
-  font-size: 29rpx;
-}
-
-.history-value {
-  font-size: 25rpx;
-}
-
-/* Unified history typography */
-.history-word {
-  font-size: 28rpx;
-}
-
-.history-value {
-  font-size: 24rpx;
-}
-
-.latest-mark {
-  font-size: 18rpx;
-}
-
-.history-empty {
-  font-size: 24rpx;
-}
+.empty-rings text:nth-child(2) { border-color: #63b9aa; }
+.empty-rings text:nth-child(3) { border-color: #0f8f82; }

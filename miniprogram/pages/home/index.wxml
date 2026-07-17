@@ -11,7 +11,7 @@
     <view class="hero-copy">
       <text class="hero-title">今天能几次猜中？</text>
       <text class="hero-note">输入相关词，关联度越高就越接近答案</text>
-      <view class="hero-cta">开始经典猜词 <text>→</text></view>
+      <view class="hero-cta">开始经典猜词 <view class="inline-arrow"></view></view>
     </view>
     <view class="word-stack">
       <view class="word-shadow back">猜</view>
@@ -32,7 +32,7 @@
         <text class="mode-title">分类闯关</text>
         <text class="mode-description">13 个分类 · 260 关 · 难度递增</text>
       </view>
-      <view class="mode-arrow">→</view>
+      <view class="mode-arrow"><view class="inline-arrow"></view></view>
     </view>
 
     <view class="mode-row battle" bindtap="openBattle" hover-class="card-pressed">
@@ -41,7 +41,7 @@
         <text class="mode-title">双人竞速</text>
         <text class="mode-description">邀请好友 · 90 秒实时对决</text>
       </view>
-      <view class="mode-arrow">→</view>
+      <view class="mode-arrow"><view class="inline-arrow"></view></view>
     </view>
   </view>
 

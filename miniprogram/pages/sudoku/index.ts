@@ -15,10 +15,44 @@ import {
   saveGuestPuzzleDefinition,
   saveGuestPuzzleState,
 } from "../../utils/puzzle-storage";
+import { LatestTaskQueue } from "../../utils/latest-task-queue";
 import { request, showRequestError } from "../../utils/request";
 
 let clockTimer: any = null;
 let saveTimer: any = null;
+
+interface SudokuSaveTask {
+  loggedIn: boolean;
+  silent: boolean;
+  puzzleId: string;
+  runId: string;
+  state: SudokuSavedState;
+}
+
+const sudokuSaveQueue = new LatestTaskQueue<SudokuSaveTask>(
+  async (task) => {
+    if (!task.loggedIn) {
+      saveGuestPuzzleState("sudoku", task.puzzleId, task.state);
+      return;
+    }
+    if (!task.runId) return;
+    await request("/sudoku/save", {
+      method: "POST",
+      authenticated: true,
+      data: {
+        run_id: task.runId,
+        puzzle_id: task.puzzleId,
+        grid: task.state.grid,
+        notes: task.state.notes,
+        elapsed_seconds: task.state.elapsed_seconds,
+        mistakes: task.state.mistakes,
+      },
+    });
+  },
+  (error, task) => {
+    if (!task.silent) showRequestError(error, "数独进度保存失败");
+  },
+);
 
 function stopClock(): void {
   if (clockTimer) clearInterval(clockTimer);
@@ -35,7 +69,7 @@ Page({
   data: {
     loading: true,
     mode: "daily" as "daily" | "practice",
-    difficulty: "medium" as PuzzleDifficulty,
+    difficulty: "hard" as PuzzleDifficulty,
     puzzleId: "",
     puzzleDate: "",
     givens: "",
@@ -44,6 +78,7 @@ Page({
     notes: {} as Record<string, number[]>,
     cells: [] as any[],
     selectedIndex: -1,
+    selectedValue: 0,
     noteMode: false,
     elapsedSeconds: 0,
     elapsedText: "00:00",
@@ -77,14 +112,14 @@ Page({
 
   onHide() {
     stopClock();
-    this.flushSave();
+    void this.flushSave();
   },
 
   onUnload() {
     stopClock();
     if (saveTimer) clearTimeout(saveTimer);
     saveTimer = null;
-    this.flushSave();
+    void this.flushSave();
   },
 
   startClock() {
@@ -131,6 +166,7 @@ Page({
         grid,
         notes: saved?.notes || {},
         selectedIndex: -1,
+        selectedValue: 0,
         noteMode: false,
         elapsedSeconds: Number(saved?.elapsed_seconds || 0),
         elapsedText: formatTime(Number(saved?.elapsed_seconds || 0)),
@@ -172,15 +208,20 @@ Page({
 
   selectCell(event: any) {
     const index = Number(event.currentTarget.dataset.index);
-    if (!Number.isInteger(index) || this.data.givens[index] !== "0") return;
-    this.setData({ selectedIndex: index });
-    this.refreshCells();
+    if (!Number.isInteger(index) || index < 0 || index >= this.data.grid.length) return;
+    this.setData({ selectedIndex: index, selectedValue: Number(this.data.grid[index] || 0) }, () => this.refreshCells());
   },
 
   inputDigit(event: any) {
     const index = this.data.selectedIndex;
     const value = Number(event.currentTarget.dataset.value);
-    if (index < 0 || this.data.givens[index] !== "0" || this.data.completed) return;
+    if (
+      index < 0 ||
+      this.data.givens[index] !== "0" ||
+      this.data.completed ||
+      this.data.submitting ||
+      this.data.hinting
+    ) return;
     const grid = [...this.data.grid];
     const notes = { ...this.data.notes };
     if (this.data.noteMode && value > 0 && grid[index] === "0") {
@@ -197,6 +238,7 @@ Page({
     this.setData({
       grid,
       notes,
+      selectedValue: value > 0 ? value : 0,
       invalidCells: this.data.invalidCells.filter((item: number) => item !== index),
     });
     this.refreshCells();
@@ -204,20 +246,23 @@ Page({
   },
 
   toggleNoteMode() {
+    if (this.data.submitting || this.data.hinting || this.data.completed) return;
     this.setData({ noteMode: !this.data.noteMode });
   },
 
-  switchMode(event: any) {
+  async switchMode(event: any) {
+    if (this.data.loading || this.data.submitting || this.data.hinting) return;
     const mode = event.currentTarget.dataset.value as "daily" | "practice";
     if (mode === this.data.mode) return;
-    this.flushSave();
+    await this.flushSave();
     this.setData({ mode }, () => this.loadPuzzle());
   },
 
-  switchDifficulty(event: any) {
+  async switchDifficulty(event: any) {
+    if (this.data.loading || this.data.submitting || this.data.hinting) return;
     const difficulty = event.currentTarget.dataset.value as PuzzleDifficulty;
     if (difficulty === this.data.difficulty) return;
-    this.flushSave();
+    await this.flushSave();
     this.setData({ difficulty }, () => this.loadPuzzle());
   },
 
@@ -227,48 +272,47 @@ Page({
     saveTimer = setTimeout(() => this.saveProgress(true), 500);
   },
 
-  flushSave() {
+  async flushSave() {
     if (!this.data.puzzleId || this.data.completed) return;
     if (saveTimer) clearTimeout(saveTimer);
     saveTimer = null;
-    this.saveProgress(true);
+    const task = this.createSaveTask(true);
+    if (task) await sudokuSaveQueue.flush(task);
   },
 
-  async saveProgress(silent = false) {
+  createSaveTask(silent = false): SudokuSaveTask | null {
+    if (!this.data.puzzleId || this.data.completed) return null;
     const state: SudokuSavedState = {
       grid: this.data.grid.join(""),
-      notes: this.data.notes,
+      notes: Object.fromEntries(
+        Object.entries(this.data.notes as Record<string, number[]>).map(([key, values]) => [
+          key,
+          [...values],
+        ]),
+      ),
       elapsed_seconds: this.data.elapsedSeconds,
       hints_used: this.data.hintsUsed,
       mistakes: this.data.mistakes,
     };
-    if (!isLoggedIn()) {
-      saveGuestPuzzleState("sudoku", this.data.puzzleId, state);
-      return;
-    }
-    if (!this.data.runId) return;
-    try {
-      await request("/sudoku/save", {
-        method: "POST",
-        authenticated: true,
-        data: {
-          run_id: this.data.runId,
-          puzzle_id: this.data.puzzleId,
-          grid: state.grid,
-          notes: state.notes,
-          elapsed_seconds: state.elapsed_seconds,
-          mistakes: state.mistakes,
-        },
-      });
-    } catch (error) {
-      if (!silent) showRequestError(error, "数独进度保存失败");
-    }
+    return {
+      loggedIn: isLoggedIn(),
+      silent,
+      puzzleId: this.data.puzzleId,
+      runId: this.data.runId,
+      state,
+    };
+  },
+
+  saveProgress(silent = false) {
+    const task = this.createSaveTask(silent);
+    if (task) sudokuSaveQueue.enqueue(task);
   },
 
   async requestHint() {
     if (this.data.hinting || this.data.hintsUsed >= this.data.maxHints) return;
     this.setData({ hinting: true });
     try {
+      await this.flushSave();
       const hint = await request<PuzzleHintResponse>("/sudoku/hint", {
         method: "POST",
         data: {
@@ -286,6 +330,7 @@ Page({
         grid,
         notes,
         selectedIndex: index,
+        selectedValue: Number(hint.value),
         hintsUsed: hint.hints_used,
         invalidCells: this.data.invalidCells.filter((item: number) => item !== index),
       });
@@ -302,6 +347,7 @@ Page({
     if (this.data.submitting || this.data.completed) return;
     this.setData({ submitting: true });
     try {
+      await this.flushSave();
       const response = await request<PuzzleSubmitResponse>("/sudoku/submit", {
         method: "POST",
         acceptedStatusCodes: [422],
@@ -342,9 +388,9 @@ Page({
   },
 
   clearInputs() {
-    if (this.data.completed) return;
+    if (this.data.completed || this.data.submitting || this.data.hinting) return;
     const grid = this.data.givens.split("");
-    this.setData({ grid, notes: {}, invalidCells: [], selectedIndex: -1 });
+    this.setData({ grid, notes: {}, invalidCells: [], selectedIndex: -1, selectedValue: 0 });
     this.refreshCells();
     this.queueSave();
   },

@@ -28,38 +28,50 @@
   </view>
 
   <view class="game-library">
-    <view class="game-card playable" bindtap="openWordGame" hover-class="card-pressed">
+    <view class="game-card playable {{wordGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openWordGame" hover-class="card-pressed">
       <view class="game-icon word">词</view>
       <view class="game-copy">
         <text class="game-name">猜词实验室</text>
         <text class="game-description">{{wordGame.progress_text}} · 好友竞速</text>
         <view class="game-progress"><view style="width: {{wordGame.progress_percent}}%"></view></view>
       </view>
-      <view class="game-action">→</view>
+      <view class="game-action {{wordGame.availability === 'available' ? '' : 'status-text'}}">
+        <view class="arrow-icon" wx:if="{{wordGame.availability === 'available'}}"></view>
+        <text wx:else>{{wordGame.availability === 'maintenance' ? '维护' : '待开放'}}</text>
+      </view>
     </view>
 
-    <view class="game-card playable" bindtap="openSudoku" hover-class="card-pressed">
+    <view class="game-card playable {{sudokuGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openSudoku" hover-class="card-pressed">
       <view class="game-icon sudoku">▦</view>
       <view class="game-copy"><text class="game-name">每日数独</text><text class="game-description">{{sudokuGame.progress_text}} · 三种难度</text></view>
-      <view class="game-action">→</view>
+      <view class="game-action {{sudokuGame.availability === 'available' ? '' : 'status-text'}}">
+        <view class="arrow-icon" wx:if="{{sudokuGame.availability === 'available'}}"></view>
+        <text wx:else>{{sudokuGame.availability === 'maintenance' ? '维护' : '待开放'}}</text>
+      </view>
     </view>
 
-    <view class="game-card playable" bindtap="openIdiom" hover-class="card-pressed">
+    <view class="game-card playable {{idiomGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openIdiom" hover-class="card-pressed">
       <view class="game-icon idiom">成</view>
       <view class="game-copy"><text class="game-name">成语填字</text><text class="game-description">{{idiomGame.progress_text}} · 连续闯关</text></view>
-      <view class="game-action">→</view>
+      <view class="game-action {{idiomGame.availability === 'available' ? '' : 'status-text'}}">
+        <view class="arrow-icon" wx:if="{{idiomGame.availability === 'available'}}"></view>
+        <text wx:else>{{idiomGame.availability === 'maintenance' ? '维护' : '待开放'}}</text>
+      </view>
     </view>
 
-    <view class="game-card playable" bindtap="openMemory" hover-class="card-pressed">
+    <view class="game-card playable {{memoryGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openMemory" hover-class="card-pressed">
       <view class="game-icon memory">◫</view>
       <view class="game-copy"><text class="game-name">记忆翻牌</text><text class="game-description">{{memoryGame.progress_text}} · 专注训练</text></view>
-      <view class="game-action">→</view>
+      <view class="game-action {{memoryGame.availability === 'available' ? '' : 'status-text'}}">
+        <view class="arrow-icon" wx:if="{{memoryGame.availability === 'available'}}"></view>
+        <text wx:else>{{memoryGame.availability === 'maintenance' ? '维护' : '待开放'}}</text>
+      </view>
     </view>
   </view>
 
   <view class="hub-nav">
-    <view class="hub-nav-item active"><text>●</text><text>游戏</text></view>
-    <view class="hub-nav-item" bindtap="openRecords"><text>▥</text><text>记录</text></view>
-    <view class="hub-nav-item" bindtap="openProfile"><text>○</text><text>我的</text></view>
+    <view class="hub-nav-item active"><view class="nav-icon nav-games"></view><text>游戏</text></view>
+    <view class="hub-nav-item" bindtap="openRecords" hover-class="nav-pressed"><view class="nav-icon nav-records"></view><text>记录</text></view>
+    <view class="hub-nav-item" bindtap="openProfile" hover-class="nav-pressed"><view class="nav-icon nav-profile"></view><text>我的</text></view>
   </view>
 </view>

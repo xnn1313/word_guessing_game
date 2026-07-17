@@ -654,7 +654,7 @@ def _memory_board(board_id, difficulty, theme):
     ]
 
 
-def get_memory(user, mode, difficulty, theme="classic"):
+def get_memory(user, mode, difficulty, theme="classic", fresh=False):
     mode = _choice(mode, {"daily", "practice"}, "mode")
     difficulty = _choice(difficulty, DIFFICULTIES, "difficulty")
     theme = _choice(theme or "classic", set(MEMORY_THEMES), "theme")
@@ -667,7 +667,11 @@ def get_memory(user, mode, difficulty, theme="classic"):
             "memory", date, daily_key, f"memory-{date}-{difficulty}-{theme}"
         )
     else:
-        resumed = storage.get_latest_playing_run(user["id"], "memory", mode, difficulty) if user else None
+        resumed = (
+            storage.get_latest_playing_run(user["id"], "memory", mode, difficulty)
+            if user and not fresh
+            else None
+        )
         if resumed and resumed["state"].get("theme") == theme:
             board_id = resumed["puzzle_id"]
         else:
@@ -806,6 +810,7 @@ def submit_memory(user, data):
 
 def games_overview(user):
     date = server_date()
+    idiom_total = max(1, len(storage.list_idiom_puzzles()))
     if not user:
         return {
             "server_date": date,
@@ -818,7 +823,7 @@ def games_overview(user):
             "games": [
                 {"key": "word", "title": "猜词实验室", "availability": "available", "progress_text": "登录后同步进度", "progress_percent": 0, "best_score": None, "daily_completed": False, "last_played_at": None},
                 {"key": "sudoku", "title": "每日数独", "availability": "available", "progress_text": "今日未完成", "progress_percent": 0, "best_score": None, "daily_completed": False, "last_played_at": None},
-                {"key": "idiom", "title": "成语填字", "availability": "available", "progress_text": "0 / 60 关", "progress_percent": 0, "best_score": None, "daily_completed": False, "last_played_at": None},
+                {"key": "idiom", "title": "成语填字", "availability": "available", "progress_text": f"0 / {idiom_total} 关", "progress_percent": 0, "best_score": None, "daily_completed": False, "last_played_at": None},
                 {"key": "memory", "title": "记忆翻牌", "availability": "available", "progress_text": "尚无记录", "progress_percent": 0, "best_score": None, "daily_completed": False, "last_played_at": None},
             ],
         }
@@ -870,7 +875,7 @@ def games_overview(user):
             "last_played_at": _timestamp(word.get("last_played_at")),
         },
         game_entry("sudoku", "每日数独", "今日已完成" if "sudoku" in flags else "今日未完成", 100 if "sudoku" in flags else 0),
-        game_entry("idiom", "成语填字", f"{len(idiom_progress)} / 60 关", len(idiom_progress) / 60 * 100),
+        game_entry("idiom", "成语填字", f"{len(idiom_progress)} / {idiom_total} 关", len(idiom_progress) / idiom_total * 100),
         game_entry("memory", "记忆翻牌", f"最佳 {memory_best} 步" if memory_best is not None else "尚无记录", 0),
     ]
     return {

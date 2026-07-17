@@ -1,0 +1,28 @@
+<view class="page-shell records-page">
+  <view class="page-kicker">TRAINING LOG</view>
+  <view class="page-title">训练记录</view>
+  <view class="page-subtitle">看看最近练了什么，再接着完成今天的挑战。</view>
+
+  <view class="records-summary">
+    <view class="summary-main">
+      <text>累计获得</text>
+      <view><text>{{totalStars}}</text> 颗星</view>
+    </view>
+    <view class="summary-stat"><text>{{completedToday}}</text><text>今日完成</text></view>
+    <view class="summary-stat"><text>{{availableGames}}</text><text>可玩项目</text></view>
+  </view>
+
+  <view class="records-heading"><text class="section-title">游戏进度</text><text>点击继续挑战</text></view>
+  <view class="loading-state" wx:if="{{loading}}">正在整理训练记录…</view>
+  <view class="record-list" wx:else>
+    <button class="record-card" wx:for="{{records}}" wx:key="key" data-key="{{item.key}}" bindtap="openGame" hover-class="card-pressed">
+      <view class="record-mark {{item.key}}">{{item.mark}}</view>
+      <view class="record-copy">
+        <view class="record-title-row"><text>{{item.title}}</text><text>{{item.progress_text}}</text></view>
+        <view class="record-track"><view style="width: {{item.progress_percent}}%"></view></view>
+        <view class="record-meta"><text>{{item.playedText}}</text><text wx:if="{{item.best_score !== null}}">最高 {{item.best_score}} 分</text></view>
+      </view>
+      <view class="record-arrow"></view>
+    </button>
+  </view>
+</view>

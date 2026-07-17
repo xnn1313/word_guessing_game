@@ -142,6 +142,7 @@ def register_puzzle_routes(app, get_current_user):
                 request.args.get("mode"),
                 request.args.get("difficulty"),
                 request.args.get("theme", "classic"),
+                request.args.get("fresh") == "1",
             )
         )
 

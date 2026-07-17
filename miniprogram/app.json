@@ -11,14 +11,16 @@
     "pages/campaign-game/index",
     "pages/battle/index",
     "pages/battle-room/index",
+    "pages/records/index",
     "pages/profile/index"
   ],
   "window": {
     "navigationBarTitleText": "脑力游乐场",
-    "navigationBarBackgroundColor": "#f3f0e7",
+    "navigationBarBackgroundColor": "#f2f6f3",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#f3f0e7",
-    "backgroundTextStyle": "dark"
+    "backgroundColor": "#f2f6f3",
+    "backgroundTextStyle": "dark",
+    "enablePullDownRefresh": false
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",

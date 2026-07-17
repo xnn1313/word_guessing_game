@@ -1,0 +1,139 @@
+.records-page {
+  padding-top: 22rpx;
+}
+
+.records-summary {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112rpx 112rpx;
+  gap: 12rpx;
+  align-items: center;
+  margin-top: 28rpx;
+  padding: 26rpx 24rpx 26rpx 32rpx;
+  overflow: hidden;
+  border-radius: 26rpx;
+  background: var(--color-night);
+  color: #ffffff;
+  box-shadow: 0 14rpx 30rpx rgba(22, 54, 58, 0.16);
+}
+
+.records-summary::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 8rpx;
+  background: linear-gradient(180deg, var(--color-coral), var(--color-accent));
+  content: "";
+}
+
+.summary-main,
+.summary-stat {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.summary-main > text,
+.summary-stat text:last-child {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 19rpx;
+}
+
+.summary-main view {
+  margin-top: 5rpx;
+  color: var(--color-accent);
+  font-size: 23rpx;
+  font-weight: 720;
+}
+
+.summary-main view text {
+  font-size: 40rpx;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-stat {
+  align-items: center;
+  padding-left: 12rpx;
+  border-left: 2rpx solid rgba(255, 255, 255, 0.13);
+  text-align: center;
+}
+
+.summary-stat text:first-child {
+  color: #ffffff;
+  font-size: 31rpx;
+  font-weight: 800;
+}
+
+.records-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 36rpx;
+}
+
+.records-heading > text:last-child {
+  color: var(--color-subtle);
+  font-size: 19rpx;
+}
+
+.record-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+  margin-top: 17rpx;
+}
+
+.record-card {
+  display: grid;
+  width: 100%;
+  min-height: 132rpx;
+  grid-template-columns: 72rpx minmax(0, 1fr) 30rpx;
+  gap: 18rpx;
+  align-items: center;
+  padding: 20rpx;
+  border: 2rpx solid var(--color-border);
+  border-radius: 22rpx;
+  background: var(--color-surface);
+  text-align: left;
+  box-shadow: 0 7rpx 20rpx rgba(22, 54, 58, 0.06);
+}
+
+.record-mark {
+  display: grid;
+  width: 72rpx;
+  height: 72rpx;
+  place-items: center;
+  border-radius: 18rpx;
+  color: var(--color-ink);
+  font-size: 25rpx;
+  font-weight: 820;
+}
+
+.record-mark.word { background: #ffe3a0; }
+.record-mark.sudoku { background: #dceef7; }
+.record-mark.idiom { background: #fbdedb; }
+.record-mark.memory { background: #e9e4f7; }
+
+.record-copy { min-width: 0; }
+.record-title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12rpx; }
+.record-title-row text:first-child { font-size: 26rpx; font-weight: 780; }
+.record-title-row text:last-child { color: var(--color-primary-dark); font-size: 18rpx; font-weight: 680; }
+.record-track { height: 7rpx; margin-top: 10rpx; overflow: hidden; border-radius: 999rpx; background: #e2eae7; }
+.record-track view { min-width: 5rpx; height: 100%; border-radius: inherit; background: var(--color-primary); }
+.record-meta { display: flex; justify-content: space-between; gap: 12rpx; margin-top: 9rpx; color: var(--color-muted); font-size: 17rpx; }
+
+.record-arrow {
+  width: 16rpx;
+  height: 16rpx;
+  border-top: 3rpx solid var(--color-primary-dark);
+  border-right: 3rpx solid var(--color-primary-dark);
+  transform: rotate(45deg);
+}
+
+@media (max-height: 700px) {
+  .records-summary { margin-top: 20rpx; padding-top: 20rpx; padding-bottom: 20rpx; }
+  .records-heading { margin-top: 26rpx; }
+  .record-card { min-height: 118rpx; }
+}

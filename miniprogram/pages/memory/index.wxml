@@ -13,7 +13,7 @@
     >{{item.label}}</button>
   </view>
 
-  <scroll-view class="option-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+  <view class="option-scroll" wx:if="{{mode === 'daily'}}">
     <button
       class="option-chip {{difficulty === item.value ? 'active' : ''}}"
       wx:for="{{difficultyOptions}}"
@@ -21,8 +21,8 @@
       data-value="{{item.value}}"
       bindtap="switchDifficulty"
     >{{item.label}}</button>
-  </scroll-view>
-  <view class="theme-bar">
+  </view>
+  <view class="theme-bar" wx:if="{{mode === 'daily'}}">
     <button
       class="{{theme === item.value ? 'active' : ''}}"
       wx:for="{{themeOptions}}"
@@ -30,6 +30,19 @@
       data-value="{{item.value}}"
       bindtap="switchTheme"
     >{{item.label}}</button>
+  </view>
+
+  <view class="level-section" wx:else>
+    <view class="level-heading"><text>训练关卡</text><text>第 {{selectedLevel}} / {{levelCount}} 关</text></view>
+    <scroll-view class="level-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <button
+        class="level-chip {{item.selected ? 'active' : ''}} {{item.unlocked ? '' : 'locked'}} {{item.stars ? 'completed' : ''}}"
+        wx:for="{{levelOptions}}"
+        wx:key="level"
+        data-level="{{item.level}}"
+        bindtap="switchLevel"
+      ><text>{{item.level}}</text><text>{{item.unlocked ? item.detail : '锁定'}}</text></button>
+    </scroll-view>
   </view>
 
   <view class="loading-state" wx:if="{{loading}}">正在洗牌…</view>
@@ -59,7 +72,11 @@
       <view class="complete-title">全部配对完成</view>
       <view class="complete-stars">{{result.stars === 3 ? '★★★' : result.stars === 2 ? '★★☆' : '★☆☆'}}</view>
       <view class="complete-detail">{{result.score}} 分 · {{result.moves}} 步 · {{elapsedText}}</view>
-      <button class="primary-button" bindtap="playAgain">再来一局</button>
+      <view class="complete-actions">
+        <button class="secondary-button" bindtap="playAgain">本关重玩</button>
+        <button class="primary-button" wx:if="{{mode === 'practice'}}" bindtap="nextLevel">{{selectedLevel < levelCount ? '下一关' : '重新挑战'}}</button>
+        <button class="primary-button" wx:else bindtap="playAgain">进入关卡</button>
+      </view>
     </view>
   </block>
 </view>

@@ -3,7 +3,7 @@
     <view class="auth-mark">词</view>
     <view>
       <view class="auth-title">保存你的进度</view>
-      <view class="auth-subtitle">经典记录、闯关星级和对战历史都会跟随账号保存。</view>
+      <view class="auth-subtitle">登录后使用云端进度；游客记录会保留在本机，暂不自动合并。</view>
     </view>
   </view>
 
@@ -27,5 +27,5 @@
     </button>
   </view>
 
-  <view class="auth-footnote"><text></text>账号仅用于同步你的游戏数据</view>
+  <view class="auth-footnote"><text></text>账号用于同步登录后的游戏数据</view>
 </view>

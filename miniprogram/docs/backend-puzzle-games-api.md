@@ -250,8 +250,8 @@ CREATE TABLE IF NOT EXISTS daily_puzzles (
       "key": "idiom",
       "title": "成语填字",
       "availability": "available",
-      "progress_text": "3 / 60 关",
-      "progress_percent": 5,
+      "progress_text": "3 / 120 关",
+      "progress_percent": 2.5,
       "best_score": 870,
       "daily_completed": true,
       "last_played_at": "2026-07-16T08:30:00Z"
@@ -681,6 +681,7 @@ mode=level&level_id=idiom-001
 | `mode` | 是 | `daily` | `daily` 或 `practice` |
 | `difficulty` | 是 | `easy` | `easy`、`medium`、`hard` |
 | `theme` | 否 | `fruit` | 默认 `classic` |
+| `fresh` | 否 | `1` | 练习模式传 `1` 时创建全新牌局，不恢复上一局 |
 
 建议棋盘：
 

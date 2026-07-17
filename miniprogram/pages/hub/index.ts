@@ -70,23 +70,34 @@ Page({
   },
 
   openWordGame() {
-    wx.navigateTo({ url: "/pages/home/index" });
+    this.openGame(this.data.wordGame, "/pages/home/index");
   },
 
   openSudoku() {
-    wx.navigateTo({ url: "/pages/sudoku/index" });
+    this.openGame(this.data.sudokuGame, "/pages/sudoku/index");
   },
 
   openIdiom() {
-    wx.navigateTo({ url: "/pages/idiom/index" });
+    this.openGame(this.data.idiomGame, "/pages/idiom/index");
   },
 
   openMemory() {
-    wx.navigateTo({ url: "/pages/memory/index" });
+    this.openGame(this.data.memoryGame, "/pages/memory/index");
+  },
+
+  openGame(game: GameOverviewItem, url: string) {
+    if (game.availability !== "available") {
+      wx.showToast({
+        title: game.availability === "maintenance" ? "游戏维护中，请稍后再试" : "游戏即将上线",
+        icon: "none",
+      });
+      return;
+    }
+    wx.navigateTo({ url });
   },
 
   openRecords() {
-    wx.navigateTo({ url: this.data.loggedIn ? "/pages/profile/index" : "/pages/auth/index" });
+    wx.navigateTo({ url: this.data.loggedIn ? "/pages/records/index" : "/pages/auth/index" });
   },
 
   openProfile() {

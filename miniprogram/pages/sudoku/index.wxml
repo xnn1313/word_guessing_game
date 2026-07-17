@@ -46,7 +46,7 @@
 
     <block wx:if="{{!completed}}">
       <view class="number-pad">
-        <button wx:for="{{digits}}" wx:key="*this" data-value="{{item}}" bindtap="inputDigit">{{item}}</button>
+        <button class="{{selectedValue === item ? 'active' : ''}}" wx:for="{{digits}}" wx:key="*this" data-value="{{item}}" bindtap="inputDigit">{{item}}</button>
       </view>
 
       <view class="tool-row">

@@ -16,10 +16,43 @@ import {
   saveGuestIdiomResult,
   saveGuestPuzzleState,
 } from "../../utils/puzzle-storage";
+import { LatestTaskQueue } from "../../utils/latest-task-queue";
 import { request, showRequestError } from "../../utils/request";
 
 let clockTimer: any = null;
 let saveTimer: any = null;
+
+interface IdiomSaveTask {
+  loggedIn: boolean;
+  silent: boolean;
+  puzzleId: string;
+  runId: string;
+  state: IdiomSavedState;
+}
+
+const idiomSaveQueue = new LatestTaskQueue<IdiomSaveTask>(
+  async (task) => {
+    if (!task.loggedIn) {
+      saveGuestPuzzleState("idiom", task.puzzleId, task.state);
+      return;
+    }
+    if (!task.runId) return;
+    await request("/idiom/save", {
+      method: "POST",
+      authenticated: true,
+      data: {
+        run_id: task.runId,
+        puzzle_id: task.puzzleId,
+        grid: task.state.grid,
+        elapsed_seconds: task.state.elapsed_seconds,
+        mistakes: task.state.mistakes,
+      },
+    });
+  },
+  (error, task) => {
+    if (!task.silent) showRequestError(error, "成语进度保存失败");
+  },
+);
 
 function stopClock(): void {
   if (clockTimer) clearInterval(clockTimer);
@@ -85,14 +118,14 @@ Page({
 
   onHide() {
     stopClock();
-    this.flushSave();
+    void this.flushSave();
   },
 
   onUnload() {
     stopClock();
     if (saveTimer) clearTimeout(saveTimer);
     saveTimer = null;
-    this.flushSave();
+    void this.flushSave();
   },
 
   startClock() {
@@ -156,6 +189,7 @@ Page({
   },
 
   openLevel(event: any) {
+    if (this.data.loading || this.data.submitting || this.data.hinting) return;
     const id = String(event.currentTarget.dataset.id || "");
     const unlocked = Boolean(event.currentTarget.dataset.unlocked);
     if (!unlocked) {
@@ -166,10 +200,12 @@ Page({
   },
 
   switchDailyDifficulty(event: any) {
+    if (this.data.loading) return;
     this.setData({ dailyDifficulty: event.currentTarget.dataset.value });
   },
 
   openDaily() {
+    if (this.data.loading) return;
     this.loadPuzzle(
       `/idiom/puzzle?mode=daily&difficulty=${this.data.dailyDifficulty}`,
     );
@@ -260,7 +296,14 @@ Page({
   inputCharacter(event: any) {
     const value = String(event.currentTarget.dataset.value || "");
     const index = this.data.selectedIndex;
-    if (!value || index < 0 || !this.data.puzzle || this.data.completed) return;
+    if (
+      !value ||
+      index < 0 ||
+      !this.data.puzzle ||
+      this.data.completed ||
+      this.data.submitting ||
+      this.data.hinting
+    ) return;
     if (this.data.puzzle.cells[index]?.type !== "input") return;
     const grid = [...this.data.grid];
     grid[index] = value;
@@ -283,7 +326,13 @@ Page({
 
   eraseCharacter() {
     const index = this.data.selectedIndex;
-    if (index < 0 || !this.data.puzzle || this.data.puzzle.cells[index]?.type !== "input") return;
+    if (
+      index < 0 ||
+      !this.data.puzzle ||
+      this.data.puzzle.cells[index]?.type !== "input" ||
+      this.data.submitting ||
+      this.data.hinting
+    ) return;
     const grid = [...this.data.grid];
     grid[index] = "";
     this.setData({
@@ -300,47 +349,41 @@ Page({
     saveTimer = setTimeout(() => this.saveProgress(true), 500);
   },
 
-  flushSave() {
+  async flushSave() {
     if (!this.data.puzzle || this.data.completed || this.data.view !== "game") return;
     if (saveTimer) clearTimeout(saveTimer);
     saveTimer = null;
-    this.saveProgress(true);
+    const task = this.createSaveTask(true);
+    if (task) await idiomSaveQueue.flush(task);
   },
 
-  async saveProgress(silent = false) {
-    if (!this.data.puzzle) return;
+  createSaveTask(silent = false): IdiomSaveTask | null {
+    if (!this.data.puzzle || this.data.completed || this.data.view !== "game") return null;
     const state: IdiomSavedState = {
-      grid: this.data.grid,
+      grid: [...this.data.grid],
       elapsed_seconds: this.data.elapsedSeconds,
       hints_used: this.data.hintsUsed,
       mistakes: this.data.mistakes,
     };
-    if (!isLoggedIn()) {
-      saveGuestPuzzleState("idiom", this.data.puzzle.puzzle_id, state);
-      return;
-    }
-    if (!this.data.runId) return;
-    try {
-      await request("/idiom/save", {
-        method: "POST",
-        authenticated: true,
-        data: {
-          run_id: this.data.runId,
-          puzzle_id: this.data.puzzle.puzzle_id,
-          grid: state.grid,
-          elapsed_seconds: state.elapsed_seconds,
-          mistakes: state.mistakes,
-        },
-      });
-    } catch (error) {
-      if (!silent) showRequestError(error, "成语进度保存失败");
-    }
+    return {
+      loggedIn: isLoggedIn(),
+      silent,
+      puzzleId: this.data.puzzle.puzzle_id,
+      runId: this.data.runId,
+      state,
+    };
+  },
+
+  saveProgress(silent = false) {
+    const task = this.createSaveTask(silent);
+    if (task) idiomSaveQueue.enqueue(task);
   },
 
   async requestHint() {
     if (!this.data.puzzle || this.data.hinting || this.data.hintsUsed >= this.data.maxHints) return;
     this.setData({ hinting: true });
     try {
+      await this.flushSave();
       const hint = await request<PuzzleHintResponse>("/idiom/hint", {
         method: "POST",
         data: {
@@ -376,6 +419,7 @@ Page({
     if (!this.data.puzzle || this.data.submitting || this.data.completed) return;
     this.setData({ submitting: true });
     try {
+      await this.flushSave();
       const response = await request<PuzzleSubmitResponse>("/idiom/submit", {
         method: "POST",
         acceptedStatusCodes: [422],
@@ -425,9 +469,10 @@ Page({
     this.backToCatalog();
   },
 
-  backToCatalog() {
+  async backToCatalog() {
+    if (this.data.submitting || this.data.hinting) return;
     stopClock();
-    this.flushSave();
+    await this.flushSave();
     this.setData({ view: "catalog", puzzle: null, completed: false, result: null });
     this.loadCatalog();
   },

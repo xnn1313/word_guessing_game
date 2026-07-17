@@ -11,7 +11,7 @@
   <view class="score-grid">
     <view class="player-card {{player.is_self ? 'self' : 'opponent'}} {{player.empty ? 'empty' : ''}}" wx:for="{{players}}" wx:key="username" wx:for-item="player">
       <view class="player-head">
-        <view class="player-name">{{player.is_winner ? '🏆 ' : ''}}{{player.username}}</view>
+        <view class="player-name"><text class="winner-badge" wx:if="{{player.is_winner}}">胜</text>{{player.username}}</view>
         <view class="player-role">{{player.roleText}}</view>
       </view>
       <view class="player-score">
@@ -55,7 +55,7 @@
 
   <view class="result-panel" wx:if="{{finished}}">
     <view class="result-summary">
-      <view class="result-emblem">{{state.winner_username ? '🏆' : '◇'}}</view>
+      <view class="result-emblem">{{state.winner_username ? '胜' : '平'}}</view>
       <view>
         <view class="result-title">{{resultTitle}}</view>
         <view class="result-answer">{{resultAnswer}}</view>

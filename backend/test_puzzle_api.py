@@ -53,7 +53,7 @@ class PuzzleApiTestCase(unittest.TestCase):
                 "SELECT puzzle, solution FROM sudoku_puzzles"
             ).fetchall()
         self.assertEqual(counts, {"easy": 100, "medium": 100, "hard": 100})
-        self.assertEqual(idiom_count, 60)
+        self.assertEqual(idiom_count, 120)
         self.assertTrue(
             all(puzzle_content.sudoku_solution_valid(row["puzzle"], row["solution"]) for row in sudoku_rows)
         )
@@ -344,6 +344,23 @@ class PuzzleApiTestCase(unittest.TestCase):
         overview = self.client.get("/api/games/overview", headers=self.auth).json
         self.assertEqual(overview["summary"]["available_games"], 4)
         self.assertGreaterEqual(overview["summary"]["total_stars"], 3)
+
+    def test_memory_fresh_board_does_not_resume_previous_layout(self):
+        first = self.client.get(
+            "/api/memory/board?mode=practice&difficulty=easy&theme=classic",
+            headers=self.auth,
+        ).json
+        resumed = self.client.get(
+            "/api/memory/board?mode=practice&difficulty=easy&theme=classic",
+            headers=self.auth,
+        ).json
+        fresh = self.client.get(
+            "/api/memory/board?mode=practice&difficulty=easy&theme=classic&fresh=1",
+            headers=self.auth,
+        ).json
+        self.assertEqual(resumed["board_id"], first["board_id"])
+        self.assertNotEqual(fresh["board_id"], first["board_id"])
+        self.assertNotEqual(fresh["cards"], first["cards"])
 
 
 if __name__ == "__main__":

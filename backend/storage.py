@@ -3,6 +3,7 @@ import hashlib
 import os
 import secrets
 import sqlite3
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 
 
@@ -12,11 +13,19 @@ DB_PATH = os.environ.get(
 )
 
 
+@contextmanager
 def _connect():
     connection = sqlite3.connect(DB_PATH, timeout=10)
     connection.row_factory = sqlite3.Row
     connection.execute("PRAGMA foreign_keys=ON")
-    return connection
+    try:
+        yield connection
+        connection.commit()
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        connection.close()
 
 
 def init_db():
@@ -438,7 +447,7 @@ def get_latest_playing_run(user_id, game_key, mode, difficulty=None):
             SELECT * FROM game_runs
             WHERE user_id = ? AND game_key = ? AND mode = ? AND status = 'playing'
             {difficulty_sql}
-            ORDER BY updated_at DESC LIMIT 1
+            ORDER BY updated_at DESC, rowid DESC LIMIT 1
             """,
             params,
         ).fetchone()
@@ -457,7 +466,8 @@ def update_game_run(run_id, user_id, state, elapsed_seconds, hints_used, mistake
             """,
             (serialized, elapsed_seconds, hints_used, mistakes, now, run_id, user_id),
         )
-    return cursor.rowcount > 0, now
+        updated = cursor.rowcount > 0
+    return updated, now
 
 
 def complete_game_run(run_id, user_id, state, elapsed_seconds, hints_used, mistakes, score, stars):
@@ -473,7 +483,8 @@ def complete_game_run(run_id, user_id, state, elapsed_seconds, hints_used, mista
             """,
             (serialized, elapsed_seconds, hints_used, mistakes, score, stars, now, now, run_id, user_id),
         )
-    return cursor.rowcount > 0, get_game_run(run_id)
+        completed = cursor.rowcount > 0
+    return completed, get_game_run(run_id)
 
 
 def get_recent_completed_puzzle_ids(user_id, game_key, difficulty=None, limit=20):

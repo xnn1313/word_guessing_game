@@ -3,11 +3,24 @@
 }
 
 .campaign-progress {
-  margin-top: 24rpx;
-  padding: 24rpx 26rpx;
+  position: relative;
+  margin-top: 26rpx;
+  padding: 24rpx 28rpx 24rpx 34rpx;
+  overflow: hidden;
   border-radius: 24rpx;
-  background: #17343b;
+  background: var(--color-night);
   color: #ffffff;
+  box-shadow: 0 12rpx 28rpx rgba(22, 54, 58, 0.16);
+}
+
+.campaign-progress::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 7rpx;
+  background: linear-gradient(180deg, var(--color-primary), var(--color-accent));
+  content: "";
 }
 
 .progress-copy {
@@ -17,72 +30,75 @@
   gap: 18rpx;
 }
 
-.progress-copy view {
-  color: #b4cbc6;
-  font-size: 21rpx;
+.progress-copy view,
+.progress-copy > text {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: var(--font-label);
 }
 
 .progress-copy view text {
-  color: #ffc857;
-  font-size: 37rpx;
-  font-weight: 840;
-}
-
-.progress-copy > text {
-  color: #9fb8b3;
-  font-size: 20rpx;
+  color: var(--color-accent);
+  font-size: 36rpx;
+  font-weight: 820;
+  font-variant-numeric: tabular-nums;
 }
 
 .progress-track {
-  height: 12rpx;
-  margin-top: 20rpx;
+  height: 11rpx;
+  margin-top: 18rpx;
   overflow: hidden;
-  border-radius: 12rpx;
-  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .progress-fill {
   min-width: 4rpx;
   height: 100%;
-  border-radius: 12rpx;
-  background: #ffc857;
+  border-radius: inherit;
+  background: var(--color-accent);
 }
 
 .category-list {
   display: flex;
   flex-direction: column;
-  gap: 12rpx;
-  margin-top: 20rpx;
+  gap: 16rpx;
+  margin-top: 24rpx;
 }
 
 .category {
   overflow: hidden;
-  border: 2rpx solid #dce7e3;
+  border: 2rpx solid var(--color-border);
   border-radius: 22rpx;
-  background: #ffffff;
+  background: var(--color-surface);
+  box-shadow: 0 7rpx 20rpx rgba(22, 54, 58, 0.06);
 }
 
 .category-header {
   display: flex;
-  align-items: center;
   width: 100%;
-  min-height: 116rpx;
+  min-width: 0;
+  min-height: 122rpx;
+  align-items: center;
   padding: 18rpx 20rpx;
   text-align: left;
 }
 
 .category-header.expanded {
-  background: #f8fbfa;
+  background: #edf7f4;
+}
+
+.category-header.card-pressed {
+  transform: none;
 }
 
 .category-emoji {
   display: grid;
-  width: 68rpx;
-  height: 68rpx;
+  width: 76rpx;
+  height: 76rpx;
   flex: 0 0 auto;
   place-items: center;
-  border-radius: 18rpx;
-  background: #e5f5ef;
+  border-radius: 19rpx;
+  background: #ffe3a0;
   font-size: 34rpx;
 }
 
@@ -91,38 +107,40 @@
   min-width: 0;
   flex: 1;
   flex-direction: column;
-  margin-left: 17rpx;
+  margin-left: 18rpx;
+  overflow: hidden;
 }
 
 .category-name {
-  color: #203633;
+  color: var(--color-text);
   font-size: 28rpx;
-  font-weight: 770;
+  font-weight: 780;
 }
 
 .category-description {
+  width: 100%;
   overflow: hidden;
   margin-top: 4rpx;
-  color: #83918d;
-  font-size: 20rpx;
+  color: var(--color-muted);
+  font-size: 21rpx;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .category-track {
-  width: 150rpx;
-  height: 6rpx;
-  margin-top: 9rpx;
+  width: 160rpx;
+  height: 7rpx;
+  margin-top: 10rpx;
   overflow: hidden;
-  border-radius: 6rpx;
-  background: #e7eeeb;
+  border-radius: 999rpx;
+  background: #e2eae7;
 }
 
 .category-track view {
   min-width: 3rpx;
   height: 100%;
-  border-radius: 6rpx;
-  background: #12a37f;
+  border-radius: inherit;
+  background: var(--color-primary);
 }
 
 .category-right {
@@ -134,16 +152,16 @@
 }
 
 .category-stars {
-  color: #4f746b;
-  font-size: 19rpx;
-  font-weight: 700;
+  color: var(--color-primary-dark);
+  font-size: var(--font-caption);
+  font-weight: 740;
 }
 
 .category-chevron {
   margin-top: 4rpx;
-  color: #85938f;
-  font-size: 29rpx;
-  transition: transform 0.2s ease;
+  color: var(--color-primary-dark);
+  font-size: 28rpx;
+  transition: transform 200ms ease;
 }
 
 .category-chevron.open {
@@ -152,8 +170,8 @@
 
 .level-area {
   padding: 0 18rpx 20rpx;
-  border-top: 2rpx solid #e9efed;
-  background: #ffffff;
+  border-top: 2rpx solid var(--color-border);
+  background: var(--color-surface-soft);
 }
 
 .difficulty-line {
@@ -162,16 +180,16 @@
   justify-content: center;
   gap: 14rpx;
   padding: 16rpx 4rpx;
-  color: #8b9894;
-  font-size: 18rpx;
+  color: var(--color-muted);
+  font-size: var(--font-caption);
 }
 
 .difficulty-dots {
   display: flex;
+  max-width: 240rpx;
   flex: 1;
   align-items: center;
   justify-content: space-between;
-  max-width: 240rpx;
 }
 
 .difficulty-dots view {
@@ -188,18 +206,26 @@
 
 .level-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10rpx;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12rpx;
 }
 
 .level-button {
-  min-height: 100rpx;
-  padding: 10rpx 3rpx;
-  border: 2rpx solid #d7e5df;
-  border-top-width: 5rpx;
-  border-radius: 16rpx;
-  background: #fbfdfc;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 112rpx;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 10rpx 6rpx;
+  overflow: hidden;
+  border: 2rpx solid var(--color-border-strong);
+  border-top-width: 6rpx;
+  border-radius: 15rpx;
+  background: var(--color-surface);
   line-height: 1.15;
+  text-align: center;
 }
 
 .level-button.difficulty-1 { border-top-color: #57ad85; }
@@ -209,198 +235,15 @@
 .level-button.difficulty-5 { border-top-color: #d45b61; }
 
 .level-button.locked {
-  border-color: #e2e8e6;
-  background: #f2f5f4;
-  color: #a1aaa7;
+  border-color: #d4dcd8;
+  background: #e9eeeb;
+  color: #96a19e;
 }
 
 .level-number,
 .level-label,
 .level-stars {
   display: block;
-}
-
-.level-number {
-  color: #283d3a;
-  font-size: 26rpx;
-  font-weight: 820;
-}
-
-.level-label {
-  margin-top: 3rpx;
-  color: #788884;
-  font-size: 17rpx;
-}
-
-.level-stars {
-  margin-top: 5rpx;
-  color: #d79a2c;
-  font-size: 15rpx;
-  letter-spacing: -1rpx;
-}
-
-.locked .level-number,
-.locked .level-label,
-.locked .level-stars {
-  color: #a1aaa7;
-}
-
-/* Visual refresh */
-.campaign-page .campaign-progress {
-  margin-top: 28rpx;
-  border: 3rpx solid var(--color-ink);
-  border-radius: 24rpx;
-  background: var(--color-primary);
-  box-shadow: 8rpx 8rpx 0 var(--color-ink);
-}
-
-.campaign-page .progress-copy view,
-.campaign-page .progress-copy > text {
-  color: #ded9ff;
-}
-
-.campaign-page .progress-copy view text {
-  color: var(--color-accent);
-}
-
-.campaign-page .progress-track {
-  height: 14rpx;
-  border: 2rpx solid var(--color-ink);
-  background: rgba(255, 255, 255, 0.22);
-}
-
-.campaign-page .progress-fill {
-  background: var(--color-accent);
-}
-
-.campaign-page .category-list {
-  gap: 16rpx;
-  margin-top: 26rpx;
-}
-
-.campaign-page .category {
-  border: 3rpx solid var(--color-ink);
-  border-radius: 22rpx;
-  background: var(--color-surface);
-  box-shadow: 5rpx 5rpx 0 rgba(41, 45, 58, 0.12);
-}
-
-.campaign-page .category-header.expanded {
-  background: var(--color-primary-soft);
-}
-
-.campaign-page .category-emoji {
-  border: 2rpx solid var(--color-ink);
-  background: var(--color-accent);
-}
-
-.campaign-page .category-name {
-  color: var(--color-text);
-  font-weight: 820;
-}
-
-.campaign-page .category-description,
-.campaign-page .difficulty-line {
-  color: var(--color-muted);
-}
-
-.campaign-page .category-track {
-  background: #ded8ce;
-}
-
-.campaign-page .category-track view {
-  background: var(--color-primary);
-}
-
-.campaign-page .category-stars {
-  color: var(--color-primary-dark);
-}
-
-.campaign-page .category-chevron {
-  color: var(--color-primary-dark);
-}
-
-.campaign-page .level-area {
-  border-top: 3rpx solid var(--color-ink);
-  background: #fffdf8;
-}
-
-.campaign-page .level-button {
-  border: 2rpx solid var(--color-ink);
-  border-top-width: 7rpx;
-  border-radius: 14rpx;
-  background: #ffffff;
-  box-shadow: 3rpx 3rpx 0 rgba(41, 45, 58, 0.12);
-}
-
-.campaign-page .level-button:active {
-  box-shadow: 1rpx 1rpx 0 rgba(41, 45, 58, 0.12);
-}
-
-.campaign-page .level-button.locked {
-  border-color: #aaa59c;
-  background: #eae6de;
-  box-shadow: none;
-}
-
-.campaign-page .level-number {
-  color: var(--color-text);
-}
-
-.campaign-page .level-stars {
-  color: #c78310;
-}
-
-/* Compact phone layout fixes from simulator review */
-.campaign-page .category-header {
-  display: flex;
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  align-items: center;
-  margin: 0;
-}
-
-.campaign-page .category-header.card-pressed {
-  opacity: 0.88;
-  transform: none;
-}
-
-.campaign-page .category-copy {
-  overflow: hidden;
-}
-
-.campaign-page .category-description {
-  width: 100%;
-}
-
-.campaign-page .level-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12rpx;
-}
-
-.campaign-page .level-button {
-  display: flex;
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  min-height: 112rpx;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  padding: 10rpx 6rpx;
-  overflow: hidden;
-  text-align: center;
-}
-
-.campaign-page .level-button.level-pressed {
-  box-shadow: 1rpx 1rpx 0 rgba(41, 45, 58, 0.12);
-}
-
-.campaign-page .level-number,
-.campaign-page .level-label,
-.campaign-page .level-stars {
   width: 100%;
   overflow: hidden;
   text-align: center;
@@ -408,58 +251,27 @@
   white-space: nowrap;
 }
 
-.campaign-page .level-number {
-  font-size: 29rpx;
+.level-number {
+  color: var(--color-text);
+  font-size: 28rpx;
+  font-weight: 800;
   line-height: 1.1;
 }
 
-.campaign-page .level-label {
+.level-label {
   margin-top: 5rpx;
-  font-size: 18rpx;
-  line-height: 1.2;
+  color: var(--color-muted);
+  font-size: 19rpx;
 }
 
-.campaign-page .level-stars {
+.level-stars {
   margin-top: 7rpx;
-  font-size: 17rpx;
-  line-height: 1.2;
-  letter-spacing: 0;
-}
-
-/* Unified campaign typography */
-.campaign-page .progress-copy view text {
-  font-size: 36rpx;
-}
-
-.campaign-page .progress-copy view,
-.campaign-page .progress-copy > text {
-  font-size: 22rpx;
-}
-
-.campaign-page .category-name {
-  font-size: 28rpx;
-}
-
-.campaign-page .category-description {
-  font-size: 22rpx;
-}
-
-.campaign-page .category-stars {
-  font-size: 20rpx;
-}
-
-.campaign-page .difficulty-line {
-  font-size: 20rpx;
-}
-
-.campaign-page .level-number {
-  font-size: 28rpx;
-}
-
-.campaign-page .level-label {
-  font-size: 20rpx;
-}
-
-.campaign-page .level-stars {
+  color: #a66c12;
   font-size: 18rpx;
+}
+
+.locked .level-number,
+.locked .level-label,
+.locked .level-stars {
+  color: #96a19e;
 }

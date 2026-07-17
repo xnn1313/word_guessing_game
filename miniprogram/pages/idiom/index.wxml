@@ -1,4 +1,4 @@
-<view class="page-shell idiom-page">
+<view class="page-shell idiom-page {{view === 'game' ? 'game-view' : 'catalog-view'}}">
   <block wx:if="{{view === 'catalog'}}">
     <view class="page-kicker">IDIOM · 词汇挑战</view>
     <view class="page-title">成语填字</view>
@@ -9,7 +9,7 @@
         <text>每日一题</text>
         <text>同一天、同难度获得相同题目</text>
       </view>
-      <button class="daily-start" bindtap="openDaily">开始 →</button>
+      <button class="daily-start" bindtap="openDaily">开始挑战</button>
       <view class="daily-options">
         <button
           class="{{dailyDifficulty === item.value ? 'active' : ''}}"
@@ -58,7 +58,7 @@
   </block>
 
   <block wx:else>
-    <button class="back-button" bindtap="backToCatalog">← 返回关卡</button>
+    <button class="back-button" bindtap="backToCatalog">返回关卡</button>
     <view class="page-kicker">IDIOM · {{puzzleMode === 'daily' ? '每日挑战' : '连续闯关'}}</view>
     <view class="game-heading">
       <view><view class="page-title">{{puzzle.title}}</view><view class="page-subtitle">点击格子，再从字库选择文字。</view></view>
