@@ -165,3 +165,85 @@
 .profile-action {
   margin-top: 24rpx;
 }
+
+/* Visual refresh */
+.profile-page .profile-hero {
+  min-height: 204rpx;
+  border: 3rpx solid var(--color-ink);
+  border-radius: 28rpx;
+  background: var(--color-night);
+  box-shadow: 9rpx 9rpx 0 var(--color-primary);
+}
+
+.profile-page .profile-avatar {
+  border: 3rpx solid var(--color-ink);
+  border-radius: 20rpx;
+  background: var(--color-primary);
+  box-shadow: 4rpx 4rpx 0 rgba(255, 255, 255, 0.25);
+}
+
+.profile-page .guest .profile-avatar {
+  background: #596074;
+  color: #ffffff;
+}
+
+.profile-page .profile-state {
+  color: #c8cce0;
+}
+
+.profile-page .profile-state text {
+  background: var(--color-mint);
+}
+
+.profile-page .guest-note {
+  color: #c4c8da;
+}
+
+.profile-page .profile-mark {
+  border: 3rpx solid var(--color-ink);
+  border-radius: 16rpx;
+  background: var(--color-accent);
+  color: var(--color-ink);
+  box-shadow: 4rpx 4rpx 0 rgba(0, 0, 0, 0.28);
+}
+
+.profile-page .progress-panel {
+  margin-top: 30rpx;
+  border: 3rpx solid var(--color-ink);
+  border-radius: 24rpx;
+  background: var(--color-surface);
+  box-shadow: 7rpx 7rpx 0 rgba(41, 45, 58, 0.12);
+}
+
+.profile-page .progress-number text {
+  color: var(--color-primary-dark);
+}
+
+.profile-page .progress-track {
+  height: 16rpx;
+  border: 2rpx solid var(--color-ink);
+  background: #e7e1d7;
+}
+
+.profile-page .progress-fill {
+  background: linear-gradient(90deg, var(--color-primary), #9a8cff);
+}
+
+/* Unified profile typography */
+.profile-page .profile-name {
+  font-size: 32rpx;
+}
+
+.profile-page .profile-state,
+.profile-page .guest-note {
+  font-size: 22rpx;
+}
+
+.profile-page .progress-note,
+.profile-page .progress-number {
+  font-size: var(--font-caption);
+}
+
+.profile-page .progress-number text {
+  font-size: 30rpx;
+}

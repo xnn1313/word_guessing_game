@@ -212,3 +212,177 @@
     padding-top: 18rpx;
   }
 }
+
+/* Visual refresh */
+.battle-lobby .battle-visual {
+  border: 3rpx solid var(--color-ink);
+  border-radius: 28rpx;
+  background: var(--color-night);
+  box-shadow: 9rpx 9rpx 0 var(--color-primary);
+}
+
+.battle-lobby .battle-visual::before,
+.battle-lobby .battle-visual::after {
+  border-color: rgba(255, 202, 75, 0.1);
+}
+
+.battle-lobby .player-side > text {
+  color: #c3c6d6;
+}
+
+.battle-lobby .player-orb {
+  border: 3rpx solid var(--color-ink);
+  background: var(--color-primary);
+  box-shadow: 5rpx 5rpx 0 rgba(0, 0, 0, 0.3);
+}
+
+.battle-lobby .player-side.right .player-orb {
+  background: var(--color-accent);
+  color: var(--color-ink);
+}
+
+.battle-lobby .versus view {
+  color: #aeb2c5;
+}
+
+.battle-lobby .battle-line {
+  height: 3rpx;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.battle-lobby .create-button {
+  margin-top: 30rpx;
+}
+
+.battle-lobby .join-heading text:first-child {
+  color: var(--color-text);
+  font-weight: 820;
+}
+
+.battle-lobby .join-heading text:last-child {
+  color: var(--color-muted);
+}
+
+.battle-lobby .room-input {
+  border: 3rpx solid var(--color-ink);
+  border-radius: 18rpx;
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 4rpx 4rpx 0 rgba(41, 45, 58, 0.12);
+}
+
+.battle-lobby .join-button {
+  border: 3rpx solid var(--color-ink);
+  border-radius: 18rpx;
+  background: var(--color-accent);
+  color: var(--color-ink);
+  box-shadow: 4rpx 4rpx 0 var(--color-ink);
+}
+
+.battle-lobby .join-button:active {
+  box-shadow: 1rpx 1rpx 0 var(--color-ink);
+}
+
+.battle-lobby .battle-rules {
+  gap: 14rpx;
+  padding: 24rpx 0 0;
+  border-top: none;
+}
+
+.battle-lobby .battle-rules > view {
+  min-height: 74rpx;
+  padding: 14rpx 18rpx;
+  border: 2rpx solid var(--color-ink);
+  border-radius: 16rpx;
+  background: var(--color-surface);
+}
+
+.battle-lobby .battle-rules > view > text {
+  color: var(--color-primary);
+  font-weight: 880;
+}
+
+.battle-lobby .battle-rules view view text:first-child {
+  color: var(--color-text);
+  font-weight: 760;
+}
+
+.battle-lobby .battle-rules view view text:last-child {
+  color: var(--color-muted);
+}
+
+/* Unified control sizing */
+.battle-lobby .battle-visual {
+  min-height: 258rpx;
+}
+
+.battle-lobby .create-button {
+  display: grid;
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  height: var(--control-height);
+  margin-top: 30rpx;
+  place-items: center;
+  border: 3rpx solid var(--color-ink);
+  border-radius: 18rpx;
+  background: var(--color-primary);
+  color: #ffffff;
+  font-size: var(--font-control);
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 6rpx 6rpx 0 var(--color-ink);
+}
+
+.battle-lobby .create-button.card-pressed {
+  box-shadow: 2rpx 2rpx 0 var(--color-ink);
+}
+
+.battle-lobby .join-heading text:first-child {
+  font-size: var(--font-section);
+}
+
+.battle-lobby .join-heading text:last-child {
+  font-size: var(--font-caption);
+}
+
+.battle-lobby .join-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150rpx;
+  gap: 14rpx;
+}
+
+.battle-lobby .room-input {
+  width: 100%;
+  min-width: 0;
+  height: var(--control-height);
+  font-size: 26rpx;
+  letter-spacing: 7rpx;
+}
+
+.battle-lobby .join-button {
+  display: grid;
+  width: 150rpx;
+  min-width: 150rpx;
+  max-width: 150rpx;
+  height: var(--control-height);
+  place-items: center;
+  font-size: var(--font-control);
+  line-height: 1;
+}
+
+.battle-lobby .join-button.card-pressed {
+  box-shadow: 1rpx 1rpx 0 var(--color-ink);
+}
+
+.battle-lobby .battle-rules > view > text {
+  font-size: var(--font-caption);
+}
+
+.battle-lobby .battle-rules view view text:first-child {
+  font-size: 23rpx;
+}
+
+.battle-lobby .battle-rules view view text:last-child {
+  font-size: 21rpx;
+}

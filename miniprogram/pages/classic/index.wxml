@@ -1,6 +1,7 @@
 <view class="page-shell game-page">
   <view class="game-topbar">
     <view>
+      <view class="page-kicker">CLASSIC · 无限模式</view>
       <view class="page-title">经典猜词</view>
       <view class="game-hint">沿着关联度寻找隐藏答案</view>
     </view>
@@ -24,8 +25,8 @@
     <view class="history-toolbar">
       <text class="section-title">猜测记录</text>
       <view class="sort-control">
-        <button class="sort-button {{sortMode === 'time' ? 'active' : ''}}" data-sort="time" bindtap="switchSort">最新</button>
-        <button class="sort-button {{sortMode === 'similarity' ? 'active' : ''}}" data-sort="similarity" bindtap="switchSort">最接近</button>
+        <view class="sort-button {{sortMode === 'time' ? 'active' : ''}}" data-sort="time" bindtap="switchSort">最新</view>
+        <view class="sort-button {{sortMode === 'similarity' ? 'active' : ''}}" data-sort="similarity" bindtap="switchSort">最接近</view>
       </view>
     </view>
     <scroll-view class="history-scroll" scroll-y enhanced show-scrollbar="{{false}}">
@@ -38,7 +39,9 @@
   <view class="guess-dock">
     <view class="guess-row">
       <input class="text-input guess-input" value="{{guess}}" maxlength="20" placeholder="输入任意中文词语" confirm-type="send" bindinput="onGuessInput" bindconfirm="submitGuess" />
-      <button class="submit-guess" loading="{{submitting}}" disabled="{{submitting || !guess}}" bindtap="submitGuess">提交</button>
+      <view class="submit-guess {{submitting || !guess ? 'control-disabled' : ''}}" bindtap="submitGuess" hover-class="card-pressed">
+        {{submitting ? '提交中' : '提交'}}
+      </view>
     </view>
     <view class="game-actions">
       <button class="action-text" bindtap="revealAnswer">查看答案并换题</button>

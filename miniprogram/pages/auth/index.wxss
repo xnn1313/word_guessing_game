@@ -109,3 +109,88 @@
   border-radius: 50%;
   background: #12a37f;
 }
+
+/* Visual refresh */
+.auth-page .auth-intro {
+  min-height: 236rpx;
+  border: 3rpx solid var(--color-ink);
+  border-radius: 28rpx;
+  background: var(--color-primary);
+  box-shadow: 9rpx 9rpx 0 var(--color-ink);
+}
+
+.auth-page .auth-mark {
+  border: 3rpx solid var(--color-ink);
+  border-radius: 18rpx;
+  background: var(--color-accent);
+  color: var(--color-ink);
+  box-shadow: 4rpx 4rpx 0 var(--color-ink);
+}
+
+.auth-page .auth-title {
+  font-size: 39rpx;
+  font-weight: 860;
+}
+
+.auth-page .auth-subtitle {
+  color: #e1ddff;
+  font-size: 22rpx;
+}
+
+.auth-page .auth-panel {
+  margin-top: 30rpx;
+  padding: 28rpx;
+  border: 3rpx solid var(--color-ink);
+  border-radius: 24rpx;
+  background: var(--color-surface);
+  box-shadow: 7rpx 7rpx 0 rgba(41, 45, 58, 0.12);
+}
+
+.auth-page .auth-tabs {
+  background: #ebe6dc;
+}
+
+.auth-page .auth-tab {
+  color: var(--color-muted);
+}
+
+.auth-page .auth-tab.active {
+  border: 2rpx solid var(--color-ink);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+  box-shadow: 3rpx 3rpx 0 rgba(41, 45, 58, 0.12);
+}
+
+.auth-page .field-label {
+  color: var(--color-text);
+  font-weight: 760;
+}
+
+.auth-page .auth-footnote {
+  color: var(--color-muted);
+}
+
+.auth-page .auth-footnote text {
+  background: var(--color-mint);
+}
+
+/* Unified auth typography */
+.auth-page .auth-title {
+  font-size: 36rpx;
+}
+
+.auth-page .auth-subtitle {
+  font-size: 23rpx;
+}
+
+.auth-page .auth-tab {
+  font-size: 24rpx;
+}
+
+.auth-page .field-label {
+  font-size: 22rpx;
+}
+
+.auth-page .auth-footnote {
+  font-size: var(--font-caption);
+}

@@ -1,6 +1,7 @@
 <view class="page-shell campaign-page">
   <view class="campaign-header">
     <view>
+      <view class="page-kicker">CAMPAIGN · 挑战路线</view>
       <view class="page-title">分类闯关</view>
       <view class="page-subtitle">完成当前关，沿着难度路线继续前进。</view>
     </view>
@@ -20,7 +21,7 @@
 
   <view class="category-list" wx:else>
     <view class="category" wx:for="{{categories}}" wx:key="id" wx:for-item="category">
-      <button class="category-header {{category.expanded ? 'expanded' : ''}}" data-id="{{category.id}}" bindtap="toggleCategory">
+      <view class="category-header {{category.expanded ? 'expanded' : ''}}" data-id="{{category.id}}" bindtap="toggleCategory" hover-class="card-pressed">
         <view class="category-emoji">{{category.emoji}}</view>
         <view class="category-copy">
           <text class="category-name">{{category.name}}</text>
@@ -33,7 +34,7 @@
           <text class="category-stars">{{category.progressText}}</text>
           <text class="category-chevron {{category.expanded ? 'open' : ''}}">⌄</text>
         </view>
-      </button>
+      </view>
 
       <view class="level-area" wx:if="{{category.expanded}}">
         <view class="difficulty-line">
@@ -42,7 +43,7 @@
           <text>高手</text>
         </view>
         <view class="level-grid">
-          <button
+          <view
             class="level-button difficulty-{{level.difficulty}} {{level.unlocked ? '' : 'locked'}}"
             wx:for="{{category.levels}}"
             wx:key="id"
@@ -50,11 +51,12 @@
             data-id="{{level.id}}"
             data-unlocked="{{level.unlocked}}"
             bindtap="openLevel"
+            hover-class="level-pressed"
           >
             <text class="level-number">{{level.order}}</text>
             <text class="level-label">{{level.difficulty_label}}</text>
             <text class="level-stars">{{level.unlocked ? level.starText : '未解锁'}}</text>
-          </button>
+          </view>
         </view>
       </view>
     </view>

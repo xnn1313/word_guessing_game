@@ -244,3 +244,222 @@
 .locked .level-stars {
   color: #a1aaa7;
 }
+
+/* Visual refresh */
+.campaign-page .campaign-progress {
+  margin-top: 28rpx;
+  border: 3rpx solid var(--color-ink);
+  border-radius: 24rpx;
+  background: var(--color-primary);
+  box-shadow: 8rpx 8rpx 0 var(--color-ink);
+}
+
+.campaign-page .progress-copy view,
+.campaign-page .progress-copy > text {
+  color: #ded9ff;
+}
+
+.campaign-page .progress-copy view text {
+  color: var(--color-accent);
+}
+
+.campaign-page .progress-track {
+  height: 14rpx;
+  border: 2rpx solid var(--color-ink);
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.campaign-page .progress-fill {
+  background: var(--color-accent);
+}
+
+.campaign-page .category-list {
+  gap: 16rpx;
+  margin-top: 26rpx;
+}
+
+.campaign-page .category {
+  border: 3rpx solid var(--color-ink);
+  border-radius: 22rpx;
+  background: var(--color-surface);
+  box-shadow: 5rpx 5rpx 0 rgba(41, 45, 58, 0.12);
+}
+
+.campaign-page .category-header.expanded {
+  background: var(--color-primary-soft);
+}
+
+.campaign-page .category-emoji {
+  border: 2rpx solid var(--color-ink);
+  background: var(--color-accent);
+}
+
+.campaign-page .category-name {
+  color: var(--color-text);
+  font-weight: 820;
+}
+
+.campaign-page .category-description,
+.campaign-page .difficulty-line {
+  color: var(--color-muted);
+}
+
+.campaign-page .category-track {
+  background: #ded8ce;
+}
+
+.campaign-page .category-track view {
+  background: var(--color-primary);
+}
+
+.campaign-page .category-stars {
+  color: var(--color-primary-dark);
+}
+
+.campaign-page .category-chevron {
+  color: var(--color-primary-dark);
+}
+
+.campaign-page .level-area {
+  border-top: 3rpx solid var(--color-ink);
+  background: #fffdf8;
+}
+
+.campaign-page .level-button {
+  border: 2rpx solid var(--color-ink);
+  border-top-width: 7rpx;
+  border-radius: 14rpx;
+  background: #ffffff;
+  box-shadow: 3rpx 3rpx 0 rgba(41, 45, 58, 0.12);
+}
+
+.campaign-page .level-button:active {
+  box-shadow: 1rpx 1rpx 0 rgba(41, 45, 58, 0.12);
+}
+
+.campaign-page .level-button.locked {
+  border-color: #aaa59c;
+  background: #eae6de;
+  box-shadow: none;
+}
+
+.campaign-page .level-number {
+  color: var(--color-text);
+}
+
+.campaign-page .level-stars {
+  color: #c78310;
+}
+
+/* Compact phone layout fixes from simulator review */
+.campaign-page .category-header {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  align-items: center;
+  margin: 0;
+}
+
+.campaign-page .category-header.card-pressed {
+  opacity: 0.88;
+  transform: none;
+}
+
+.campaign-page .category-copy {
+  overflow: hidden;
+}
+
+.campaign-page .category-description {
+  width: 100%;
+}
+
+.campaign-page .level-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12rpx;
+}
+
+.campaign-page .level-button {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 112rpx;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 10rpx 6rpx;
+  overflow: hidden;
+  text-align: center;
+}
+
+.campaign-page .level-button.level-pressed {
+  box-shadow: 1rpx 1rpx 0 rgba(41, 45, 58, 0.12);
+}
+
+.campaign-page .level-number,
+.campaign-page .level-label,
+.campaign-page .level-stars {
+  width: 100%;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.campaign-page .level-number {
+  font-size: 29rpx;
+  line-height: 1.1;
+}
+
+.campaign-page .level-label {
+  margin-top: 5rpx;
+  font-size: 18rpx;
+  line-height: 1.2;
+}
+
+.campaign-page .level-stars {
+  margin-top: 7rpx;
+  font-size: 17rpx;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+/* Unified campaign typography */
+.campaign-page .progress-copy view text {
+  font-size: 36rpx;
+}
+
+.campaign-page .progress-copy view,
+.campaign-page .progress-copy > text {
+  font-size: 22rpx;
+}
+
+.campaign-page .category-name {
+  font-size: 28rpx;
+}
+
+.campaign-page .category-description {
+  font-size: 22rpx;
+}
+
+.campaign-page .category-stars {
+  font-size: 20rpx;
+}
+
+.campaign-page .difficulty-line {
+  font-size: 20rpx;
+}
+
+.campaign-page .level-number {
+  font-size: 28rpx;
+}
+
+.campaign-page .level-label {
+  font-size: 20rpx;
+}
+
+.campaign-page .level-stars {
+  font-size: 18rpx;
+}

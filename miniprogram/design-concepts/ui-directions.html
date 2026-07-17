@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>猜词游戏 UI 方向</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      background: #11131a;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .board {
+      --bg: #f6f2e9;
+      --surface: #fffdf8;
+      --ink: #242735;
+      --muted: #747783;
+      --primary: #6557e8;
+      --accent: #ffca4b;
+      --support: #35c7a5;
+      --danger: #ed626d;
+      --border: #292d3a;
+      --soft: #eeeafe;
+      --radius: 18px;
+      --card-shadow: 5px 5px 0 #292d3a;
+      width: 1600px;
+      min-height: 1000px;
+      padding: 42px 52px 50px;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    .board-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .direction-no {
+      margin-bottom: 7px;
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 3px;
+    }
+    .board-title {
+      margin: 0;
+      font-size: 40px;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+    }
+    .board-desc {
+      max-width: 620px;
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .chips { display: flex; gap: 9px; }
+    .chip {
+      padding: 8px 13px;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 750;
+    }
+    .screens {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 25px;
+    }
+    .screen-wrap { min-width: 0; }
+    .screen-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 4px 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+    }
+    .phone {
+      position: relative;
+      height: 792px;
+      padding: 22px 18px 18px;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      border-radius: 34px;
+      background: var(--bg);
+      box-shadow: 0 16px 34px rgba(22, 25, 36, .16);
+    }
+    .phone::before {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 104px;
+      height: 22px;
+      border-radius: 0 0 15px 15px;
+      background: var(--border);
+      content: "";
+      transform: translateX(-50%);
+    }
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 26px;
+      margin-bottom: 16px;
+      color: var(--ink);
+      font-size: 10px;
+      font-weight: 750;
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 34px;
+      margin-bottom: 18px;
+    }
+    .nav-title { font-size: 16px; font-weight: 800; }
+    .nav-side { width: 32px; font-size: 21px; }
+    .menu {
+      display: grid;
+      width: 52px;
+      height: 26px;
+      place-items: center;
+      border: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
+      border-radius: 14px;
+      background: var(--surface);
+      font-size: 13px;
+      letter-spacing: 2px;
+    }
+    .kicker {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 5px;
+      color: var(--primary);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 1.7px;
+    }
+    .kicker::before {
+      width: 14px;
+      height: 4px;
+      border-radius: 3px;
+      background: var(--danger);
+      content: "";
+    }
+    .page-heading {
+      margin: 0;
+      color: var(--ink);
+      font-size: 28px;
+      font-weight: 930;
+      letter-spacing: -1px;
+      line-height: 1.15;
+    }
+    .subtitle {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .hero,
+    .stat-card,
+    .panel,
+    .category,
+    .mode,
+    .battle-card,
+    .rule {
+      border: 1.8px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .hero {
+      position: relative;
+      min-height: 180px;
+      margin-top: 24px;
+      padding: 25px 22px;
+      overflow: hidden;
+      background: var(--primary);
+      color: #fff;
+      box-shadow: var(--card-shadow);
+    }
+    .hero-title {
+      position: relative;
+      z-index: 2;
+      width: 62%;
+      font-size: 25px;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+    .hero-note {
+      position: relative;
+      z-index: 2;
+      width: 57%;
+      margin-top: 12px;
+      color: rgba(255,255,255,.75);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .hero-button,
+    .main-button,
+    .small-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.8px solid var(--border);
+      border-radius: 12px;
+      background: var(--accent);
+      color: #202432;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 3px 3px 0 var(--border);
+    }
+    .hero-button {
+      position: relative;
+      z-index: 2;
+      height: 36px;
+      margin-top: 17px;
+      padding: 0 15px;
+    }
+    .word-cards {
+      position: absolute;
+      right: 16px;
+      bottom: 24px;
+      width: 76px;
+      height: 94px;
+    }
+    .word-card {
+      position: absolute;
+      display: grid;
+      width: 56px;
+      height: 66px;
+      place-items: center;
+      border: 1.8px solid var(--border);
+      border-radius: 12px;
+      color: var(--ink);
+      font-size: 24px;
+      font-weight: 900;
+      box-shadow: 3px 3px 0 rgba(20,22,29,.4);
+    }
+    .word-card:nth-child(1) { top: 0; left: 0; background: var(--support); transform: rotate(-10deg); }
+    .word-card:nth-child(2) { top: 14px; left: 12px; background: var(--danger); transform: rotate(-3deg); }
+    .word-card:nth-child(3) { right: 0; bottom: 0; background: var(--accent); transform: rotate(7deg); }
+    .section-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin: 26px 1px 12px;
+    }
+    .section-title { font-size: 18px; font-weight: 900; }
+    .section-hint { color: var(--muted); font-size: 10px; }
+    .mode-list { display: flex; flex-direction: column; gap: 11px; }
+    .mode {
+      display: grid;
+      grid-template-columns: 48px 1fr 30px;
+      gap: 12px;
+      align-items: center;
+      min-height: 78px;
+      padding: 13px 14px;
+      box-shadow: 3px 3px 0 color-mix(in srgb, var(--border) 18%, transparent);
+    }
+    .mode-icon,
+    .category-icon {
+      display: grid;
+      place-items: center;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      background: var(--accent);
+      color: var(--ink);
+      font-weight: 900;
+    }
+    .mode-icon { width: 48px; height: 48px; font-size: 17px; }
+    .mode:nth-child(2) .mode-icon { background: var(--support); }
+    .mode-name { font-size: 16px; font-weight: 900; }
+    .mode-desc { margin-top: 4px; color: var(--muted); font-size: 10px; }
+    .arrow {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      border: 1.4px solid var(--border);
+      border-radius: 50%;
+      background: var(--soft);
+      color: var(--primary);
+      font-weight: 900;
+    }
+    .save-tip { margin-top: 18px; color: var(--support); font-size: 10px; text-align: center; }
+    .stat-card {
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      gap: 18px;
+      align-items: center;
+      min-height: 92px;
+      margin-top: 20px;
+      padding: 18px 20px;
+      background: var(--ink);
+      color: #fff;
+      box-shadow: 5px 5px 0 var(--primary);
+    }
+    .stat-card .divider { width: 1px; height: 48px; background: rgba(255,255,255,.18); }
+    .stat-label { color: rgba(255,255,255,.6); font-size: 10px; }
+    .stat-value { margin-top: 3px; font-size: 25px; font-weight: 900; }
+    .stat-value strong { color: var(--accent); font-size: 38px; }
+    .panel {
+      margin-top: 17px;
+      padding: 18px;
+      box-shadow: 4px 4px 0 color-mix(in srgb, var(--border) 14%, transparent);
+    }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; }
+    .panel-title { font-size: 18px; font-weight: 900; }
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      margin-top: 13px;
+      padding: 4px;
+      border: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
+      border-radius: 11px;
+      background: color-mix(in srgb, var(--bg) 80%, var(--surface));
+    }
+    .tab { padding: 8px; color: var(--muted); font-size: 11px; font-weight: 750; text-align: center; }
+    .tab.active { border-radius: 8px; background: var(--primary); color: #fff; }
+    .history { min-height: 318px; margin-top: 13px; }
+    .history-row {
+      display: grid;
+      grid-template-columns: 1fr 100px;
+      align-items: center;
+      min-height: 54px;
+      border-bottom: 1px solid color-mix(in srgb, var(--border) 13%, transparent);
+    }
+    .history-row:first-child { margin: 0 -5px; padding: 0 8px; border-radius: 10px; background: var(--soft); }
+    .guess-word { font-size: 14px; font-weight: 800; }
+    .guess-score { color: var(--danger); font-size: 12px; font-weight: 850; text-align: right; }
+    .history-row:nth-child(2) .guess-score { color: #b47813; }
+    .history-row:nth-child(3) .guess-score { color: var(--support); }
+    .input-dock { display: grid; grid-template-columns: 1fr 76px; gap: 9px; margin-top: 14px; }
+    .input {
+      display: flex;
+      align-items: center;
+      height: 44px;
+      padding: 0 13px;
+      border: 1.5px solid color-mix(in srgb, var(--border) 55%, transparent);
+      border-radius: 11px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .small-button { height: 44px; background: var(--primary); color: #fff; }
+    .sub-actions { display: flex; justify-content: space-between; margin: 12px 4px 0; color: var(--primary); font-size: 10px; font-weight: 750; }
+    .sub-actions span:last-child { color: var(--danger); }
+    .progress-card {
+      margin-top: 20px;
+      padding: 19px;
+      border: 1.8px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--primary);
+      color: #fff;
+      box-shadow: var(--card-shadow);
+    }
+    .progress-top { display: flex; align-items: flex-end; justify-content: space-between; }
+    .progress-number { font-size: 13px; }
+    .progress-number strong { color: var(--accent); font-size: 25px; }
+    .progress-meta { color: rgba(255,255,255,.72); font-size: 10px; }
+    .track { height: 7px; margin-top: 14px; overflow: hidden; border: 1px solid var(--border); border-radius: 7px; background: rgba(255,255,255,.28); }
+    .track span { display: block; width: 18%; height: 100%; background: var(--accent); }
+    .categories { display: flex; flex-direction: column; gap: 11px; margin-top: 16px; }
+    .category { padding: 13px; }
+    .category-main { display: grid; grid-template-columns: 48px 1fr auto; gap: 12px; align-items: center; }
+    .category-icon { width: 48px; height: 48px; font-size: 23px; }
+    .category-name { font-size: 15px; font-weight: 900; }
+    .category-desc { margin-top: 3px; color: var(--muted); font-size: 9px; }
+    .category-score { color: var(--primary); font-size: 10px; font-weight: 850; }
+    .mini-track { width: 86px; height: 4px; margin-top: 7px; border-radius: 4px; background: color-mix(in srgb, var(--border) 12%, transparent); }
+    .mini-track span { display: block; width: 20%; height: 100%; border-radius: 4px; background: var(--primary); }
+    .level-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-top: 13px; padding-top: 13px; border-top: 1px solid color-mix(in srgb, var(--border) 28%, transparent); }
+    .level {
+      min-height: 58px;
+      padding: 7px;
+      border: 1.3px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface);
+      text-align: center;
+    }
+    .level strong { display: block; font-size: 17px; }
+    .level small { color: var(--muted); font-size: 8px; }
+    .level-stars { margin-top: 3px; color: #c9850b; font-size: 9px; }
+    .level.locked { opacity: .48; background: color-mix(in srgb, var(--bg) 70%, var(--surface)); }
+    .battle-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 72px 1fr;
+      align-items: center;
+      min-height: 180px;
+      margin-top: 20px;
+      padding: 24px 18px;
+      overflow: hidden;
+      background: var(--ink);
+      color: #fff;
+      box-shadow: 5px 5px 0 var(--primary);
+    }
+    .fighter { position: relative; z-index: 2; text-align: center; }
+    .fighter-orb {
+      display: grid;
+      width: 66px;
+      height: 66px;
+      margin: 0 auto 10px;
+      place-items: center;
+      border: 1.8px solid var(--border);
+      border-radius: 50%;
+      background: var(--primary);
+      font-size: 21px;
+      font-weight: 900;
+      box-shadow: 3px 3px 0 rgba(0,0,0,.36);
+    }
+    .fighter:last-child .fighter-orb { background: var(--accent); color: var(--ink); }
+    .fighter-label { color: rgba(255,255,255,.65); font-size: 10px; }
+    .vs { position: relative; z-index: 2; font-size: 22px; font-weight: 950; font-style: italic; text-align: center; }
+    .vs small { display: block; margin-top: 4px; color: rgba(255,255,255,.52); font-size: 9px; font-style: normal; }
+    .main-button {
+      width: 100%;
+      height: 46px;
+      margin-top: 17px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 14px;
+    }
+    .join-title { display: flex; align-items: baseline; justify-content: space-between; margin-top: 22px; }
+    .join-title strong { font-size: 16px; }
+    .join-title span { color: var(--muted); font-size: 9px; }
+    .join-row { display: grid; grid-template-columns: 1fr 72px; gap: 9px; margin-top: 10px; }
+    .rules { display: flex; flex-direction: column; gap: 8px; margin-top: 19px; }
+    .rule { display: grid; grid-template-columns: 31px 72px 1fr; align-items: center; min-height: 48px; padding: 9px 11px; }
+    .rule-no { color: var(--primary); font-size: 11px; font-weight: 900; }
+    .rule-name { font-size: 11px; font-weight: 850; }
+    .rule-desc { color: var(--muted); font-size: 9px; }
+
+    /* B — editorial dictionary */
+    .concept-b {
+      --bg: #f1eee5;
+      --surface: #fbfaf5;
+      --ink: #13233f;
+      --muted: #657084;
+      --primary: #1457f3;
+      --accent: #ef4d3e;
+      --support: #efc64a;
+      --danger: #ef4d3e;
+      --border: #13233f;
+      --soft: #e7ebf4;
+      --radius: 3px;
+      --card-shadow: none;
+      background-image: linear-gradient(rgba(19,35,63,.045) 1px, transparent 1px);
+      background-size: 100% 28px;
+    }
+    .concept-b .board-title,
+    .concept-b .page-heading,
+    .concept-b .hero-title,
+    .concept-b .stat-value,
+    .concept-b .progress-number strong {
+      font-family: "Songti SC", "STSong", "SimSun", serif;
+      font-weight: 900;
+    }
+    .concept-b .phone { border-radius: 18px; box-shadow: 8px 8px 0 rgba(19,35,63,.14); }
+    .concept-b .phone::before { width: 76px; height: 8px; border-radius: 0; }
+    .concept-b .hero { background: var(--surface); color: var(--ink); border-width: 2.5px; border-left: 10px solid var(--primary); }
+    .concept-b .hero-title { font-size: 29px; }
+    .concept-b .hero-note { color: var(--muted); }
+    .concept-b .hero::after { position: absolute; right: -18px; top: 12px; color: var(--accent); content: "词"; font: 900 126px/1 "Songti SC", serif; opacity: .12; }
+    .concept-b .word-cards { display: none; }
+    .concept-b .mode { border-left: 7px solid var(--primary); box-shadow: none; }
+    .concept-b .mode:nth-child(2) { border-left-color: var(--accent); }
+    .concept-b .mode-icon,
+    .concept-b .category-icon { border-radius: 0; background: transparent; color: var(--primary); }
+    .concept-b .mode:nth-child(2) .mode-icon { background: transparent; color: var(--accent); }
+    .concept-b .arrow { border-radius: 0; background: transparent; }
+    .concept-b .stat-card,
+    .concept-b .battle-card { background: var(--primary); box-shadow: none; }
+    .concept-b .panel,
+    .concept-b .category,
+    .concept-b .rule { box-shadow: none; }
+    .concept-b .progress-card { box-shadow: none; border-left: 10px solid var(--accent); }
+    .concept-b .main-button,
+    .concept-b .hero-button,
+    .concept-b .small-button { border-radius: 2px; box-shadow: none; }
+    .concept-b .fighter-orb { border-radius: 3px; box-shadow: none; }
+
+    /* C — night arena */
+    .concept-c {
+      --bg: #090e1d;
+      --surface: #141c31;
+      --ink: #f5f7ff;
+      --muted: #9ba6c5;
+      --primary: #a4ff55;
+      --accent: #58dfe8;
+      --support: #a98cff;
+      --danger: #ff6f91;
+      --border: #3a486a;
+      --soft: #202b49;
+      --radius: 17px;
+      --card-shadow: 0 0 22px rgba(164,255,85,.18);
+      background:
+        radial-gradient(circle at 14% 8%, rgba(88,223,232,.12), transparent 27%),
+        radial-gradient(circle at 85% 4%, rgba(169,140,255,.15), transparent 26%),
+        var(--bg);
+    }
+    .concept-c .phone { border-color: #405077; box-shadow: 0 20px 44px rgba(0,0,0,.52); }
+    .concept-c .phone::before { background: #02050d; }
+    .concept-c .menu,
+    .concept-c .chip { background: rgba(20,28,49,.78); }
+    .concept-c .hero { background: linear-gradient(145deg, #6c46e9, #2931a9 55%, #173868); }
+    .concept-c .hero::before { position: absolute; right: -52px; top: -56px; width: 150px; height: 150px; border: 22px solid rgba(88,223,232,.14); border-radius: 50%; content: ""; }
+    .concept-c .hero-button { background: var(--primary); }
+    .concept-c .mode,
+    .concept-c .panel,
+    .concept-c .category,
+    .concept-c .rule { box-shadow: inset 0 0 0 1px rgba(255,255,255,.025); }
+    .concept-c .mode-icon,
+    .concept-c .category-icon { border-color: #536187; background: var(--soft); color: var(--accent); }
+    .concept-c .mode:nth-child(2) .mode-icon { background: var(--soft); color: var(--primary); }
+    .concept-c .arrow { border-color: #536187; background: #202b49; color: var(--primary); }
+    .concept-c .stat-card,
+    .concept-c .battle-card { background: linear-gradient(145deg, #151e36, #20284a); box-shadow: 0 0 22px rgba(88,223,232,.16); }
+    .concept-c .stat-value strong { color: var(--primary); }
+    .concept-c .tabs { background: #0c1325; }
+    .concept-c .tab.active { color: #07110b; background: var(--primary); }
+    .concept-c .history-row:first-child { background: #222d4e; }
+    .concept-c .progress-card { background: linear-gradient(110deg, #5638d1, #236f8d); }
+    .concept-c .track span { background: var(--primary); }
+    .concept-c .level { background: #0e1628; }
+    .concept-c .main-button,
+    .concept-c .small-button { color: #07110b; background: var(--primary); box-shadow: 0 0 16px rgba(164,255,85,.22); }
+    .concept-c .fighter-orb { color: #07110b; background: var(--primary); box-shadow: 0 0 18px rgba(164,255,85,.25); }
+    .concept-c .fighter:last-child .fighter-orb { background: var(--accent); }
+
+    /* A2 — expandable puzzle-game platform */
+    .concept-a2 {
+      --bg: #f3f0e7;
+      --surface: #fffdf7;
+      --ink: #19323a;
+      --muted: #718087;
+      --primary: #168f82;
+      --accent: #ffd166;
+      --support: #43c6b7;
+      --danger: #f36f61;
+      --border: #19323a;
+      --soft: #e5f4f0;
+      --radius: 19px;
+      --card-shadow: 5px 5px 0 #19323a;
+      width: 1800px;
+      min-height: 1100px;
+      background:
+        radial-gradient(circle at 4% 4%, rgba(67,198,183,.13), transparent 19%),
+        radial-gradient(circle at 96% 7%, rgba(255,209,102,.15), transparent 18%),
+        var(--bg);
+    }
+    .concept-a2 .screens { grid-template-columns: repeat(5, 1fr); gap: 18px; }
+    .concept-a2 .phone { padding-right: 15px; padding-left: 15px; border-radius: 31px; }
+    .concept-a2 .hero { background: linear-gradient(145deg, #168f82, #08766f); }
+    .concept-a2 .stat-card,
+    .concept-a2 .battle-card { background: #19323a; box-shadow: 5px 5px 0 var(--primary); }
+    .concept-a2 .progress-card { background: linear-gradient(120deg, #168f82, #20a896); }
+    .concept-a2 .mode:nth-child(2) .mode-icon { background: var(--danger); }
+    .concept-a2 .word-card:nth-child(1) { background: #5ed1c1; }
+    .concept-a2 .word-card:nth-child(2) { background: #f58a7f; }
+    .concept-a2 .direction-no,
+    .concept-a2 .kicker,
+    .concept-a2 .category-score,
+    .concept-a2 .rule-no { color: #08766f; }
+    .concept-a2 .hero-button,
+    .concept-a2 .fighter:last-child .fighter-orb { background: var(--accent); }
+
+    .hub-welcome {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .hub-avatar {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border: 1.7px solid var(--border);
+      border-radius: 50%;
+      background: var(--accent);
+      font-size: 16px;
+      font-weight: 900;
+      box-shadow: 2px 2px 0 var(--border);
+    }
+    .hub-featured {
+      position: relative;
+      min-height: 202px;
+      margin-top: 20px;
+      padding: 24px 20px;
+      overflow: hidden;
+      border: 1.8px solid var(--border);
+      border-radius: 22px;
+      background: linear-gradient(145deg, #168f82, #08766f);
+      color: #fff;
+      box-shadow: var(--card-shadow);
+    }
+    .hub-featured::after {
+      position: absolute;
+      right: -30px;
+      bottom: -40px;
+      width: 142px;
+      height: 142px;
+      border: 22px solid rgba(255,255,255,.1);
+      border-radius: 50%;
+      content: "";
+    }
+    .game-tag {
+      display: inline-flex;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.16);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 850;
+      letter-spacing: .8px;
+    }
+    .hub-game-title { position: relative; z-index: 2; margin-top: 12px; font-size: 25px; font-weight: 950; }
+    .hub-game-desc { position: relative; z-index: 2; width: 70%; margin-top: 7px; color: rgba(255,255,255,.76); font-size: 11px; line-height: 1.5; }
+    .hub-play {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      height: 38px;
+      margin-top: 18px;
+      padding: 0 15px;
+      border: 1.7px solid var(--border);
+      border-radius: 11px;
+      background: var(--accent);
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 3px 3px 0 var(--border);
+    }
+    .hub-card-stack { position: absolute; z-index: 1; right: 19px; top: 48px; width: 74px; height: 90px; }
+    .hub-card-stack span {
+      position: absolute;
+      display: grid;
+      width: 54px;
+      height: 64px;
+      place-items: center;
+      border: 1.6px solid var(--border);
+      border-radius: 12px;
+      color: var(--ink);
+      font-size: 21px;
+      font-weight: 950;
+      box-shadow: 3px 3px 0 rgba(0,0,0,.3);
+    }
+    .hub-card-stack span:nth-child(1) { left: 0; top: 0; background: #65d3c3; transform: rotate(-9deg); }
+    .hub-card-stack span:nth-child(2) { left: 11px; top: 12px; background: #f58a7f; transform: rotate(-2deg); }
+    .hub-card-stack span:nth-child(3) { right: 0; bottom: 0; background: var(--accent); transform: rotate(7deg); }
+    .hub-games { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .hub-game {
+      position: relative;
+      min-height: 108px;
+      padding: 14px;
+      overflow: hidden;
+      border: 1.6px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+    }
+    .hub-game-icon {
+      display: grid;
+      width: 35px;
+      height: 35px;
+      margin-bottom: 10px;
+      place-items: center;
+      border: 1.4px solid var(--border);
+      border-radius: 10px;
+      background: #dceffb;
+      font-size: 17px;
+    }
+    .hub-game:nth-child(2) .hub-game-icon { background: #fee1dc; }
+    .hub-game:nth-child(3) .hub-game-icon { background: #eee6ff; }
+    .hub-game:nth-child(4) .hub-game-icon { background: #e3f5df; }
+    .hub-game-name { font-size: 13px; font-weight: 900; }
+    .hub-game-state { margin-top: 4px; color: var(--muted); font-size: 9px; }
+    .soon-tag {
+      position: absolute;
+      top: 13px;
+      right: 10px;
+      color: var(--danger);
+      font-size: 8px;
+      font-weight: 800;
+    }
+    .hub-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 18px;
+      padding: 13px 14px;
+      border-radius: 14px;
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 10px;
+    }
+    .hub-footer strong { color: var(--primary); font-size: 12px; }
+    .hub-overview {
+      display: grid;
+      grid-template-columns: 1fr 72px;
+      gap: 14px;
+      align-items: center;
+      min-height: 112px;
+      margin-top: 19px;
+      padding: 18px 18px 18px 20px;
+      border: 1.8px solid var(--border);
+      border-radius: 18px;
+      background: var(--ink);
+      color: #fff;
+      box-shadow: 4px 4px 0 var(--primary);
+    }
+    .overview-label { color: rgba(255,255,255,.58); font-size: 10px; }
+    .overview-value { margin-top: 2px; font-size: 25px; font-weight: 950; }
+    .overview-value strong { color: var(--accent); font-size: 34px; }
+    .overview-note { margin-top: 5px; color: rgba(255,255,255,.58); font-size: 9px; }
+    .streak-ring {
+      display: grid;
+      width: 65px;
+      height: 65px;
+      place-content: center;
+      border: 7px solid rgba(255,255,255,.14);
+      border-top-color: var(--accent);
+      border-right-color: var(--support);
+      border-radius: 50%;
+      text-align: center;
+      transform: rotate(10deg);
+    }
+    .streak-ring > * { transform: rotate(-10deg); }
+    .streak-ring strong { font-size: 18px; line-height: 1; }
+    .streak-ring span { margin-top: 3px; color: rgba(255,255,255,.65); font-size: 8px; }
+    .library-filter {
+      display: inline-flex;
+      gap: 3px;
+      padding: 3px;
+      border-radius: 999px;
+      background: #e6e2d8;
+    }
+    .library-filter span { padding: 4px 8px; color: var(--muted); font-size: 8px; }
+    .library-filter .active { border-radius: 999px; background: var(--surface); color: var(--ink); font-weight: 850; }
+    .hub-library { display: flex; flex-direction: column; gap: 9px; }
+    .library-game {
+      display: grid;
+      grid-template-columns: 48px 1fr 30px;
+      gap: 11px;
+      align-items: center;
+      min-height: 70px;
+      padding: 10px 11px;
+      border: 1.5px solid var(--border);
+      border-radius: 15px;
+      background: var(--surface);
+    }
+    .library-game.active { border-width: 1.8px; box-shadow: 3px 3px 0 color-mix(in srgb, var(--border) 18%, transparent); }
+    .library-icon {
+      display: grid;
+      width: 46px;
+      height: 46px;
+      place-items: center;
+      border: 1.4px solid var(--border);
+      border-radius: 13px;
+      background: var(--accent);
+      color: var(--ink);
+      font-size: 18px;
+      font-weight: 950;
+    }
+    .library-game:nth-child(2) .library-icon { background: #dceffb; }
+    .library-game:nth-child(3) .library-icon { background: #fee1dc; }
+    .library-game:nth-child(4) .library-icon { background: #eee6ff; }
+    .library-name { font-size: 14px; font-weight: 900; }
+    .library-desc { margin-top: 3px; color: var(--muted); font-size: 9px; }
+    .library-progress { width: 82px; height: 3px; margin-top: 7px; border-radius: 3px; background: #e6e2d8; }
+    .library-progress span { display: block; width: 34%; height: 100%; border-radius: inherit; background: var(--primary); }
+    .library-action {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      border: 1.3px solid var(--border);
+      border-radius: 50%;
+      background: var(--soft);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .library-game.locked { opacity: .68; }
+    .library-game.locked .library-action { border: 0; background: transparent; color: var(--danger); font-size: 8px; white-space: nowrap; }
+    .hub-bottom-nav {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      margin-top: 15px;
+      padding: 9px 4px 3px;
+      border-top: 1px solid color-mix(in srgb, var(--border) 18%, transparent);
+      color: var(--muted);
+      font-size: 9px;
+      text-align: center;
+    }
+    .hub-bottom-nav .active { color: var(--primary); font-weight: 900; }
+  </style>
+</head>
+<body>
+  <main id="app"></main>
+  <script>
+    const concepts = {
+      a: {
+        className: 'concept-a', no: 'DIRECTION A', title: '轻松实验室 · Soft Play',
+        desc: '温暖、亲和、带一点桌游触感。保留游戏感，但弱化夸张字号和粗重装饰，最适合当前用户群和功能结构。',
+        chips: ['温暖', '轻游戏', '高可读性']
+      },
+      a2: {
+        className: 'concept-a2', no: 'DIRECTION A2', title: '脑力游乐场 · Puzzle Club',
+        desc: '从单一猜词扩展为可持续增加游戏的益智平台。深青绿建立稳定主品牌，珊瑚橙与暖黄色负责反馈和活力，每款游戏可以拥有自己的辅助色。',
+        chips: ['平台化', '可扩展', '温暖耐看']
+      },
+      b: {
+        className: 'concept-b', no: 'DIRECTION B', title: '现代词典 · Editorial',
+        desc: '更像一本现代互动词典：留白、网格、宋体标题与克制的蓝红配色。质感成熟，信息层级最清晰。',
+        chips: ['编辑感', '克制', '内容优先']
+      },
+      c: {
+        className: 'concept-c', no: 'DIRECTION C', title: '夜间竞技 · Neon Arena',
+        desc: '深色沉浸式游戏界面，荧光绿和青色强调状态与对战。氛围最强，适合强化竞速和挑战属性。',
+        chips: ['沉浸', '竞技', '强品牌感']
+      }
+    };
+
+    const status = `<div class="status"><span>15:01</span><span>▮▮▮　⌁　▰</span></div>`;
+    const nav = title => `<div class="nav"><div class="nav-side">‹</div><div class="nav-title">${title}</div><div class="menu">•••</div></div>`;
+
+    function hubScreen() {
+      return `<div class="phone">
+        ${status}<div class="nav"><div class="nav-side"></div><div class="nav-title">脑力游乐场</div><div class="menu">•••</div></div>
+        <div class="hub-welcome"><div><div class="kicker">PLAYGROUND</div><h2 class="page-heading">选择一个挑战</h2><div class="subtitle">每天十分钟，给大脑做个热身。</div></div><div class="hub-avatar">X</div></div>
+        <div class="hub-overview"><div><div class="overview-label">今日脑力训练</div><div class="overview-value"><strong>8</strong> 分钟</div><div class="overview-note">再完成 2 分钟即可达成今日目标</div></div><div class="streak-ring"><strong>3</strong><span>连续天数</span></div></div>
+        <div class="section-row"><div class="section-title">游戏库</div><div class="library-filter"><span class="active">全部</span><span>最近</span></div></div>
+        <div class="hub-library">
+          <div class="library-game active"><div class="library-icon">词</div><div><div class="library-name">猜词实验室</div><div class="library-desc">关联猜词 · 闯关 · 好友竞速</div><div class="library-progress"><span></span></div></div><div class="library-action">→</div></div>
+          <div class="library-game locked"><div class="library-icon">▦</div><div><div class="library-name">每日数独</div><div class="library-desc">数字逻辑 · 3 种难度</div></div><div class="library-action">即将上线</div></div>
+          <div class="library-game locked"><div class="library-icon">成</div><div><div class="library-name">成语填字</div><div class="library-desc">词汇挑战 · 连续闯关</div></div><div class="library-action">即将上线</div></div>
+          <div class="library-game locked"><div class="library-icon">◫</div><div><div class="library-name">记忆翻牌</div><div class="library-desc">专注训练 · 限时挑战</div></div><div class="library-action">计划中</div></div>
+        </div>
+        <div class="hub-bottom-nav"><div class="active">◉<br>游戏</div><div>▥<br>记录</div><div>○<br>我的</div></div>
+      </div>`;
+    }
+
+    function homeScreen() {
+      return `<div class="phone">
+        ${status}${nav('猜词游戏')}
+        <div class="kicker">WORD LAB</div><h2 class="page-heading">猜词游戏</h2><div class="subtitle">从一个词开始，慢慢靠近答案。</div>
+        <div class="hero"><div class="hero-title">今天能几次猜中？</div><div class="hero-note">输入相关词，关联度越高就越接近答案</div><div class="hero-button">开始经典猜词　→</div><div class="word-cards"><div class="word-card">猜</div><div class="word-card">近</div><div class="word-card">词</div></div></div>
+        <div class="section-row"><div class="section-title">更多玩法</div><div class="section-hint">选择一种挑战</div></div>
+        <div class="mode-list"><div class="mode"><div class="mode-icon">关</div><div><div class="mode-name">分类闯关</div><div class="mode-desc">13 个分类 · 260 关 · 难度递增</div></div><div class="arrow">→</div></div><div class="mode"><div class="mode-icon">竞</div><div><div class="mode-name">双人竞速</div><div class="mode-desc">邀请好友 · 90 秒实时对决</div></div><div class="arrow">→</div></div></div>
+        <div class="save-tip">●　游戏进度会自动保存</div>
+      </div>`;
+    }
+
+    function classicScreen() {
+      return `<div class="phone">
+        ${status}${nav('经典猜词')}
+        <div class="kicker">CLASSIC · 无限模式</div><h2 class="page-heading">经典猜词</h2><div class="subtitle">沿着关联度寻找隐藏答案</div>
+        <div class="stat-card"><div><div class="stat-label">本轮猜测</div><div class="stat-value"><strong>3</strong> 次</div></div><div class="divider"></div><div><div class="stat-label">累计猜中</div><div class="stat-value">12 个词</div></div></div>
+        <div class="panel"><div class="panel-head"><div class="panel-title">猜测记录</div><div class="section-hint">本轮进行中</div></div><div class="tabs"><div class="tab active">最新</div><div class="tab">最接近</div></div><div class="history"><div class="history-row"><div class="guess-word">演员　<small>新</small></div><div class="guess-score">65.8412%</div></div><div class="history-row"><div class="guess-word">角色</div><div class="guess-score">42.7068%</div></div><div class="history-row"><div class="guess-word">人物</div><div class="guess-score">13.9241%</div></div></div></div>
+        <div class="input-dock"><div class="input">输入任意中文词语</div><div class="small-button">提交</div></div><div class="sub-actions"><span>查看答案并换题</span><span>重置全部记录</span></div>
+      </div>`;
+    }
+
+    function campaignScreen() {
+      return `<div class="phone">
+        ${status}${nav('分类闯关')}
+        <div class="kicker">CAMPAIGN · 挑战路线</div><h2 class="page-heading">分类闯关</h2><div class="subtitle">完成当前关，沿着难度路线继续前进。</div>
+        <div class="progress-card"><div class="progress-top"><div class="progress-number"><strong>12</strong> / 780 星</div><div class="progress-meta">13 个分类 · 260 个关卡</div></div><div class="track"><span></span></div></div>
+        <div class="categories"><div class="category"><div class="category-main"><div class="category-icon">🍎</div><div><div class="category-name">水果乐园</div><div class="category-desc">从熟悉的水果开始语义探险</div><div class="mini-track"><span></span></div></div><div class="category-score">12/60 星　⌃</div></div><div class="level-grid"><div class="level"><strong>1</strong><small>入门</small><div class="level-stars">★★★</div></div><div class="level"><strong>2</strong><small>入门</small><div class="level-stars">★★★</div></div><div class="level"><strong>3</strong><small>入门</small><div class="level-stars">★★★</div></div><div class="level"><strong>4</strong><small>入门</small><div class="level-stars">★★★</div></div><div class="level"><strong>5</strong><small>熟练</small><div class="level-stars">☆☆☆</div></div><div class="level locked"><strong>6</strong><small>熟练</small><div class="level-stars">未解锁</div></div></div></div><div class="category"><div class="category-main"><div class="category-icon">🐼</div><div><div class="category-name">动物世界</div><div class="category-desc">探索陆地、海洋与极地动物</div></div><div class="category-score">0/60 星　⌄</div></div></div><div class="category"><div class="category-main"><div class="category-icon">🤖</div><div><div class="category-name">科技数码</div><div class="category-desc">从常用设备走向前沿科技</div></div><div class="category-score">0/60 星　⌄</div></div></div></div>
+      </div>`;
+    }
+
+    function battleScreen() {
+      return `<div class="phone">
+        ${status}${nav('双人竞速')}
+        <div class="kicker">BATTLE · 好友对决</div><h2 class="page-heading">双人竞速</h2><div class="subtitle">同一个隐藏词，90 秒内率先猜中者获胜。</div>
+        <div class="battle-card"><div class="fighter"><div class="fighter-orb">你</div><div class="fighter-label">我的进度</div></div><div class="vs">VS<small>90 秒</small></div><div class="fighter"><div class="fighter-orb">友</div><div class="fighter-label">好友进度</div></div></div>
+        <div class="main-button">创建房间，邀请好友</div><div class="join-title"><strong>已有房间码？</strong><span>输入好友发来的 6 位代码</span></div><div class="join-row"><div class="input">L N 5 V G C</div><div class="small-button">加入</div></div>
+        <div class="rules"><div class="rule"><div class="rule-no">01</div><div class="rule-name">等待好友</div><div class="rule-desc">两人到齐后由房主开始</div></div><div class="rule"><div class="rule-no">02</div><div class="rule-name">实时追赶</div><div class="rule-desc">同步次数与最高相似度</div></div><div class="rule"><div class="rule-no">03</div><div class="rule-name">原房再战</div><div class="rule-desc">结束后可直接再来一局</div></div></div>
+      </div>`;
+    }
+
+    function screenWrap(no, label, content) {
+      return `<div class="screen-wrap"><div class="screen-label"><span>${no}</span><span>${label}</span></div>${content}</div>`;
+    }
+
+    function renderBoard(key) {
+      const c = concepts[key] || concepts.a;
+      const screens = key === 'a2'
+        ? [
+            screenWrap('01', 'GAME HUB', hubScreen()),
+            screenWrap('02', 'WORD HOME', homeScreen()),
+            screenWrap('03', 'CLASSIC', classicScreen()),
+            screenWrap('04', 'CAMPAIGN', campaignScreen()),
+            screenWrap('05', 'BATTLE', battleScreen())
+          ].join('')
+        : [
+            screenWrap('01', 'HOME', homeScreen()),
+            screenWrap('02', 'CLASSIC', classicScreen()),
+            screenWrap('03', 'CAMPAIGN', campaignScreen()),
+            screenWrap('04', 'BATTLE', battleScreen())
+          ].join('');
+      return `<section class="board ${c.className}"><header class="board-head"><div><div class="direction-no">${c.no}</div><h1 class="board-title">${c.title}</h1><p class="board-desc">${c.desc}</p></div><div class="chips">${c.chips.map(x => `<span class="chip">${x}</span>`).join('')}</div></header><div class="screens">${screens}</div></section>`;
+    }
+
+    const key = new URLSearchParams(location.search).get('concept') || 'a';
+    document.getElementById('app').innerHTML = renderBoard(key);
+  </script>
+</body>
+</html>

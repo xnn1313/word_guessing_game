@@ -297,3 +297,297 @@
     min-height: 112rpx;
   }
 }
+
+/* 2026 visual refresh: playful editorial game board */
+.home-page {
+  background: var(--color-bg);
+}
+
+.home-page .account-button {
+  min-height: 66rpx;
+  padding: 7rpx 17rpx 7rpx 8rpx;
+  border: 3rpx solid var(--color-ink);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 4rpx 4rpx 0 rgba(41, 45, 58, 0.13);
+}
+
+.home-page .account-avatar {
+  background: #ebe6dc;
+  color: var(--color-text);
+}
+
+.home-page .account-button.signed .account-avatar {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+}
+
+.home-page .hero {
+  min-height: 326rpx;
+  margin-top: 38rpx;
+  padding: 40rpx 34rpx;
+  border: 3rpx solid var(--color-ink);
+  border-radius: 30rpx;
+  background: var(--color-primary);
+  box-shadow: 10rpx 10rpx 0 var(--color-ink);
+}
+
+.home-page .hero::before {
+  position: absolute;
+  top: -90rpx;
+  right: 56rpx;
+  width: 180rpx;
+  height: 180rpx;
+  border: 26rpx solid rgba(255, 202, 75, 0.22);
+  border-radius: 50%;
+  content: "";
+}
+
+.home-page .hero::after {
+  right: -92rpx;
+  bottom: -138rpx;
+  border-color: rgba(255, 255, 255, 0.09);
+}
+
+.home-page .hero-title {
+  font-size: 43rpx;
+  font-weight: 880;
+  letter-spacing: -1rpx;
+}
+
+.home-page .hero-note {
+  color: #e3dfff;
+  font-size: 23rpx;
+}
+
+.home-page .hero-cta {
+  border: 3rpx solid var(--color-ink);
+  border-radius: 16rpx;
+  background: var(--color-accent);
+  color: var(--color-ink);
+  box-shadow: 4rpx 4rpx 0 var(--color-ink);
+}
+
+.home-page .hero-word,
+.home-page .word-shadow {
+  border: 3rpx solid var(--color-ink);
+  border-radius: 20rpx;
+  box-shadow: 5rpx 5rpx 0 rgba(41, 45, 58, 0.45);
+}
+
+.home-page .hero-word {
+  background: var(--color-accent);
+  color: var(--color-ink);
+}
+
+.home-page .word-shadow.middle {
+  background: var(--color-coral);
+  color: #ffffff;
+}
+
+.home-page .word-shadow.back {
+  background: var(--color-mint);
+  color: var(--color-ink);
+}
+
+.home-page .mode-heading {
+  margin-top: 44rpx;
+}
+
+.home-page .mode-heading text:first-child {
+  font-size: 32rpx;
+  font-weight: 840;
+}
+
+.home-page .mode-row {
+  min-height: 132rpx;
+  border: 3rpx solid var(--color-ink);
+  border-radius: 22rpx;
+  background: var(--color-surface);
+  box-shadow: 5rpx 5rpx 0 rgba(41, 45, 58, 0.13);
+}
+
+.home-page .mode-row:active {
+  box-shadow: 2rpx 2rpx 0 rgba(41, 45, 58, 0.16);
+}
+
+.home-page .mode-icon {
+  border: 3rpx solid var(--color-ink);
+  border-radius: 18rpx;
+}
+
+.home-page .campaign .mode-icon {
+  background: var(--color-accent);
+  color: var(--color-ink);
+}
+
+.home-page .battle .mode-icon {
+  background: var(--color-mint);
+  color: var(--color-ink);
+}
+
+.home-page .mode-title {
+  color: var(--color-text);
+  font-size: 30rpx;
+  font-weight: 820;
+}
+
+.home-page .mode-description {
+  color: var(--color-muted);
+}
+
+.home-page .mode-arrow {
+  border: 2rpx solid var(--color-ink);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+  font-weight: 800;
+}
+
+.home-page .save-hint {
+  color: #8a6c25;
+}
+
+.home-page .save-dot {
+  background: var(--color-accent);
+  box-shadow: 0 0 0 4rpx rgba(255, 202, 75, 0.22);
+}
+
+.home-page .save-hint.saved {
+  color: #347e6c;
+}
+
+.home-page .save-hint.saved .save-dot {
+  background: var(--color-mint);
+}
+
+/* Compact phone layout fixes from simulator review */
+.home-page .hero {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 300rpx;
+  align-self: stretch;
+  padding: 34rpx 30rpx;
+}
+
+.home-page .hero.hero-pressed {
+  box-shadow: 4rpx 4rpx 0 var(--color-ink);
+}
+
+.home-page .hero-copy {
+  min-width: 0;
+  max-width: none;
+  flex: 1;
+}
+
+.home-page .hero-title {
+  max-width: 330rpx;
+  font-size: 42rpx;
+  line-height: 1.18;
+}
+
+.home-page .hero-note {
+  max-width: 330rpx;
+  font-size: 22rpx;
+}
+
+.home-page .hero-cta {
+  margin-top: 24rpx;
+  padding: 13rpx 18rpx;
+  font-size: 22rpx;
+}
+
+.home-page .word-stack {
+  width: 142rpx;
+  height: 164rpx;
+  margin-left: 16rpx;
+}
+
+.home-page .hero-word,
+.home-page .word-shadow {
+  width: 102rpx;
+  height: 114rpx;
+  font-size: 46rpx;
+}
+
+.home-page .mode-list {
+  width: 100%;
+  align-items: stretch;
+}
+
+.home-page .mode-row {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  align-self: stretch;
+  margin: 0;
+}
+
+.home-page .mode-row.card-pressed {
+  box-shadow: 2rpx 2rpx 0 rgba(41, 45, 58, 0.16);
+}
+
+/* Unified home typography */
+.home-page .hero-title {
+  font-size: 38rpx;
+  line-height: 1.22;
+}
+
+.home-page .hero-note {
+  font-size: var(--font-body);
+  line-height: 1.5;
+}
+
+.home-page .hero-cta {
+  font-size: 25rpx;
+}
+
+.home-page .mode-heading text:first-child {
+  font-size: var(--font-section);
+}
+
+.home-page .mode-heading text:last-child,
+.home-page .mode-description,
+.home-page .save-hint {
+  font-size: 22rpx;
+}
+
+.home-page .mode-title {
+  font-size: 28rpx;
+}
+
+/* A2 word-module theme */
+.home-page .home-header {
+  display: block;
+}
+
+.home-page .hero {
+  background: linear-gradient(145deg, #168f82, #08766f);
+}
+
+.home-page .hero-note {
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.home-page .hero::before {
+  border-color: rgba(255, 209, 102, 0.2);
+}
+
+.home-page .battle .mode-icon {
+  background: var(--color-coral);
+}
+
+.home-page .mode-arrow {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+}
+
+.home-page .hero {
+  min-height: 340rpx;
+}
+
+.home-page .mode-row {
+  min-height: 142rpx;
+}

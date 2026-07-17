@@ -40,7 +40,9 @@
     <view class="guess-dock">
       <view class="guess-row">
         <input class="text-input" value="{{guess}}" maxlength="20" placeholder="输入你的猜测" confirm-type="send" bindinput="onGuessInput" bindconfirm="submitGuess" />
-        <button class="guess-button" loading="{{submitting}}" disabled="{{submitting || !guess}}" bindtap="submitGuess">提交</button>
+        <view class="guess-button {{submitting || !guess ? 'control-disabled' : ''}}" bindtap="submitGuess" hover-class="card-pressed">
+          {{submitting ? '提交中' : '提交'}}
+        </view>
       </view>
       <view class="level-actions">
         <button bindtap="revealAnswer">查看答案并重试</button>

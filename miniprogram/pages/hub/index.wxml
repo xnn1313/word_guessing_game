@@ -1,0 +1,65 @@
+<view class="page-shell hub-page">
+  <view class="hub-header">
+    <view class="hub-heading">
+      <view class="page-kicker">PLAYGROUND</view>
+      <view class="page-title">选择一个挑战</view>
+      <view class="page-subtitle">每天十分钟，给大脑做个热身。</view>
+    </view>
+    <view class="account-button {{loggedIn ? 'signed' : ''}}" bindtap="openProfile" aria-label="打开个人中心">
+      <view class="account-avatar">{{avatarText}}</view>
+    </view>
+  </view>
+
+  <view class="training-summary">
+    <view class="training-copy">
+      <text class="training-label">{{trainingLabel}}</text>
+      <text class="training-value">{{trainingValue}}</text>
+      <text class="training-note">{{trainingNote}}</text>
+    </view>
+    <view class="training-ring">
+      <text>1</text>
+      <text>款可玩</text>
+    </view>
+  </view>
+
+  <view class="library-heading">
+    <text class="section-title">游戏库</text>
+    <view class="library-filter"><text class="active">全部</text><text>最近</text></view>
+  </view>
+
+  <view class="game-library">
+    <view class="game-card playable" bindtap="openWordGame" hover-class="card-pressed">
+      <view class="game-icon word">词</view>
+      <view class="game-copy">
+        <text class="game-name">猜词实验室</text>
+        <text class="game-description">关联猜词 · 分类闯关 · 好友竞速</text>
+        <view class="game-progress"><view style="width: {{campaignStars ? 34 : 8}}%"></view></view>
+      </view>
+      <view class="game-action">→</view>
+    </view>
+
+    <view class="game-card upcoming" data-name="每日数独" bindtap="showComingSoon" hover-class="card-pressed">
+      <view class="game-icon sudoku">▦</view>
+      <view class="game-copy"><text class="game-name">每日数独</text><text class="game-description">数字逻辑 · 三种难度</text></view>
+      <text class="coming-tag">即将上线</text>
+    </view>
+
+    <view class="game-card upcoming" data-name="成语填字" bindtap="showComingSoon" hover-class="card-pressed">
+      <view class="game-icon idiom">成</view>
+      <view class="game-copy"><text class="game-name">成语填字</text><text class="game-description">词汇挑战 · 连续闯关</text></view>
+      <text class="coming-tag">即将上线</text>
+    </view>
+
+    <view class="game-card upcoming" data-name="记忆翻牌" bindtap="showComingSoon" hover-class="card-pressed">
+      <view class="game-icon memory">◫</view>
+      <view class="game-copy"><text class="game-name">记忆翻牌</text><text class="game-description">专注训练 · 限时挑战</text></view>
+      <text class="coming-tag planned">计划中</text>
+    </view>
+  </view>
+
+  <view class="hub-nav">
+    <view class="hub-nav-item active"><text>●</text><text>游戏</text></view>
+    <view class="hub-nav-item" bindtap="openRecords"><text>▥</text><text>记录</text></view>
+    <view class="hub-nav-item" bindtap="openProfile"><text>○</text><text>我的</text></view>
+  </view>
+</view>

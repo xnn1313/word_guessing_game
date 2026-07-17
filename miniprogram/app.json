@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/hub/index",
     "pages/home/index",
     "pages/auth/index",
     "pages/classic/index",
@@ -10,10 +11,10 @@
     "pages/profile/index"
   ],
   "window": {
-    "navigationBarTitleText": "猜词游戏",
-    "navigationBarBackgroundColor": "#f3f7f5",
+    "navigationBarTitleText": "脑力游乐场",
+    "navigationBarBackgroundColor": "#f3f0e7",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#f3f7f5",
+    "backgroundColor": "#f3f0e7",
     "backgroundTextStyle": "dark"
   },
   "style": "v2",

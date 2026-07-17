@@ -423,3 +423,256 @@
     margin-top: 9rpx;
   }
 }
+
+/* Visual refresh */
+.room-page {
+  background: var(--color-bg);
+}
+
+.room-page .room-code text {
+  color: var(--color-muted);
+}
+
+.room-page .room-code view {
+  color: var(--color-primary-dark);
+}
+
+.room-page .room-status {
+  padding: 7rpx 11rpx;
+  border: 2rpx solid var(--color-ink);
+  border-radius: 999rpx;
+  background: #fff0be;
+  color: #7f590f;
+}
+
+.room-page .room-status.status-playing {
+  background: #dcf7ef;
+  color: #176f5a;
+}
+
+.room-page .room-status.status-playing text {
+  background: var(--color-mint);
+  box-shadow: 0 0 0 5rpx rgba(53, 199, 165, 0.12);
+}
+
+.room-page .room-status.status-finished {
+  background: #e7e2d9;
+  color: #65636a;
+}
+
+.room-page .leave-button {
+  color: var(--color-danger);
+  font-weight: 720;
+}
+
+.room-page .score-grid {
+  gap: 12rpx;
+  margin-top: 14rpx;
+}
+
+.room-page .player-card {
+  border: 3rpx solid var(--color-ink);
+  border-radius: 18rpx;
+  background: var(--color-surface);
+  box-shadow: 4rpx 4rpx 0 rgba(41, 45, 58, 0.11);
+}
+
+.room-page .player-card.self {
+  border-color: var(--color-ink);
+  background: var(--color-primary-soft);
+  box-shadow: 4rpx 4rpx 0 var(--color-primary);
+}
+
+.room-page .player-card.opponent {
+  background: #fff3c9;
+  box-shadow: 4rpx 4rpx 0 #e3a82a;
+}
+
+.room-page .player-card.empty {
+  border-color: #8f8b84;
+  background: #eae6de;
+  box-shadow: none;
+}
+
+.room-page .player-name {
+  color: var(--color-text);
+  font-weight: 820;
+}
+
+.room-page .player-role,
+.room-page .score-label,
+.room-page .attempt-count {
+  color: var(--color-muted);
+}
+
+.room-page .score-number {
+  color: var(--color-primary-dark);
+}
+
+.room-page .opponent .score-number {
+  color: #a56a0b;
+}
+
+.room-page .player-track {
+  border: 1rpx solid rgba(41, 45, 58, 0.35);
+  background: #ddd7cd;
+}
+
+.room-page .player-track view {
+  background: var(--color-primary);
+}
+
+.room-page .opponent .player-track view {
+  background: var(--color-accent);
+}
+
+.room-page .waiting-panel,
+.room-page .arena,
+.room-page .result-panel {
+  border: 3rpx solid var(--color-ink);
+  border-radius: 20rpx;
+  background: var(--color-surface);
+  box-shadow: 6rpx 6rpx 0 rgba(41, 45, 58, 0.11);
+}
+
+.room-page .waiting-rings text {
+  background: var(--color-primary);
+}
+
+.room-page .waiting-rings text:nth-child(2) { background: var(--color-coral); }
+.room-page .waiting-rings text:nth-child(3) { background: var(--color-accent); }
+
+.room-page .waiting-title,
+.room-page .result-title {
+  color: var(--color-text);
+  font-weight: 840;
+}
+
+.room-page .waiting-note,
+.room-page .result-answer,
+.room-page .history-heading > text:last-child {
+  color: var(--color-muted);
+}
+
+.room-page .guest-wait {
+  color: var(--color-primary-dark);
+}
+
+.room-page .timer-value {
+  color: var(--color-primary-dark);
+}
+
+.room-page .timer-value.urgent {
+  color: var(--color-danger);
+}
+
+.room-page .timer-line {
+  border: 1rpx solid rgba(41, 45, 58, 0.35);
+  background: #e3ddd3;
+}
+
+.room-page .timer-line view {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-coral));
+}
+
+.room-page .guess-button {
+  border: 3rpx solid var(--color-ink);
+  border-radius: 16rpx;
+  background: var(--color-primary);
+  box-shadow: 4rpx 4rpx 0 var(--color-ink);
+}
+
+.room-page .result-emblem {
+  border: 3rpx solid var(--color-ink);
+  background: var(--color-accent);
+  box-shadow: 3rpx 3rpx 0 rgba(41, 45, 58, 0.14);
+}
+
+/* Unified room typography and compact waiting state */
+.room-page .room-code text {
+  font-size: 19rpx;
+}
+
+.room-page .room-code view {
+  font-size: 31rpx;
+}
+
+.room-page .room-status,
+.room-page .leave-button {
+  font-size: 20rpx;
+}
+
+.room-page .player-card {
+  padding: 18rpx;
+}
+
+.room-page .player-name {
+  font-size: 25rpx;
+}
+
+.room-page .player-role {
+  font-size: 18rpx;
+}
+
+.room-page .score-number {
+  font-size: 29rpx;
+}
+
+.room-page .score-label,
+.room-page .attempt-count {
+  font-size: 17rpx;
+}
+
+.room-page .attempt-count text {
+  font-size: 25rpx;
+}
+
+.room-page .waiting-panel {
+  min-height: 410rpx;
+  flex: 0 0 auto;
+  margin-top: 20rpx;
+  padding: 34rpx;
+}
+
+.room-page .waiting-title {
+  font-size: 32rpx;
+}
+
+.room-page .waiting-note {
+  margin-top: 12rpx;
+  margin-bottom: 28rpx;
+  font-size: 23rpx;
+}
+
+.room-page .waiting-panel .primary-button {
+  min-width: 100%;
+  max-width: 100%;
+}
+
+.room-page .guest-wait {
+  font-size: 24rpx;
+}
+
+.room-page .guess-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 136rpx;
+  gap: 12rpx;
+}
+
+.room-page .guess-row .text-input {
+  width: 100%;
+  min-width: 0;
+  height: 80rpx;
+  font-size: 25rpx;
+}
+
+.room-page .guess-button {
+  display: grid;
+  width: 136rpx;
+  min-width: 136rpx;
+  max-width: 136rpx;
+  height: 80rpx;
+  place-items: center;
+  font-size: 25rpx;
+  line-height: 1;
+}

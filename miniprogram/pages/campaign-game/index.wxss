@@ -262,3 +262,159 @@
     padding-bottom: 12rpx;
   }
 }
+
+/* Visual refresh */
+.level-page {
+  background: var(--color-bg);
+}
+
+.level-page .level-icon {
+  border: 3rpx solid var(--color-ink);
+  border-radius: 16rpx;
+  background: var(--color-accent);
+  box-shadow: 3rpx 3rpx 0 rgba(41, 45, 58, 0.15);
+}
+
+.level-page .level-category {
+  color: var(--color-muted);
+  font-weight: 650;
+}
+
+.level-page .level-name {
+  color: var(--color-text);
+  font-weight: 840;
+}
+
+.level-page .difficulty-badge {
+  border: 2rpx solid var(--color-ink);
+  background: #dcf7ef;
+  color: #176f5a;
+  box-shadow: 2rpx 2rpx 0 rgba(41, 45, 58, 0.12);
+}
+
+.level-page .difficulty-badge.difficulty-3 { background: #fff0be; color: #82590e; }
+.level-page .difficulty-badge.difficulty-4 { background: #ffe0c9; color: #934b24; }
+.level-page .difficulty-badge.difficulty-5 { background: #ffd8dc; color: #9c3d46; }
+
+.level-page .level-summary {
+  border: 3rpx solid var(--color-ink);
+  border-radius: 20rpx;
+  background: var(--color-night);
+  box-shadow: 6rpx 6rpx 0 var(--color-primary);
+}
+
+.level-page .level-summary > view,
+.level-page .summary-unit,
+.level-page .summary-hint {
+  color: #bdc1d3;
+}
+
+.level-page .level-summary .summary-number.accent {
+  color: var(--color-accent);
+}
+
+.level-page .history-panel {
+  margin-top: 20rpx;
+  border: 3rpx solid var(--color-ink);
+  border-radius: 20rpx;
+  background: var(--color-surface);
+  box-shadow: 5rpx 5rpx 0 rgba(41, 45, 58, 0.1);
+}
+
+.level-page .history-title-row > text:last-child {
+  color: var(--color-muted);
+}
+
+.level-page .result-note {
+  border: 2rpx solid #bd7d18;
+  background: #fff0bd;
+  color: #83560e;
+  font-weight: 680;
+}
+
+.level-page .guess-dock {
+  padding-top: 17rpx;
+  background: var(--color-bg);
+}
+
+.level-page .guess-button {
+  border: 3rpx solid var(--color-ink);
+  border-radius: 18rpx;
+  background: var(--color-primary);
+  box-shadow: 5rpx 5rpx 0 var(--color-ink);
+}
+
+.level-page .guess-button:active {
+  box-shadow: 2rpx 2rpx 0 var(--color-ink);
+}
+
+.level-page .level-actions button,
+.level-page .retry-button {
+  color: var(--color-primary-dark);
+  font-weight: 680;
+}
+
+.level-page .complete-emblem {
+  border: 3rpx solid var(--color-ink);
+  background: var(--color-mint);
+  color: var(--color-ink);
+  box-shadow: 7rpx 7rpx 0 var(--color-ink);
+}
+
+.level-page .complete-title {
+  color: var(--color-text);
+  font-size: 42rpx;
+  font-weight: 880;
+}
+
+.level-page .complete-answer {
+  color: var(--color-muted);
+}
+
+.level-page .complete-stars {
+  color: #d98e0b;
+  text-shadow: 3rpx 3rpx 0 #fff0b8;
+}
+
+/* Unified level controls */
+.level-page .level-category,
+.level-page .difficulty-badge {
+  font-size: var(--font-caption);
+}
+
+.level-page .level-name {
+  font-size: 30rpx;
+}
+
+.level-page .history-title-row > text:last-child {
+  font-size: var(--font-caption);
+}
+
+.level-page .guess-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150rpx;
+  gap: 14rpx;
+}
+
+.level-page .guess-row .text-input {
+  width: 100%;
+  min-width: 0;
+  height: var(--control-height);
+  font-size: 26rpx;
+}
+
+.level-page .guess-button {
+  display: grid;
+  width: 150rpx;
+  min-width: 150rpx;
+  max-width: 150rpx;
+  height: var(--control-height);
+  place-items: center;
+  font-size: var(--font-control);
+  line-height: 1;
+}
+
+.level-page .level-actions button,
+.level-page .retry-button {
+  font-size: 22rpx;
+}

@@ -43,7 +43,7 @@ Page({
   },
 
   async createRoom() {
-    if (this.data.creating) return;
+    if (this.data.creating || this.data.checking) return;
     this.setData({ creating: true });
     try {
       await request<BattleState>("/battle/create", {
@@ -61,12 +61,12 @@ Page({
   },
 
   async joinRoom() {
+    if (this.data.joining || this.data.checking) return;
     const code = this.data.joinCode.trim();
     if (code.length !== 6) {
       wx.showToast({ title: "请输入六位房间码", icon: "none" });
       return;
     }
-    if (this.data.joining) return;
     this.setData({ joining: true });
     try {
       await request<BattleState>("/battle/join", {
