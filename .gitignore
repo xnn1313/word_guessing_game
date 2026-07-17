@@ -3,6 +3,7 @@
 *.pyc
 backend/.env
 backend/word_guessing_game.db*
+backups/
 miniprogram/project.private.config.json
 miniprogram/node_modules/
 miniprogram/miniprogram_npm/
