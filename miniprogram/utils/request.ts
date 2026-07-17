@@ -3,20 +3,23 @@ import { clearAuth, getToken } from "./auth";
 
 export class ApiError extends Error {
   statusCode: number;
+  data: Record<string, any> | null;
 
-  constructor(message: string, statusCode = 0) {
+  constructor(message: string, statusCode = 0, data: Record<string, any> | null = null) {
     super(message);
     this.name = "ApiError";
     this.statusCode = statusCode;
+    this.data = data;
   }
 }
 
-interface RequestOptions {
+export interface RequestOptions {
   method?: "GET" | "POST";
   data?: Record<string, any>;
   authenticated?: boolean;
   showLoading?: boolean;
   loadingText?: string;
+  acceptedStatusCodes?: number[];
 }
 
 export function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
@@ -41,12 +44,15 @@ export function request<T>(path: string, options: RequestOptions = {}): Promise<
       success: (response: any) => {
         const statusCode = Number(response.statusCode || 0);
         const data = response.data || {};
-        if (statusCode >= 200 && statusCode < 300) {
+        const acceptedBusinessResponse =
+          options.acceptedStatusCodes?.includes(statusCode) ||
+          (statusCode === 422 && data.correct === false);
+        if ((statusCode >= 200 && statusCode < 300) || acceptedBusinessResponse) {
           resolve(data as T);
           return;
         }
         if (statusCode === 401 && token) clearAuth();
-        reject(new ApiError(data.error || `请求失败（${statusCode}）`, statusCode));
+        reject(new ApiError(data.error || `请求失败（${statusCode}）`, statusCode, data));
       },
       fail: (error: any) => {
         const detail = error?.errMsg || "无法连接服务器";

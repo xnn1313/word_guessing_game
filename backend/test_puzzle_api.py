@@ -102,7 +102,14 @@ class PuzzleApiTestCase(unittest.TestCase):
             restored["saved_state"]["grid"][hint.json["index"]], str(hint.json["value"])
         )
 
-        incorrect_grid = puzzle["solution"][:-1] + "0"
+        incorrect_index = next(
+            index for index, given in enumerate(payload["givens"]) if given == "0"
+        )
+        incorrect_grid = (
+            puzzle["solution"][:incorrect_index]
+            + "0"
+            + puzzle["solution"][incorrect_index + 1 :]
+        )
         incorrect = self.client.post(
             "/api/sudoku/submit",
             headers=self.auth,
@@ -115,7 +122,7 @@ class PuzzleApiTestCase(unittest.TestCase):
             },
         )
         self.assertEqual(incorrect.status_code, 422)
-        self.assertIn(80, incorrect.json["invalid_cells"])
+        self.assertIn(incorrect_index, incorrect.json["invalid_cells"])
         self.assertNotIn(puzzle["solution"], incorrect.get_data(as_text=True))
 
         complete_body = {
@@ -134,11 +141,91 @@ class PuzzleApiTestCase(unittest.TestCase):
         self.assertEqual(completed.status_code, 200)
         self.assertEqual(repeated.json, completed.json)
 
+    def test_sudoku_and_idiom_allow_erasing_non_fixed_cells(self):
+        sudoku = self.client.get(
+            "/api/sudoku/puzzle?mode=practice&difficulty=easy", headers=self.auth
+        ).json
+        sudoku_puzzle = storage.get_sudoku_puzzle(sudoku["puzzle_id"])
+        editable = next(index for index, value in enumerate(sudoku["givens"]) if value == "0")
+        filled_grid = (
+            sudoku["givens"][:editable]
+            + sudoku_puzzle["solution"][editable]
+            + sudoku["givens"][editable + 1 :]
+        )
+        first_save = self.client.post(
+            "/api/sudoku/save",
+            headers=self.auth,
+            json={
+                "run_id": sudoku["run_id"],
+                "puzzle_id": sudoku["puzzle_id"],
+                "grid": filled_grid,
+                "notes": {},
+                "elapsed_seconds": 10,
+                "mistakes": 0,
+            },
+        )
+        erased_save = self.client.post(
+            "/api/sudoku/save",
+            headers=self.auth,
+            json={
+                "run_id": sudoku["run_id"],
+                "puzzle_id": sudoku["puzzle_id"],
+                "grid": sudoku["givens"],
+                "notes": {},
+                "elapsed_seconds": 11,
+                "mistakes": 0,
+            },
+        )
+        self.assertEqual(first_save.status_code, 200)
+        self.assertEqual(erased_save.status_code, 200)
+
+        idiom = self.client.get(
+            "/api/idiom/puzzle?mode=level&level_id=idiom-001", headers=self.auth
+        ).json
+        idiom_puzzle = storage.get_idiom_puzzle(idiom["puzzle_id"])
+        solution = puzzle_games._idiom_solution_list(idiom_puzzle)
+        editable = next(
+            index for index, cell in enumerate(idiom["cells"]) if cell["type"] == "input"
+        )
+        filled = list(idiom["saved_state"]["grid"])
+        filled[editable] = solution[editable]
+        first_save = self.client.post(
+            "/api/idiom/save",
+            headers=self.auth,
+            json={
+                "run_id": idiom["run_id"],
+                "puzzle_id": idiom["puzzle_id"],
+                "grid": filled,
+                "elapsed_seconds": 10,
+                "mistakes": 0,
+            },
+        )
+        filled[editable] = ""
+        erased_save = self.client.post(
+            "/api/idiom/save",
+            headers=self.auth,
+            json={
+                "run_id": idiom["run_id"],
+                "puzzle_id": idiom["puzzle_id"],
+                "grid": filled,
+                "elapsed_seconds": 11,
+                "mistakes": 0,
+            },
+        )
+        self.assertEqual(first_save.status_code, 200)
+        self.assertEqual(erased_save.status_code, 200)
+
     def test_idiom_unlock_save_and_submit(self):
         guest_catalog = self.client.get("/api/idiom/catalog").json
         for category in guest_catalog["categories"]:
             self.assertTrue(category["levels"][0]["unlocked"])
             self.assertFalse(category["levels"][1]["unlocked"])
+
+        guest_second = self.client.get(
+            f"/api/idiom/puzzle?mode=level&level_id={guest_catalog['categories'][0]['levels'][1]['id']}"
+        )
+        self.assertEqual(guest_second.status_code, 200)
+        self.assertIsNone(guest_second.json["run_id"])
 
         first = guest_catalog["categories"][0]["levels"][0]
         second = guest_catalog["categories"][0]["levels"][1]

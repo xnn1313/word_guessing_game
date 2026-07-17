@@ -269,9 +269,6 @@ def save_sudoku(user, data):
     notes = _validate_notes(data.get("notes", {}))
     elapsed = _elapsed(data)
     mistakes = _integer(data, "mistakes", 0, 10000, run["mistakes"])
-    previous_grid = run["state"].get("grid", puzzle["puzzle"])
-    if sum(value != "0" for value in grid) < sum(value != "0" for value in previous_grid):
-        raise PuzzleError("已填写格子数量不能回退", "PROGRESS_REGRESSION")
     timestamp = _save_state(
         run, user, {"grid": grid, "notes": notes}, elapsed, run["hints_used"], mistakes
     )
@@ -466,7 +463,10 @@ def get_idiom(user, mode, difficulty=None, level_id=None):
     if not puzzle:
         raise PuzzleError("成语题目不存在", "PUZZLE_NOT_FOUND", 404)
     progress = storage.get_idiom_progress(user["id"]) if user else {}
-    if mode == "level" and not _idiom_unlocked(puzzle, progress, puzzles):
+    # Guest progress lives on the mini-program. The catalog exposes only the
+    # first level by default, while the client may locally unlock and request
+    # later levels. Authenticated users continue to use server-side unlocking.
+    if mode == "level" and user and not _idiom_unlocked(puzzle, progress, puzzles):
         raise PuzzleError("请先完成上一关", "LEVEL_LOCKED", 403)
     initial_grid = _idiom_initial_grid(puzzle)
     run = _run_for_puzzle(
@@ -514,9 +514,6 @@ def save_idiom(user, data):
     grid = _validate_idiom_grid(data.get("grid"), puzzle)
     elapsed = _elapsed(data)
     mistakes = _integer(data, "mistakes", 0, 10000, run["mistakes"])
-    previous = run["state"].get("grid", _idiom_initial_grid(puzzle))
-    if sum(bool(value) for value in grid) < sum(bool(value) for value in previous):
-        raise PuzzleError("已填写格子数量不能回退", "PROGRESS_REGRESSION")
     timestamp = _save_state(run, user, {"grid": grid}, elapsed, run["hints_used"], mistakes)
     return {"saved": True, "run_id": run["id"], "updated_at": timestamp}
 
