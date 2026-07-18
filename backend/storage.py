@@ -162,12 +162,20 @@ def init_db():
                 layout_json TEXT NOT NULL,
                 clues_json TEXT NOT NULL,
                 solution_json TEXT NOT NULL,
+                layout_version INTEGER NOT NULL DEFAULT 1,
                 is_daily_enabled INTEGER NOT NULL DEFAULT 1,
                 is_active INTEGER NOT NULL DEFAULT 1,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
             """
         )
+        idiom_columns = {
+            row["name"] for row in connection.execute("PRAGMA table_info(idiom_puzzles)").fetchall()
+        }
+        if "layout_version" not in idiom_columns:
+            connection.execute(
+                "ALTER TABLE idiom_puzzles ADD COLUMN layout_version INTEGER NOT NULL DEFAULT 1"
+            )
         connection.execute(
             """
             CREATE UNIQUE INDEX IF NOT EXISTS idx_idiom_level_order

@@ -3,23 +3,38 @@
   <view class="page-title">每日数独</view>
   <view class="page-subtitle">每一行、每一列、每个九宫格都填入 1–9。</view>
 
-  <view class="option-bar">
-    <button
-      class="option-button {{mode === item.value ? 'active' : ''}}"
-      wx:for="{{modeOptions}}"
-      wx:key="value"
-      data-value="{{item.value}}"
-      bindtap="switchMode"
-    >{{item.label}}</button>
+  <view class="sudoku-modes">
+    <view class="option-bar">
+      <button
+        class="option-button {{mode === item.value ? 'active' : ''}}"
+        wx:for="{{modeOptions}}"
+        wx:key="value"
+        data-value="{{item.value}}"
+        bindtap="switchMode"
+      >{{item.label}}</button>
+    </view>
+    <view class="difficulty-bar">
+      <button
+        class="difficulty-button {{difficulty === item.value ? 'active' : ''}}"
+        wx:for="{{difficultyOptions}}"
+        wx:key="value"
+        data-value="{{item.value}}"
+        bindtap="switchDifficulty"
+      >{{item.label}}</button>
+    </view>
   </view>
-  <view class="difficulty-bar">
-    <button
-      class="difficulty-button {{difficulty === item.value ? 'active' : ''}}"
-      wx:for="{{difficultyOptions}}"
-      wx:key="value"
-      data-value="{{item.value}}"
-      bindtap="switchDifficulty"
-    >{{item.label}}</button>
+
+  <view class="daily-slot-section" wx:if="{{mode === 'daily'}}">
+    <view class="daily-slot-heading"><text>今日题组</text><text>{{dailySlot}} / {{dailyCount}}</text></view>
+    <view class="daily-slot-bar">
+      <button
+        class="daily-slot-button {{dailySlot === item ? 'active' : ''}}"
+        wx:for="{{dailySlots}}"
+        wx:key="*this"
+        data-value="{{item}}"
+        bindtap="switchDailySlot"
+      >第 {{item}} 题</button>
+    </view>
   </view>
 
   <view class="loading-state" wx:if="{{loading}}">正在准备数独…</view>
@@ -46,7 +61,7 @@
 
     <block wx:if="{{!completed}}">
       <view class="number-pad">
-        <button class="{{selectedValue === item ? 'active' : ''}}" wx:for="{{digits}}" wx:key="*this" data-value="{{item}}" bindtap="inputDigit">{{item}}</button>
+        <button wx:for="{{digits}}" wx:key="*this" data-value="{{item}}" bindtap="inputDigit">{{item}}</button>
       </view>
 
       <view class="tool-row">
@@ -64,7 +79,7 @@
       <view class="complete-title">数独完成</view>
       <view class="complete-stars">{{result.stars === 3 ? '★★★' : result.stars === 2 ? '★★☆' : '★☆☆'}}</view>
       <view class="complete-detail">{{result.score}} 分 · 用时 {{elapsedText}}</view>
-      <button class="secondary-button" bindtap="playAgain">再来一局</button>
+      <button class="secondary-button" bindtap="playAgain">{{mode === 'daily' && dailySlot < dailyCount ? '下一题' : '再来一局'}}</button>
     </view>
   </block>
 </view>

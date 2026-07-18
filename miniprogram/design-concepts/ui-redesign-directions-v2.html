@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>脑力游乐场 UI 改版提案 v2</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      background: #11131a;
+      color: #171926;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    button { font: inherit; }
+    .direction {
+      min-height: 100vh;
+      padding: 34px 42px 38px;
+      overflow: hidden;
+    }
+    body[data-only="a"] .direction:not(.direction-a),
+    body[data-only="b"] .direction:not(.direction-b),
+    body[data-only="c"] .direction:not(.direction-c) { display: none; }
+    .direction-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: end;
+      max-width: 1330px;
+      margin: 0 auto 22px;
+    }
+    .direction-code { font-size: 12px; font-weight: 900; letter-spacing: 3px; }
+    .direction-title { margin: 6px 0 5px; font-size: 34px; line-height: 1.1; }
+    .direction-desc { max-width: 700px; margin: 0; font-size: 14px; line-height: 1.65; opacity: .72; }
+    .tokens { display: flex; gap: 8px; align-items: center; }
+    .token { width: 24px; height: 24px; border: 2px solid currentColor; border-radius: 50%; }
+    .stage {
+      display: grid;
+      max-width: 1330px;
+      grid-template-columns: 250px 390px 390px;
+      gap: 32px;
+      align-items: start;
+      margin: 0 auto;
+    }
+    .notes { padding-top: 50px; }
+    .note-index { font-size: 74px; font-weight: 900; line-height: .9; opacity: .12; }
+    .note-title { margin-top: 20px; font-size: 20px; font-weight: 900; }
+    .note-list { display: grid; gap: 12px; margin-top: 18px; }
+    .note-item { padding-top: 12px; border-top: 1px solid currentColor; font-size: 13px; line-height: 1.55; opacity: .75; }
+    .screen-label { margin: 0 0 8px 4px; font-size: 11px; font-weight: 900; letter-spacing: 2px; opacity: .55; }
+    .phone {
+      position: relative;
+      width: 390px;
+      height: 844px;
+      overflow: hidden;
+      border-radius: 38px;
+    }
+    .phone::before {
+      position: absolute;
+      z-index: 10;
+      top: 0;
+      left: 50%;
+      width: 118px;
+      height: 25px;
+      border-radius: 0 0 18px 18px;
+      transform: translateX(-50%);
+      content: "";
+    }
+    .status {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      height: 39px;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 18px 7px;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .signal { letter-spacing: 2px; }
+    .topbar {
+      display: grid;
+      height: 50px;
+      grid-template-columns: 42px 1fr 62px;
+      align-items: center;
+      padding: 0 14px;
+    }
+    .topbar .back { font-size: 24px; }
+    .topbar .name { font-size: 17px; font-weight: 850; text-align: center; }
+    .capsule { justify-self: end; font-size: 17px; font-weight: 900; letter-spacing: 3px; }
+    .home-content, .sudoku-content { padding: 12px 18px 16px; }
+    .bottom-nav {
+      position: absolute;
+      right: 17px;
+      bottom: 12px;
+      left: 17px;
+      display: grid;
+      height: 58px;
+      grid-template-columns: repeat(3, 1fr);
+      align-items: center;
+    }
+    .nav-item { display: grid; gap: 3px; place-items: center; font-size: 10px; }
+    .nav-icon { width: 20px; height: 20px; border: 2px solid currentColor; }
+    .nav-item.active { font-weight: 900; }
+    .sudoku-board { display: grid; grid-template-columns: repeat(9, 1fr); }
+    .sudoku-cell { display: grid; aspect-ratio: 1; place-items: center; font-size: 15px; font-weight: 850; }
+    .sudoku-cell:nth-child(3n) { border-right-width: 2px !important; }
+    .sudoku-cell:nth-child(9n) { border-right-width: 0 !important; }
+    .sudoku-cell:nth-child(n+19):nth-child(-n+27),
+    .sudoku-cell:nth-child(n+46):nth-child(-n+54) { border-bottom-width: 2px !important; }
+    .digit-dock { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
+    .digit { display: grid; height: 40px; place-items: center; font-size: 16px; font-weight: 900; }
+
+    /* A — Toy Blocks */
+    .direction-a { background: #e9edff; color: #161b3a; }
+    .direction-a .direction-code { color: #3157ff; }
+    .direction-a .token:nth-child(1) { background: #3157ff; }
+    .direction-a .token:nth-child(2) { background: #ffd84d; }
+    .direction-a .token:nth-child(3) { background: #ff6b5f; }
+    .direction-a .token:nth-child(4) { background: #69e6d4; }
+    .phone-a {
+      border: 3px solid #171b38;
+      background: #f8f9ff;
+      box-shadow: 10px 12px 0 #3157ff;
+    }
+    .phone-a::before { background: #171b38; }
+    .phone-a .capsule { padding: 6px 10px; border: 2px solid #171b38; border-radius: 99px; background: #fff; }
+    .a-welcome { display: flex; align-items: flex-end; justify-content: space-between; }
+    .a-eyebrow { color: #3157ff; font-size: 11px; font-weight: 900; letter-spacing: 1.5px; }
+    .a-title { margin-top: 4px; font-size: 31px; font-weight: 950; line-height: 1.05; }
+    .a-avatar { display: grid; width: 48px; height: 48px; place-items: center; border: 2px solid #171b38; border-radius: 16px; background: #ffd84d; font-size: 20px; font-weight: 950; transform: rotate(4deg); }
+    .a-mission {
+      position: relative;
+      display: grid;
+      height: 137px;
+      grid-template-columns: 1fr 90px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 20px;
+      overflow: hidden;
+      border: 2px solid #171b38;
+      border-radius: 25px;
+      background: #3157ff;
+      color: #fff;
+      box-shadow: 5px 6px 0 #171b38;
+    }
+    .a-mission::after { position: absolute; right: -30px; bottom: -50px; width: 125px; height: 125px; border: 22px solid #69e6d4; border-radius: 50%; content: ""; opacity: .55; }
+    .a-mission-label { font-size: 11px; opacity: .78; }
+    .a-mission-main { margin-top: 6px; font-size: 27px; font-weight: 950; }
+    .a-mission-sub { margin-top: 6px; font-size: 11px; opacity: .72; }
+    .a-progress-orb { position: relative; z-index: 1; display: grid; width: 72px; height: 72px; place-items: center; border: 10px solid #ffd84d; border-right-color: rgba(255,255,255,.22); border-radius: 50%; font-size: 17px; font-weight: 950; }
+    .a-section-row { display: flex; align-items: baseline; justify-content: space-between; margin: 24px 0 11px; }
+    .a-section-row b { font-size: 19px; }
+    .a-section-row span { font-size: 10px; opacity: .55; }
+    .a-game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .a-game {
+      position: relative;
+      height: 133px;
+      padding: 15px;
+      border: 2px solid #171b38;
+      border-radius: 21px;
+      box-shadow: 4px 5px 0 #171b38;
+    }
+    .a-game:nth-child(1) { background: #ffd84d; }
+    .a-game:nth-child(2) { background: #69e6d4; }
+    .a-game:nth-child(3) { background: #ff8c84; }
+    .a-game:nth-child(4) { background: #c8b8ff; }
+    .a-game-mark { display: grid; width: 34px; height: 34px; place-items: center; border: 2px solid #171b38; border-radius: 10px; background: rgba(255,255,255,.55); font-weight: 950; }
+    .a-game-name { margin-top: 11px; font-size: 17px; font-weight: 950; }
+    .a-game-meta { margin-top: 4px; font-size: 10px; opacity: .63; }
+    .a-game-arrow { position: absolute; right: 12px; bottom: 11px; font-size: 18px; font-weight: 950; }
+    .phone-a .bottom-nav { border: 2px solid #171b38; border-radius: 20px; background: #fff; box-shadow: 4px 4px 0 #171b38; }
+    .phone-a .nav-item.active { color: #3157ff; }
+    .phone-a .nav-icon { border-radius: 6px; }
+    .a-sudoku-head { display: flex; align-items: center; justify-content: space-between; }
+    .a-sudoku-head b { font-size: 25px; }
+    .a-difficulty { padding: 7px 11px; border: 2px solid #171b38; border-radius: 99px; background: #ffd84d; font-size: 11px; font-weight: 900; }
+    .a-control-line { display: grid; grid-template-columns: 1fr 1.35fr; gap: 9px; margin-top: 12px; }
+    .a-segment, .a-slots { display: grid; height: 42px; align-items: center; border: 2px solid #171b38; border-radius: 13px; background: #fff; }
+    .a-segment { grid-template-columns: 1fr 1fr; }
+    .a-segment span, .a-slots span { text-align: center; font-size: 10px; font-weight: 800; }
+    .a-segment .active { height: 100%; padding-top: 12px; border-radius: 10px; background: #3157ff; color: #fff; }
+    .a-slots { grid-template-columns: repeat(5, 1fr); }
+    .a-slots .active { display: grid; width: 28px; height: 28px; place-items: center; justify-self: center; border: 2px solid #171b38; border-radius: 8px; background: #ffd84d; }
+    .a-stats { display: grid; height: 45px; grid-template-columns: repeat(3, 1fr); align-items: center; margin-top: 10px; border-radius: 13px; background: #171b38; color: #fff; }
+    .a-stat { text-align: center; font-size: 9px; opacity: .72; }
+    .a-stat b { display: block; margin-top: 2px; color: #ffd84d; font-size: 15px; opacity: 1; }
+    .phone-a .sudoku-board { margin-top: 12px; overflow: hidden; border: 3px solid #171b38; border-radius: 12px; background: #171b38; }
+    .phone-a .sudoku-cell { border-right: 1px solid #c7cbea; border-bottom: 1px solid #c7cbea; background: #fff; }
+    .phone-a .sudoku-cell.given { background: #edf0ff; }
+    .phone-a .sudoku-cell.selected { background: #ffd84d; }
+    .phone-a .digit-dock { margin-top: 11px; }
+    .phone-a .digit { border: 2px solid #171b38; border-radius: 11px; background: #fff; box-shadow: 2px 3px 0 #171b38; }
+    .phone-a .digit.active { background: #69e6d4; }
+    .a-tools { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 10px; }
+    .a-tool { display: grid; height: 38px; place-items: center; border: 2px solid #171b38; border-radius: 11px; background: #c8b8ff; font-size: 10px; font-weight: 850; }
+    .a-tool.primary { background: #3157ff; color: #fff; }
+
+    /* B — Eastern paper */
+    .direction-b { background: #d9d8d2; color: #211f1a; }
+    .direction-b .direction-code { color: #aa3024; }
+    .direction-b .token { border-radius: 2px; }
+    .direction-b .token:nth-child(1) { background: #211f1a; }
+    .direction-b .token:nth-child(2) { background: #aa3024; }
+    .direction-b .token:nth-child(3) { background: #426253; }
+    .direction-b .token:nth-child(4) { background: #efeee8; }
+    .phone-b {
+      border: 1px solid #24221e;
+      border-radius: 26px;
+      background:
+        linear-gradient(rgba(46,42,34,.035) 1px, transparent 1px),
+        #efeee8;
+      background-size: 100% 7px;
+      box-shadow: 7px 9px 0 rgba(42,39,33,.18);
+    }
+    .phone-b::before { width: 86px; background: #24221e; border-radius: 0; }
+    .phone-b .topbar { border-bottom: 1px solid #bcb9af; }
+    .phone-b .capsule { font-family: Georgia, serif; letter-spacing: 0; }
+    .b-date { color: #aa3024; font-family: Georgia, serif; font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+    .b-title { margin-top: 8px; font-family: "Songti SC", SimSun, serif; font-size: 34px; font-weight: 900; letter-spacing: 2px; }
+    .b-lead { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 4px; padding-bottom: 17px; border-bottom: 2px solid #24221e; }
+    .b-lead p { max-width: 215px; margin: 0; color: #68635a; font-family: "Songti SC", SimSun, serif; font-size: 12px; line-height: 1.7; }
+    .b-seal { display: grid; width: 58px; height: 58px; place-items: center; border: 2px solid #aa3024; color: #aa3024; font-family: "Songti SC", serif; font-size: 18px; font-weight: 900; line-height: 1.05; text-align: center; transform: rotate(-4deg); }
+    .b-today { display: grid; grid-template-columns: 118px 1fr; gap: 18px; align-items: center; padding: 20px 0; border-bottom: 1px solid #878278; }
+    .b-brush-ring { display: grid; width: 106px; height: 106px; place-items: center; border: 12px solid #24221e; border-right-color: #aa3024; border-bottom-color: #426253; border-radius: 50%; font-family: Georgia, serif; font-size: 25px; font-weight: 700; }
+    .b-today small { color: #aa3024; font-size: 10px; font-weight: 800; letter-spacing: 2px; }
+    .b-today b { display: block; margin-top: 7px; font-family: "Songti SC", serif; font-size: 23px; }
+    .b-today p { margin: 7px 0 0; color: #746f65; font-size: 11px; line-height: 1.55; }
+    .b-menu-title { display: flex; justify-content: space-between; margin-top: 18px; font-family: "Songti SC", serif; font-size: 18px; font-weight: 900; }
+    .b-menu-title span:last-child { color: #7c776d; font-family: sans-serif; font-size: 10px; font-weight: 500; }
+    .b-game-list { margin-top: 6px; border-top: 2px solid #24221e; }
+    .b-game { display: grid; height: 76px; grid-template-columns: 48px 1fr 54px; align-items: center; border-bottom: 1px solid #8d887e; }
+    .b-game-num { color: #aa3024; font-family: Georgia, serif; font-size: 14px; font-weight: 700; }
+    .b-game-name { font-family: "Songti SC", serif; font-size: 18px; font-weight: 900; }
+    .b-game-meta { margin-top: 3px; color: #767168; font-size: 10px; }
+    .b-game-state { justify-self: end; color: #426253; font-size: 10px; font-weight: 800; }
+    .phone-b .bottom-nav { height: 48px; border-top: 1px solid #24221e; background: rgba(239,238,232,.94); }
+    .phone-b .nav-icon { width: 16px; height: 16px; border-width: 1px; border-radius: 50%; }
+    .phone-b .nav-item.active { color: #aa3024; }
+    .b-sudoku-title { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 2px solid #24221e; padding-bottom: 10px; }
+    .b-sudoku-title b { font-family: "Songti SC", serif; font-size: 28px; }
+    .b-sudoku-title span { color: #aa3024; font-family: Georgia,serif; font-size: 12px; }
+    .b-control-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #9c978d; }
+    .b-control-row div { display: flex; gap: 6px; }
+    .b-chip { padding: 6px 9px; border: 1px solid #24221e; background: transparent; font-size: 10px; }
+    .b-chip.active { background: #24221e; color: #efeee8; }
+    .b-slots { display: grid; grid-template-columns: repeat(5,1fr); gap: 5px; padding: 11px 0; }
+    .b-slot { display: grid; height: 35px; place-items: center; border: 1px solid #8b867c; font-family: Georgia,serif; font-size: 11px; }
+    .b-slot.active { border: 2px solid #aa3024; color: #aa3024; font-weight: 800; }
+    .b-meta { display: flex; justify-content: space-between; margin: 0 2px 8px; color: #6f6b62; font-family: Georgia,serif; font-size: 11px; }
+    .phone-b .sudoku-board { border: 2px solid #24221e; background: #24221e; }
+    .phone-b .sudoku-cell { border-right: 1px solid #aaa69d; border-bottom: 1px solid #aaa69d; background: rgba(239,238,232,.98); font-family: Georgia,serif; }
+    .phone-b .sudoku-cell.given { background: #dad8d0; }
+    .phone-b .sudoku-cell.selected { background: #aa3024; color: #fff; }
+    .b-key-title { display: flex; justify-content: space-between; margin: 11px 1px 7px; color: #6f6b62; font-size: 10px; }
+    .phone-b .digit { border: 1px solid #24221e; background: #e5e3dc; font-family: Georgia,serif; }
+    .phone-b .digit.active { background: #426253; color: #fff; }
+    .b-actions { display: grid; grid-template-columns: 1fr 1fr 1.7fr; gap: 6px; margin-top: 9px; }
+    .b-action { display: grid; height: 35px; place-items: center; border: 1px solid #24221e; font-size: 10px; }
+    .b-action.primary { background: #aa3024; color: #fff; }
+
+    /* C — Retro handheld */
+    .direction-c { background: #27202a; color: #f2e9d7; }
+    .direction-c .direction-code { color: #d7e1a8; }
+    .direction-c .token { border-color: #f2e9d7; }
+    .direction-c .token:nth-child(1) { background: #7d2b4b; }
+    .direction-c .token:nth-child(2) { background: #c6d39d; }
+    .direction-c .token:nth-child(3) { background: #e29d3d; }
+    .direction-c .token:nth-child(4) { background: #313d32; }
+    .phone-c {
+      border: 4px solid #351224;
+      border-radius: 48px 48px 65px 48px;
+      background: #7d2b4b;
+      color: #f4ead8;
+      box-shadow: inset -10px -12px 0 rgba(49,12,30,.24), 11px 13px 0 #160d16;
+    }
+    .phone-c::before { width: 100px; background: #351224; border-radius: 0 0 22px 22px; }
+    .phone-c .status { color: #f4ead8; }
+    .phone-c .topbar { margin: 0 12px; padding: 0 6px; border-bottom: 2px solid rgba(255,255,255,.16); }
+    .phone-c .capsule { color: #e7ac52; font-family: monospace; }
+    .c-brand { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
+    .c-brand small { color: #efb55e; font-family: monospace; font-size: 10px; letter-spacing: 2px; }
+    .c-brand b { display: block; margin-top: 3px; font-size: 26px; font-weight: 950; }
+    .c-power { width: 14px; height: 14px; border-radius: 50%; background: #e45846; box-shadow: 0 0 0 4px #531b34, 0 0 12px #ff5c48; }
+    .c-lcd {
+      margin-top: 16px;
+      padding: 14px;
+      border: 9px solid #3a2934;
+      border-radius: 14px 14px 27px 14px;
+      background: #c6d39d;
+      color: #273228;
+      box-shadow: inset 0 0 18px rgba(45,57,43,.25);
+      font-family: "Courier New", monospace;
+    }
+    .c-lcd-top { display: flex; justify-content: space-between; font-size: 10px; font-weight: 800; }
+    .c-score { margin-top: 8px; font-size: 28px; font-weight: 900; letter-spacing: -2px; }
+    .c-score small { font-size: 12px; letter-spacing: 0; }
+    .c-pixel-track { height: 10px; margin-top: 12px; border: 2px solid #273228; background: repeating-linear-gradient(90deg, transparent 0 11px, rgba(39,50,40,.18) 11px 13px); }
+    .c-pixel-track::before { display: block; width: 42%; height: 100%; background: #273228; content: ""; }
+    .c-select-title { display: flex; justify-content: space-between; margin: 18px 5px 9px; color: #f5c578; font-family: monospace; font-size: 11px; font-weight: 900; }
+    .c-cartridges { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .c-cart { position: relative; height: 118px; padding: 13px; border: 3px solid #351224; border-radius: 10px 10px 22px 10px; background: #eadcc4; color: #372532; box-shadow: inset -5px -6px 0 #cdbfa8; }
+    .c-cart::before { position: absolute; top: 0; right: 18px; left: 18px; height: 7px; background: repeating-linear-gradient(90deg,#3d2634 0 5px,transparent 5px 9px); content: ""; }
+    .c-cart-mark { display: grid; width: 35px; height: 35px; place-items: center; margin-top: 4px; border: 3px solid #372532; font-size: 16px; font-weight: 950; }
+    .c-cart:nth-child(2) .c-cart-mark { background: #c6d39d; }
+    .c-cart:nth-child(3) .c-cart-mark { background: #e8a14a; }
+    .c-cart:nth-child(4) .c-cart-mark { background: #b7a6d9; }
+    .c-cart-name { margin-top: 8px; font-size: 15px; font-weight: 950; }
+    .c-cart-meta { margin-top: 3px; font-family: monospace; font-size: 9px; }
+    .c-controls { display: flex; align-items: center; justify-content: space-between; margin: 20px 10px 0; }
+    .c-dpad { position: relative; width: 68px; height: 68px; }
+    .c-dpad::before, .c-dpad::after { position: absolute; background: #351224; border-radius: 5px; content: ""; }
+    .c-dpad::before { top: 22px; width: 68px; height: 24px; }
+    .c-dpad::after { left: 22px; width: 24px; height: 68px; }
+    .c-ab { display: flex; gap: 13px; transform: rotate(-10deg); }
+    .c-button { display: grid; width: 42px; height: 42px; place-items: center; border: 3px solid #351224; border-radius: 50%; background: #e29d3d; color: #351224; font-family: monospace; font-weight: 900; box-shadow: 3px 4px 0 #351224; }
+    .c-sudoku-shell { margin-top: 3px; padding: 12px; border: 5px solid #351224; border-radius: 18px 18px 30px 18px; background: #3b2835; }
+    .c-screen {
+      padding: 10px;
+      border: 4px solid #1f171d;
+      border-radius: 8px;
+      background: #c6d39d;
+      color: #273228;
+      box-shadow: inset 0 0 16px rgba(39,50,40,.3);
+      font-family: "Courier New", monospace;
+    }
+    .c-screen-head { display: flex; justify-content: space-between; font-size: 10px; font-weight: 900; }
+    .c-screen-slots { display: grid; grid-template-columns: repeat(5,1fr); gap: 4px; margin-top: 8px; }
+    .c-screen-slot { display: grid; height: 27px; place-items: center; border: 2px solid #273228; font-size: 10px; }
+    .c-screen-slot.active { background: #273228; color: #c6d39d; }
+    .c-screen-meta { display: flex; justify-content: space-between; margin: 8px 0 6px; font-size: 9px; font-weight: 800; }
+    .phone-c .sudoku-board { border: 3px solid #273228; background: #273228; }
+    .phone-c .sudoku-cell { border-right: 1px solid rgba(39,50,40,.42); border-bottom: 1px solid rgba(39,50,40,.42); background: #d2dcac; font-family: "Courier New", monospace; font-size: 13px; }
+    .phone-c .sudoku-cell.given { background: #b4c28c; }
+    .phone-c .sudoku-cell.selected { background: #273228; color: #d2dcac; }
+    .c-key-label { margin: 11px 3px 6px; color: #f5c578; font-family: monospace; font-size: 10px; }
+    .phone-c .digit-dock { gap: 6px; }
+    .phone-c .digit { height: 38px; border: 3px solid #351224; border-radius: 50%; background: #e8dfcb; color: #351224; font-family: monospace; box-shadow: 2px 3px 0 #351224; }
+    .phone-c .digit.active { background: #e29d3d; }
+    .c-game-buttons { display: grid; grid-template-columns: 1fr 1fr 1.7fr; gap: 7px; margin-top: 11px; }
+    .c-game-button { display: grid; height: 38px; place-items: center; border: 3px solid #351224; border-radius: 99px; background: #e8dfcb; color: #351224; font-family: monospace; font-size: 10px; font-weight: 900; box-shadow: 2px 3px 0 #351224; }
+    .c-game-button.primary { background: #e29d3d; }
+
+    @media (max-width: 1120px) {
+      .stage { grid-template-columns: 1fr 1fr; }
+      .notes { grid-column: 1 / -1; padding-top: 0; }
+      .note-index { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <section class="direction direction-a">
+    <header class="direction-head">
+      <div><div class="direction-code">DIRECTION A · TOY BLOCKS</div><h1 class="direction-title">玩具积木 · 把挑战变成可收集的游戏块</h1><p class="direction-desc">大胆、亲和、年轻。大厅从纵向列表改为 2×2 彩色游戏架；数独把模式、题号和状态压成两行，棋盘成为第一视觉焦点。</p></div>
+      <div class="tokens"><i class="token"></i><i class="token"></i><i class="token"></i><i class="token"></i></div>
+    </header>
+    <div class="stage">
+      <aside class="notes"><div class="note-index">A</div><div class="note-title">适合：大众娱乐、年轻用户</div><div class="note-list"><div class="note-item">结构变化最大：游戏库由长列表改为彩色方块矩阵，信息更短、更有识别度。</div><div class="note-item">数独控制区只占两行，保留 44px 触控目标，棋盘在首屏更靠上。</div><div class="note-item">风险：视觉性格较强，需要其他游戏页面一并更新才会完整。</div></div></aside>
+      <div><div class="screen-label">GAME HUB</div><div class="phone phone-a"><div class="status"><span>09:09</span><span class="signal">▮▮▮ ◔ ▰</span></div><div class="topbar"><span></span><span class="name">脑力游乐场</span><span class="capsule">•••</span></div><main class="home-content"><div class="a-welcome"><div><div class="a-eyebrow">HELLO, XRQ13</div><div class="a-title">今天玩点<br>不一样的</div></div><div class="a-avatar">X</div></div><div class="a-mission"><div><div class="a-mission-label">TODAY'S MISSION</div><div class="a-mission-main">完成 2 个挑战</div><div class="a-mission-sub">再完成 1 项，领取今日徽章</div></div><div class="a-progress-orb">1/3</div></div><div class="a-section-row"><b>选择游戏</b><span>4 款可玩</span></div><div class="a-game-grid"><div class="a-game"><div class="a-game-mark">词</div><div class="a-game-name">猜词实验室</div><div class="a-game-meta">12 / 780 星</div><div class="a-game-arrow">→</div></div><div class="a-game"><div class="a-game-mark">数</div><div class="a-game-name">每日数独</div><div class="a-game-meta">15 道今日题</div><div class="a-game-arrow">→</div></div><div class="a-game"><div class="a-game-mark">成</div><div class="a-game-name">成语填字</div><div class="a-game-meta">16 / 1120 关</div><div class="a-game-arrow">→</div></div><div class="a-game"><div class="a-game-mark">记</div><div class="a-game-name">记忆翻牌</div><div class="a-game-meta">最佳 13 步</div><div class="a-game-arrow">→</div></div></div></main><nav class="bottom-nav"><div class="nav-item active"><i class="nav-icon"></i><span>游戏</span></div><div class="nav-item"><i class="nav-icon"></i><span>记录</span></div><div class="nav-item"><i class="nav-icon"></i><span>我的</span></div></nav></div></div>
+      <div><div class="screen-label">SUDOKU</div><div class="phone phone-a"><div class="status"><span>09:09</span><span class="signal">▮▮▮ ◔ ▰</span></div><div class="topbar"><span class="back">‹</span><span class="name">每日数独</span><span class="capsule">•••</span></div><main class="sudoku-content"><div class="a-sudoku-head"><b>今日挑战</b><span class="a-difficulty">困难</span></div><div class="a-control-line"><div class="a-segment"><span class="active">每日</span><span>练习</span></div><div class="a-slots"><span class="active">1</span><span>2</span><span>3</span><span>4</span><span>5</span></div></div><div class="a-stats"><div class="a-stat">用时<b>08:24</b></div><div class="a-stat">错误<b>0</b></div><div class="a-stat">提示<b>0 / 3</b></div></div><div class="sudoku-board" data-board="a"></div><div class="digit-dock"><span class="digit active">1</span><span class="digit">2</span><span class="digit">3</span><span class="digit">4</span><span class="digit">5</span><span class="digit">6</span><span class="digit">7</span><span class="digit">8</span><span class="digit">9</span><span class="digit">×</span></div><div class="a-tools"><span class="a-tool">候选</span><span class="a-tool">提示</span><span class="a-tool primary">检查答案</span></div></main></div></div>
+    </div>
+  </section>
+
+  <section class="direction direction-b">
+    <header class="direction-head"><div><div class="direction-code">DIRECTION B · EASTERN PAPER</div><h1 class="direction-title">东方纸境 · 一册安静但有分量的益智练习</h1><p class="direction-desc">冷灰纸张、宋体标题、墨线与朱砂印记。去掉圆润卡片和大面积彩色底，把游戏进度组织成练习册目录，适合长期使用。</p></div><div class="tokens"><i class="token"></i><i class="token"></i><i class="token"></i><i class="token"></i></div></header>
+    <div class="stage"><aside class="notes"><div class="note-index">B</div><div class="note-title">适合：成年用户、文字益智</div><div class="note-list"><div class="note-item">视觉来源是字帖、棋谱与现代练习册，不使用常见的渐变卡片。</div><div class="note-item">大厅像目录，数独像棋谱；信息密度稳定，长时间使用不疲劳。</div><div class="note-item">风险：娱乐感更克制，需要通过完成印章和翻页动效补充奖励感。</div></div></aside>
+      <div><div class="screen-label">GAME HUB</div><div class="phone phone-b"><div class="status"><span>09:09</span><span class="signal">▮▮▮ ◔ ▰</span></div><div class="topbar"><span></span><span class="name">今日练习册</span><span class="capsule">•••</span></div><main class="home-content"><div class="b-date">JUL 18 · SATURDAY</div><div class="b-title">脑力练习册</div><div class="b-lead"><p>每天留一点时间，做一道题。答案不必来得很快，思考本身就是收获。</p><div class="b-seal">已练<br>一项</div></div><div class="b-today"><div class="b-brush-ring">1/3</div><div><small>今日练习</small><b>再完成两项</b><p>本日已累计 79 星<br>建议从一局数独开始</p></div></div><div class="b-menu-title"><span>练习目录</span><span>共四项</span></div><div class="b-game-list"><div class="b-game"><div class="b-game-num">壹</div><div><div class="b-game-name">猜词实验室</div><div class="b-game-meta">关联词语 · 12 / 780 星</div></div><div class="b-game-state">继续</div></div><div class="b-game"><div class="b-game-num">贰</div><div><div class="b-game-name">每日数独</div><div class="b-game-meta">数字逻辑 · 今日 15 题</div></div><div class="b-game-state">开始</div></div><div class="b-game"><div class="b-game-num">叁</div><div><div class="b-game-name">成语填字</div><div class="b-game-meta">词汇练习 · 16 / 1120 关</div></div><div class="b-game-state">继续</div></div><div class="b-game"><div class="b-game-num">肆</div><div><div class="b-game-name">记忆翻牌</div><div class="b-game-meta">专注训练 · 最佳 13 步</div></div><div class="b-game-state">开始</div></div></div></main><nav class="bottom-nav"><div class="nav-item active"><i class="nav-icon"></i><span>练习</span></div><div class="nav-item"><i class="nav-icon"></i><span>记录</span></div><div class="nav-item"><i class="nav-icon"></i><span>我的</span></div></nav></div></div>
+      <div><div class="screen-label">SUDOKU</div><div class="phone phone-b"><div class="status"><span>09:09</span><span class="signal">▮▮▮ ◔ ▰</span></div><div class="topbar"><span class="back">‹</span><span class="name">数字棋谱</span><span class="capsule">•••</span></div><main class="sudoku-content"><div class="b-sudoku-title"><b>每日数独</b><span>第 1 / 5 题</span></div><div class="b-control-row"><div><span class="b-chip active">每日</span><span class="b-chip">练习</span></div><div><span class="b-chip">易</span><span class="b-chip">中</span><span class="b-chip active">难</span></div></div><div class="b-slots"><span class="b-slot active">壹</span><span class="b-slot">贰</span><span class="b-slot">叁</span><span class="b-slot">肆</span><span class="b-slot">伍</span></div><div class="b-meta"><span>用时 08:24</span><span>错误 0</span><span>提示 0/3</span></div><div class="sudoku-board" data-board="b"></div><div class="b-key-title"><span>活字盘</span><span>选择数字填入空格</span></div><div class="digit-dock"><span class="digit active">1</span><span class="digit">2</span><span class="digit">3</span><span class="digit">4</span><span class="digit">5</span><span class="digit">6</span><span class="digit">7</span><span class="digit">8</span><span class="digit">9</span><span class="digit">空</span></div><div class="b-actions"><span class="b-action">候选</span><span class="b-action">提示</span><span class="b-action primary">核对答案</span></div></main></div></div>
+    </div>
+  </section>
+
+  <section class="direction direction-c">
+    <header class="direction-head"><div><div class="direction-code">DIRECTION C · RETRO HANDHELD</div><h1 class="direction-title">复古掌机 · 把每款益智游戏做成一张卡带</h1><p class="direction-desc">酒红机身、橄榄 LCD、实体按键和卡带槽。不是简单的像素滤镜，而是用掌机的硬件逻辑重新组织大厅、关卡和操作区。</p></div><div class="tokens"><i class="token"></i><i class="token"></i><i class="token"></i><i class="token"></i></div></header>
+    <div class="stage"><aside class="notes"><div class="note-index">C</div><div class="note-title">适合：游戏感、强品牌记忆</div><div class="note-list"><div class="note-item">四款游戏变成卡带，模式和关卡变成掌机菜单，品牌识别最强。</div><div class="note-item">数独棋盘放进 LCD 屏幕，数字键模拟实体按键，但仍保持清晰和可点击。</div><div class="note-item">风险：风格最鲜明，未来新增游戏必须遵守同一套“卡带/屏幕”语言。</div></div></aside>
+      <div><div class="screen-label">GAME HUB</div><div class="phone phone-c"><div class="status"><span>09:09</span><span class="signal">▮▮▮ ◔ ▰</span></div><div class="topbar"><span></span><span class="name">BRAIN BOY</span><span class="capsule">•••</span></div><main class="home-content"><div class="c-brand"><div><small>PLAYER XRQ13</small><b>选择卡带</b></div><i class="c-power"></i></div><div class="c-lcd"><div class="c-lcd-top"><span>DAILY QUEST</span><span>BAT 79</span></div><div class="c-score">1/3 <small>COMPLETE</small></div><div class="c-pixel-track"></div></div><div class="c-select-title"><span>GAME SELECT</span><span>4 CARTRIDGES</span></div><div class="c-cartridges"><div class="c-cart"><div class="c-cart-mark">词</div><div class="c-cart-name">猜词实验室</div><div class="c-cart-meta">STARS 012/780</div></div><div class="c-cart"><div class="c-cart-mark">数</div><div class="c-cart-name">每日数独</div><div class="c-cart-meta">TODAY 15 GAMES</div></div><div class="c-cart"><div class="c-cart-mark">成</div><div class="c-cart-name">成语填字</div><div class="c-cart-meta">LEVEL 016/1120</div></div><div class="c-cart"><div class="c-cart-mark">记</div><div class="c-cart-name">记忆翻牌</div><div class="c-cart-meta">BEST 013 MOVES</div></div></div><div class="c-controls"><div class="c-dpad"></div><div class="c-ab"><span class="c-button">B</span><span class="c-button">A</span></div></div></main></div></div>
+      <div><div class="screen-label">SUDOKU</div><div class="phone phone-c"><div class="status"><span>09:09</span><span class="signal">▮▮▮ ◔ ▰</span></div><div class="topbar"><span class="back">‹</span><span class="name">SUDOKU 99</span><span class="capsule">•••</span></div><main class="sudoku-content"><div class="c-brand"><div><small>DAILY MODE · HARD</small><b>每日数独</b></div><i class="c-power"></i></div><div class="c-sudoku-shell"><div class="c-screen"><div class="c-screen-head"><span>STAGE 1/5</span><span>TIME 08:24</span></div><div class="c-screen-slots"><span class="c-screen-slot active">1</span><span class="c-screen-slot">2</span><span class="c-screen-slot">3</span><span class="c-screen-slot">4</span><span class="c-screen-slot">5</span></div><div class="c-screen-meta"><span>MISS 0</span><span>HINT 0/3</span><span>SCORE ----</span></div><div class="sudoku-board" data-board="c"></div></div></div><div class="c-key-label">NUMBER KEYS</div><div class="digit-dock"><span class="digit active">1</span><span class="digit">2</span><span class="digit">3</span><span class="digit">4</span><span class="digit">5</span><span class="digit">6</span><span class="digit">7</span><span class="digit">8</span><span class="digit">9</span><span class="digit">×</span></div><div class="c-game-buttons"><span class="c-game-button">NOTE</span><span class="c-game-button">HINT</span><span class="c-game-button primary">CHECK</span></div></main></div></div>
+    </div>
+  </section>
+
+  <script>
+    const puzzle = "010000000250103704081040090100070009053000670000508000010000040300604007409050008";
+    document.querySelectorAll("[data-board]").forEach((board) => {
+      const scheme = board.dataset.board;
+      [...puzzle].forEach((value, index) => {
+        const cell = document.createElement("span");
+        cell.className = "sudoku-cell";
+        if (value !== "0") cell.classList.add("given");
+        if (index === 1) cell.classList.add("selected");
+        cell.textContent = value === "0" ? "" : value;
+        board.appendChild(cell);
+      });
+    });
+    const only = new URLSearchParams(location.search).get("scheme");
+    if (["a", "b", "c"].includes(only)) document.body.dataset.only = only;
+  </script>
+</body>
+</html>

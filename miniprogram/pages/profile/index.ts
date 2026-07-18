@@ -35,6 +35,18 @@ Page({
     wx.navigateTo({ url: "/pages/auth/index" });
   },
 
+  openHub() {
+    wx.reLaunch({ url: "/pages/hub/index" });
+  },
+
+  openRecords() {
+    if (!this.data.loggedIn) {
+      wx.navigateTo({ url: "/pages/auth/index" });
+      return;
+    }
+    wx.redirectTo({ url: "/pages/records/index" });
+  },
+
   async logout() {
     const result = await new Promise<boolean>((resolve) => {
       wx.showModal({
@@ -52,7 +64,7 @@ Page({
     }
     clearAuth();
     wx.showToast({ title: "已退出", icon: "success" });
-    setTimeout(() => wx.reLaunch({ url: "/pages/home/index" }), 400);
+    setTimeout(() => wx.reLaunch({ url: "/pages/hub/index" }), 400);
   },
 });
 

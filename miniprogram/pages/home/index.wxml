@@ -49,4 +49,10 @@
     <text class="save-dot"></text>
     <text>{{loggedIn ? '游戏进度会自动保存' : '登录后保存闯关与对战记录'}}</text>
   </view>
+
+  <view class="lab-rules">
+    <view><text>01</text><text>从熟悉的词开始</text></view>
+    <view><text>02</text><text>根据关联度调整方向</text></view>
+    <view><text>03</text><text>越接近答案，颜色越亮</text></view>
+  </view>
 </view>

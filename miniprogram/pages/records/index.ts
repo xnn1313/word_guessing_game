@@ -69,6 +69,14 @@ Page({
     const url = routes[key];
     if (url) wx.navigateTo({ url });
   },
+
+  openHub() {
+    wx.reLaunch({ url: "/pages/hub/index" });
+  },
+
+  openProfile() {
+    wx.redirectTo({ url: "/pages/profile/index" });
+  },
 });
 
 export {};

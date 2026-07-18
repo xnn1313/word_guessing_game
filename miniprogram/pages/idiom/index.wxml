@@ -72,7 +72,7 @@
     </view>
 
     <view class="crossword-wrap">
-      <view class="crossword-board">
+      <view class="crossword-board size-{{puzzle.size}}">
         <button
           class="idiom-cell {{item.type === 'fixed' ? 'fixed' : ''}} {{item.selected ? 'selected' : ''}} {{item.invalid ? 'invalid' : ''}} {{item.activeEntry ? 'active-entry' : ''}}"
           wx:for="{{cells}}"
@@ -102,10 +102,12 @@
         <button wx:for="{{characterBank}}" wx:key="index" data-value="{{item}}" bindtap="inputCharacter">{{item}}</button>
       </view>
 
-      <view class="game-tools">
-        <button bindtap="eraseCharacter">擦除</button>
-        <button loading="{{hinting}}" disabled="{{hintsUsed >= maxHints}}" bindtap="requestHint">提示</button>
-        <button class="submit" loading="{{submitting}}" bindtap="submitPuzzle">检查答案</button>
+      <view class="game-action-panel">
+        <view class="game-tools">
+          <button bindtap="eraseCharacter">擦除</button>
+          <button loading="{{hinting}}" disabled="{{hintsUsed >= maxHints}}" bindtap="requestHint">提示</button>
+        </view>
+        <button class="primary-button idiom-submit" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submitPuzzle">提交答案</button>
       </view>
     </block>
 

@@ -168,6 +168,13 @@ IDIOM_CATEGORY_NAMES = {
 # existing idiom-xxx layout. Add a new boundary when a new built-in batch is
 # appended; never edit or remove an earlier value.
 IDIOM_LAYOUT_COHORT_ENDS = (60, 120)
+IDIOM_LAYOUT_VERSION = 2
+IDIOM_ENTRY_COUNTS = {"easy": 2, "medium": 3, "hard": 4}
+IDIOM_BRIDGE_ENTRIES = [
+    ("威风凛凛", "形容声势或气派令人敬畏。"),
+    ("气冲斗牛", "形容气势或怒气直冲天际。"),
+    ("通情达理", "形容说话做事合乎情理。"),
+]
 
 
 def count_sudoku_solutions(puzzle, limit=2):
@@ -357,6 +364,296 @@ def _idiom_layout(index):
     }
 
 
+def _entry_word(entry, solution):
+    row = int(entry["start"]["row"])
+    column = int(entry["start"]["column"])
+    values = []
+    for offset in range(int(entry["length"])):
+        current_row = row + (offset if entry["direction"] == "down" else 0)
+        current_column = column + (offset if entry["direction"] == "across" else 0)
+        value = solution.get(f"{current_row},{current_column}")
+        if not isinstance(value, str) or len(value) != 1:
+            return ""
+        values.append(value)
+    return "".join(values)
+
+
+def _crossword_layout(primary, candidates, entry_count, seed):
+    """Build a deterministic, connected crossword with 2-4 four-character idioms."""
+    primary_word, primary_clue = primary
+    if len(primary_word) != 4:
+        raise ValueError(f"只允许四字成语: {primary_word}")
+
+    rng = random.Random(f"idiom-crossword-v{IDIOM_LAYOUT_VERSION}:{seed}")
+    ordered = []
+    seen = {primary_word}
+    for word, clue in candidates:
+        if len(word) == 4 and word not in seen:
+            seen.add(word)
+            ordered.append((word, clue))
+    rng.shuffle(ordered)
+
+    placed = [
+        {
+            "word": primary_word,
+            "clue": primary_clue,
+            "direction": "across",
+            "row": 0,
+            "column": 0,
+        }
+    ]
+    values = {(0, column): character for column, character in enumerate(primary_word)}
+    directions = {(0, column): {"across"} for column in range(4)}
+
+    def placement_options(word, clue, candidate_order, current_placed, current_values, current_directions):
+        options = []
+        for anchor_order, anchor in enumerate(current_placed):
+            direction = "down" if anchor["direction"] == "across" else "across"
+            for anchor_offset, anchor_character in enumerate(anchor["word"]):
+                for word_offset, character in enumerate(word):
+                    if character != anchor_character:
+                        continue
+                    crossing_row = anchor["row"] + (
+                        anchor_offset if anchor["direction"] == "down" else 0
+                    )
+                    crossing_column = anchor["column"] + (
+                        anchor_offset if anchor["direction"] == "across" else 0
+                    )
+                    row = crossing_row - (word_offset if direction == "down" else 0)
+                    column = crossing_column - (word_offset if direction == "across" else 0)
+                    cells = []
+                    intersections = 0
+                    valid = True
+                    for offset, value in enumerate(word):
+                        position = (
+                            row + (offset if direction == "down" else 0),
+                            column + (offset if direction == "across" else 0),
+                        )
+                        existing = current_values.get(position)
+                        if existing is not None:
+                            if existing != value or direction in current_directions[position]:
+                                valid = False
+                                break
+                            intersections += 1
+                        cells.append((position, value))
+                    if not valid or intersections == 0:
+                        continue
+                    combined = set(current_values) | {position for position, _ in cells}
+                    rows = [position[0] for position in combined]
+                    columns = [position[1] for position in combined]
+                    height = max(rows) - min(rows) + 1
+                    width = max(columns) - min(columns) + 1
+                    score = (
+                        max(height, width),
+                        height * width,
+                        -intersections,
+                        candidate_order,
+                        anchor_order,
+                        row,
+                        column,
+                    )
+                    options.append(
+                        (
+                            score,
+                            {
+                                "word": word,
+                                "clue": clue,
+                                "direction": direction,
+                                "row": row,
+                                "column": column,
+                            },
+                            cells,
+                        )
+                    )
+        return options
+
+    def search(current_placed, current_values, current_directions):
+        if len(current_placed) >= entry_count:
+            return current_placed, current_values, current_directions
+        options = []
+        used_words = {entry["word"] for entry in current_placed}
+        for candidate_order, (word, clue) in enumerate(ordered):
+            if word in used_words:
+                continue
+            options.extend(
+                placement_options(
+                    word,
+                    clue,
+                    candidate_order,
+                    current_placed,
+                    current_values,
+                    current_directions,
+                )
+            )
+        options.sort(key=lambda item: item[0])
+        # Compact options are tried first. The cap prevents a very large custom
+        # catalog from causing exponential startup time while retaining ample
+        # alternatives for four-entry layouts.
+        for _, entry, cells in options[:600]:
+            next_placed = current_placed + [entry]
+            next_values = dict(current_values)
+            next_directions = {
+                position: set(value) for position, value in current_directions.items()
+            }
+            for position, value in cells:
+                next_values[position] = value
+                next_directions.setdefault(position, set()).add(entry["direction"])
+            result = search(next_placed, next_values, next_directions)
+            if result:
+                return result
+        return None
+
+    result = search(placed, values, directions)
+    if not result:
+        raise ValueError(f"成语 {primary_word} 无法生成 {entry_count} 条交叉布局")
+    placed, values, directions = result
+
+    min_row = min(row for row, _ in values)
+    max_row = max(row for row, _ in values)
+    min_column = min(column for _, column in values)
+    max_column = max(column for _, column in values)
+    height = max_row - min_row + 1
+    width = max_column - min_column + 1
+    size = max(height, width)
+    row_padding = (size - height) // 2
+    column_padding = (size - width) // 2
+
+    normalized_values = {
+        (row - min_row + row_padding, column - min_column + column_padding): value
+        for (row, column), value in values.items()
+    }
+    entries = []
+    for entry_index, entry in enumerate(placed, start=1):
+        entries.append(
+            {
+                "id": f"entry-{entry_index}",
+                "direction": entry["direction"],
+                "start": {
+                    "row": entry["row"] - min_row + row_padding,
+                    "column": entry["column"] - min_column + column_padding,
+                },
+                "length": 4,
+                "clue": entry["clue"],
+                "pinyin_hint": "· · · ·",
+            }
+        )
+
+    fixed_position = (
+        entries[0]["start"]["row"],
+        entries[0]["start"]["column"],
+    )
+    cells = []
+    solution = {}
+    for row, column in sorted(normalized_values):
+        value = normalized_values[(row, column)]
+        cell = {
+            "row": row,
+            "column": column,
+            "type": "fixed" if (row, column) == fixed_position else "input",
+        }
+        if cell["type"] == "fixed":
+            cell["value"] = value
+        cells.append(cell)
+        solution[f"{row},{column}"] = value
+
+    input_characters = [
+        solution[f"{cell['row']},{cell['column']}"]
+        for cell in cells
+        if cell["type"] == "input"
+    ]
+    distractors = [value for value in "天地人心山水风月春秋云海日夜" if value not in input_characters]
+    rng.shuffle(distractors)
+    character_bank = input_characters + distractors[:4]
+    rng.shuffle(character_bank)
+    return {
+        "size": size,
+        "layout": {"cells": cells, "character_bank": character_bank},
+        "entries": entries,
+        "solution": solution,
+    }
+
+
+def upgrade_idiom_layouts(connection):
+    """Upgrade stored layouts without changing ids, titles, ordering or progress."""
+    rows = connection.execute(
+        """
+        SELECT id, category, difficulty, size, layout_json, clues_json,
+               solution_json, layout_version
+        FROM idiom_puzzles
+        WHERE is_active = 1
+        ORDER BY level_order, id
+        """
+    ).fetchall()
+    sources = []
+    row_sources = {}
+    for row in rows:
+        try:
+            clues = json.loads(row["clues_json"])
+            solution = json.loads(row["solution_json"])
+        except (TypeError, json.JSONDecodeError):
+            continue
+        extracted = []
+        for entry in clues:
+            word = _entry_word(entry, solution)
+            if len(word) == 4:
+                source = (word, str(entry.get("clue", "根据释义填写成语")))
+                extracted.append(source)
+                sources.append((row["category"], *source))
+        if extracted:
+            row_sources[row["id"]] = extracted
+
+    # A few valid bridge idioms connect otherwise isolated pairs in the
+    # built-in catalog, so every medium/hard target can form one connected
+    # crossword instead of falling back to separate word islands.
+    sources.extend(("__bridge__", word, clue) for word, clue in IDIOM_BRIDGE_ENTRIES)
+
+    for row in rows:
+        if int(row["layout_version"] or 1) >= IDIOM_LAYOUT_VERSION:
+            continue
+        entry_count = IDIOM_ENTRY_COUNTS.get(row["difficulty"], 2)
+        primary_sources = row_sources.get(row["id"], [])
+        if not primary_sources:
+            continue
+        if entry_count == 2:
+            connection.execute(
+                "UPDATE idiom_puzzles SET layout_version = ? WHERE id = ?",
+                (IDIOM_LAYOUT_VERSION, row["id"]),
+            )
+            continue
+        same_category = [
+            (word, clue)
+            for category, word, clue in sources
+            if category == row["category"] and word != primary_sources[0][0]
+        ]
+        other_categories = [
+            (word, clue)
+            for category, word, clue in sources
+            if category != row["category"] and word != primary_sources[0][0]
+        ]
+        expanded = _crossword_layout(
+            primary_sources[0],
+            same_category + other_categories,
+            entry_count,
+            row["id"],
+        )
+        connection.execute(
+            """
+            UPDATE idiom_puzzles
+            SET size = ?, layout_json = ?, clues_json = ?, solution_json = ?,
+                layout_version = ?
+            WHERE id = ?
+            """,
+            (
+                expanded["size"],
+                json.dumps(expanded["layout"], ensure_ascii=False, separators=(",", ":")),
+                json.dumps(expanded["entries"], ensure_ascii=False, separators=(",", ":")),
+                json.dumps(expanded["solution"], ensure_ascii=False, separators=(",", ":")),
+                IDIOM_LAYOUT_VERSION,
+                row["id"],
+            ),
+        )
+
+
 def seed_puzzle_catalogs(connection):
     for difficulty, (puzzle, solution) in SUDOKU_BASES.items():
         if count_sudoku_solutions(puzzle) != 1 or not sudoku_solution_valid(puzzle, solution):
@@ -407,3 +704,4 @@ def seed_puzzle_catalogs(connection):
                 json.dumps(layout["solution"], ensure_ascii=False, separators=(",", ":")),
             ),
         )
+    upgrade_idiom_layouts(connection)

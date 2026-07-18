@@ -26,6 +26,10 @@ paths:
       parameters:
         - $ref: '#/components/parameters/ModeDailyPractice'
         - $ref: '#/components/parameters/Difficulty'
+        - name: daily_slot
+          in: query
+          description: 每日模式题号，每个难度每天固定 5 题
+          schema: {type: integer, minimum: 1, maximum: 5, default: 1}
       responses:
         '200':
           description: 不包含完整答案的数独题目
@@ -465,12 +469,14 @@ components:
               last_played_at: {type: string, format: date-time, nullable: true}
     SudokuPuzzle:
       type: object
-      required: [puzzle_id, mode, difficulty, givens, run_id, saved_state, limits]
+      required: [puzzle_id, mode, difficulty, daily_slot, daily_count, givens, run_id, saved_state, limits]
       properties:
         puzzle_id: {type: string, example: sdk-medium-000128}
         mode: {type: string, enum: [daily, practice]}
         puzzle_date: {type: string, format: date, nullable: true}
         difficulty: {type: string, enum: [easy, medium, hard]}
+        daily_slot: {type: integer, nullable: true, minimum: 1, maximum: 5}
+        daily_count: {type: integer, example: 5}
         givens: {type: string, minLength: 81, maxLength: 81}
         run_id: {type: string, nullable: true}
         saved_state:
@@ -563,7 +569,12 @@ components:
               column: {type: integer}
               type: {type: string, enum: [fixed, input]}
               value: {type: string, description: 仅固定格返回}
-        entries: {type: array, items: {type: object}}
+        entries:
+          type: array
+          description: 简单 2 条、中等 3 条、困难 4 条交叉成语及释义
+          minItems: 2
+          maxItems: 4
+          items: {type: object}
         character_bank: {type: array, items: {type: string}}
         run_id: {type: string, nullable: true}
         saved_state: {type: object, nullable: true}

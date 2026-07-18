@@ -1,9 +1,9 @@
 <view class="page-shell hub-page">
   <view class="hub-header">
     <view class="hub-heading">
-      <view class="page-kicker">PLAYGROUND</view>
-      <view class="page-title">选择一个挑战</view>
-      <view class="page-subtitle">每天十分钟，给大脑做个热身。</view>
+      <view class="page-kicker">HELLO · {{loggedIn ? username : 'PLAYER'}}</view>
+      <view class="page-title"><text>今天玩点</text><text>不一样的</text></view>
+      <view class="page-subtitle">四款益智游戏，随手挑一块开始。</view>
     </view>
     <view class="account-button {{loggedIn ? 'signed' : ''}}" bindtap="openProfile" aria-label="打开个人中心">
       <view class="account-avatar">{{avatarText}}</view>
@@ -23,8 +23,8 @@
   </view>
 
   <view class="library-heading">
-    <text class="section-title">游戏库</text>
-    <view class="library-filter"><text class="active">全部</text><text>最近</text></view>
+    <text class="section-title">选择游戏</text>
+    <text class="library-count">{{availableGames}} 款可玩</text>
   </view>
 
   <view class="game-library">
@@ -69,9 +69,9 @@
     </view>
   </view>
 
-  <view class="hub-nav">
-    <view class="hub-nav-item active"><view class="nav-icon nav-games"></view><text>游戏</text></view>
-    <view class="hub-nav-item" bindtap="openRecords" hover-class="nav-pressed"><view class="nav-icon nav-records"></view><text>记录</text></view>
-    <view class="hub-nav-item" bindtap="openProfile" hover-class="nav-pressed"><view class="nav-icon nav-profile"></view><text>我的</text></view>
+  <view class="app-tabbar">
+    <view class="app-tab-item active"><view class="nav-icon nav-games"></view><text>游戏</text></view>
+    <view class="app-tab-item" bindtap="openRecords" hover-class="nav-pressed"><view class="nav-icon nav-records"></view><text>记录</text></view>
+    <view class="app-tab-item" bindtap="openProfile" hover-class="nav-pressed"><view class="nav-icon nav-profile"></view><text>我的</text></view>
   </view>
 </view>

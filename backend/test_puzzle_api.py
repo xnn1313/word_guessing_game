@@ -95,6 +95,35 @@ class PuzzleApiTestCase(unittest.TestCase):
             ).encode("utf-8")
             self.assertEqual(hashlib.sha256(payload).hexdigest(), signature)
 
+    def test_idiom_entry_count_and_board_size_follow_difficulty(self):
+        expected_entries = {"easy": 2, "medium": 3, "hard": 4}
+        with storage._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT id, difficulty, size, layout_json, clues_json,
+                       solution_json, layout_version
+                FROM idiom_puzzles
+                ORDER BY level_order
+                """
+            ).fetchall()
+        self.assertTrue(rows)
+        for row in rows:
+            layout = json.loads(row["layout_json"])
+            clues = json.loads(row["clues_json"])
+            solution = json.loads(row["solution_json"])
+            self.assertEqual(row["layout_version"], puzzle_content.IDIOM_LAYOUT_VERSION)
+            self.assertEqual(len(clues), expected_entries[row["difficulty"]], row["id"])
+            self.assertGreaterEqual(row["size"], 4)
+            self.assertLessEqual(row["size"], 8)
+            self.assertEqual(len(layout["cells"]), len(solution))
+            self.assertTrue(
+                all(
+                    0 <= cell["row"] < row["size"]
+                    and 0 <= cell["column"] < row["size"]
+                    for cell in layout["cells"]
+                )
+            )
+
     def test_guest_overview_and_cloud_save_authentication(self):
         overview = self.client.get("/api/games/overview")
         self.assertEqual(overview.status_code, 200)
@@ -177,6 +206,35 @@ class PuzzleApiTestCase(unittest.TestCase):
         )
         self.assertEqual(completed.status_code, 200)
         self.assertEqual(repeated.json, completed.json)
+
+    def test_sudoku_daily_has_five_stable_distinct_slots_per_difficulty(self):
+        for difficulty in ("easy", "medium", "hard"):
+            first_pass = [
+                self.client.get(
+                    f"/api/sudoku/puzzle?mode=daily&difficulty={difficulty}&daily_slot={slot}"
+                ).json
+                for slot in range(1, 6)
+            ]
+            second_pass = [
+                self.client.get(
+                    f"/api/sudoku/puzzle?mode=daily&difficulty={difficulty}&daily_slot={slot}"
+                ).json
+                for slot in range(1, 6)
+            ]
+            self.assertEqual(
+                [item["puzzle_id"] for item in first_pass],
+                [item["puzzle_id"] for item in second_pass],
+            )
+            self.assertEqual(len({item["puzzle_id"] for item in first_pass}), 5)
+            self.assertEqual([item["daily_slot"] for item in first_pass], [1, 2, 3, 4, 5])
+            self.assertTrue(all(item["daily_count"] == 5 for item in first_pass))
+
+        for invalid_slot in (0, 6):
+            response = self.client.get(
+                f"/api/sudoku/puzzle?mode=daily&difficulty=medium&daily_slot={invalid_slot}"
+            )
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json["code"], "INVALID_PARAMETER")
 
     def test_sudoku_and_idiom_allow_erasing_non_fixed_cells(self):
         sudoku = self.client.get(

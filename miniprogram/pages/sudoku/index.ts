@@ -92,6 +92,8 @@ Page({
     loading: true,
     mode: "daily" as "daily" | "practice",
     difficulty: "hard" as PuzzleDifficulty,
+    dailySlot: 1,
+    dailyCount: 5,
     puzzleId: "",
     puzzleDate: "",
     givens: "",
@@ -123,6 +125,7 @@ Page({
       { value: "medium", label: "中等" },
       { value: "hard", label: "困难" },
     ],
+    dailySlots: [1, 2, 3, 4, 5],
   },
 
   onLoad() {
@@ -167,8 +170,9 @@ Page({
         ? loadGuestPuzzleDefinition<SudokuPuzzleResponse>("sudoku", guestSlot)
         : null;
       if (!payload) {
+        const dailyQuery = this.data.mode === "daily" ? `&daily_slot=${this.data.dailySlot}` : "";
         payload = await request<SudokuPuzzleResponse>(
-          `/sudoku/puzzle?mode=${this.data.mode}&difficulty=${this.data.difficulty}`,
+          `/sudoku/puzzle?mode=${this.data.mode}&difficulty=${this.data.difficulty}${dailyQuery}`,
         );
         if (!isLoggedIn() && this.data.mode === "practice") {
           saveGuestPuzzleDefinition("sudoku", guestSlot, payload);
@@ -187,6 +191,8 @@ Page({
       this.setData({
         puzzleId: payload.puzzle_id,
         puzzleDate: payload.puzzle_date || "",
+        dailySlot: Number(payload.daily_slot || this.data.dailySlot),
+        dailyCount: Number(payload.daily_count || 5),
         givens: payload.givens,
         runId: payload.run_id || "",
         cloudSavedState: payload.saved_state,
@@ -287,7 +293,7 @@ Page({
       showRequestError(error, "数独进度未同步，已取消切换");
       return;
     }
-    this.setData({ mode }, () => this.loadPuzzle());
+    this.setData({ mode, dailySlot: mode === "daily" ? 1 : this.data.dailySlot }, () => this.loadPuzzle());
   },
 
   async switchDifficulty(event: any) {
@@ -300,7 +306,21 @@ Page({
       showRequestError(error, "数独进度未同步，已取消切换");
       return;
     }
-    this.setData({ difficulty }, () => this.loadPuzzle());
+    this.setData({ difficulty, dailySlot: 1 }, () => this.loadPuzzle());
+  },
+
+  async switchDailySlot(event: any) {
+    if (this.data.loading || this.data.submitting || this.data.hinting || this.data.mode !== "daily") return;
+    const dailySlot = Number(event.currentTarget.dataset.value);
+    if (!Number.isInteger(dailySlot) || dailySlot < 1 || dailySlot > this.data.dailyCount) return;
+    if (dailySlot === this.data.dailySlot) return;
+    try {
+      await this.flushSave();
+    } catch (error) {
+      showRequestError(error, "数独进度未同步，已取消切换");
+      return;
+    }
+    this.setData({ dailySlot }, () => this.loadPuzzle());
   },
 
   queueSave() {
@@ -445,7 +465,11 @@ Page({
 
   playAgain() {
     if (this.data.mode === "daily") {
-      this.setData({ mode: "practice" }, () => this.loadPuzzle(true));
+      if (this.data.dailySlot < this.data.dailyCount) {
+        this.setData({ dailySlot: this.data.dailySlot + 1 }, () => this.loadPuzzle());
+      } else {
+        this.setData({ mode: "practice" }, () => this.loadPuzzle(true));
+      }
     } else {
       this.loadPuzzle(true);
     }

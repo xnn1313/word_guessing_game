@@ -165,6 +165,8 @@ export interface SudokuPuzzleResponse {
   mode: "daily" | "practice";
   puzzle_date: string | null;
   difficulty: PuzzleDifficulty;
+  daily_slot: number | null;
+  daily_count: number;
   givens: string;
   run_id: string | null;
   saved_state: SudokuSavedState | null;

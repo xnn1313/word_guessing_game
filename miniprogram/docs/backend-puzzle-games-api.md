@@ -165,6 +165,7 @@ CREATE TABLE IF NOT EXISTS idiom_puzzles (
     layout_json TEXT NOT NULL,
     clues_json TEXT NOT NULL,
     solution_json TEXT NOT NULL,
+    layout_version INTEGER NOT NULL DEFAULT 1,
     is_daily_enabled INTEGER NOT NULL DEFAULT 1,
     is_active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -290,6 +291,7 @@ CREATE TABLE IF NOT EXISTS daily_puzzles (
 |---|---:|---|---|
 | `mode` | 是 | `daily` | `daily` 或 `practice` |
 | `difficulty` | 是 | `medium` | `easy`、`medium`、`hard` |
+| `daily_slot` | 否 | `1` | 每日模式题号，范围 `1`–`5`；每个难度每天固定 5 题 |
 
 #### 响应
 
@@ -299,6 +301,8 @@ CREATE TABLE IF NOT EXISTS daily_puzzles (
   "mode": "daily",
   "puzzle_date": "2026-07-16",
   "difficulty": "medium",
+  "daily_slot": 1,
+  "daily_count": 5,
   "givens": "530070000600195000098000060800060003400803001700020006060000280000419005000080079",
   "run_id": "run_f9c4a03e",
   "saved_state": {
@@ -448,6 +452,8 @@ CREATE TABLE IF NOT EXISTS daily_puzzles (
 不要返回完整解答。
 
 ## 8. 成语填字 API
+
+题目包含的交叉成语数量随难度递增：`easy` 为 2 条、`medium` 为 3 条、`hard` 为 4 条。`size`、`cells`、`entries` 与 `character_bank` 均按实际布局动态返回，客户端不得假定固定为 4×4 或固定两条释义。
 
 ### 8.1 获取关卡目录
 

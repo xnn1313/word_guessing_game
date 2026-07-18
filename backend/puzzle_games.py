@@ -13,6 +13,7 @@ from puzzle_content import IDIOM_CATEGORY_NAMES
 
 
 DIFFICULTIES = {"easy", "medium", "hard"}
+SUDOKU_DAILY_PUZZLE_COUNT = 5
 MAX_HINTS = config.PUZZLE_MAX_HINTS
 MAX_ELAPSED = config.PUZZLE_MAX_ELAPSED_SECONDS
 
@@ -155,6 +156,26 @@ def _daily_pick(game_key, difficulty, puzzle_ids):
     return storage.set_daily_puzzle_id(game_key, date, difficulty, selected), date
 
 
+def _daily_sudoku_pick(difficulty, daily_slot, puzzle_ids):
+    """Pick one of five stable, non-repeating daily Sudoku slots.
+
+    Slot 1 intentionally keeps the historic storage key and hash so an
+    already-published daily puzzle never changes after this feature ships.
+    Later slots advance from the same deterministic base index.
+    """
+    date = server_date()
+    daily_key = difficulty if daily_slot == 1 else f"{difficulty}:{daily_slot}"
+    existing = storage.get_daily_puzzle_id("sudoku", date, daily_key)
+    if existing:
+        return existing, date
+    if len(puzzle_ids) < SUDOKU_DAILY_PUZZLE_COUNT:
+        raise PuzzleError("数独题库不足以生成今日题组", "PUZZLE_CATALOG_EMPTY", 500)
+    digest = hashlib.sha256(f"sudoku:{date}:{difficulty}".encode("utf-8")).digest()
+    base_index = int.from_bytes(digest[:8], "big") % len(puzzle_ids)
+    selected = puzzle_ids[(base_index + daily_slot - 1) % len(puzzle_ids)]
+    return storage.set_daily_puzzle_id("sudoku", date, daily_key, selected), date
+
+
 def _owned_run(user, run_id, game_key, puzzle_id, allow_completed=False):
     if not user:
         if run_id:
@@ -257,13 +278,22 @@ def _sudoku_score(difficulty, elapsed, hints, mistakes):
     return score, stars
 
 
-def get_sudoku(user, mode, difficulty):
+def get_sudoku(user, mode, difficulty, daily_slot=1):
     mode = _choice(mode, {"daily", "practice"}, "mode")
     difficulty = _choice(difficulty, DIFFICULTIES, "difficulty")
+    daily_slot = _integer(
+        {"daily_slot": daily_slot},
+        "daily_slot",
+        1,
+        SUDOKU_DAILY_PUZZLE_COUNT,
+        1,
+    )
     date = None
     if mode == "daily":
-        puzzle_id, date = _daily_pick(
-            "sudoku", difficulty, storage.list_sudoku_puzzle_ids(difficulty)
+        puzzle_id, date = _daily_sudoku_pick(
+            difficulty,
+            daily_slot,
+            storage.list_sudoku_puzzle_ids(difficulty),
         )
     else:
         resumed = storage.get_latest_playing_run(user["id"], "sudoku", mode, difficulty) if user else None
@@ -302,6 +332,8 @@ def get_sudoku(user, mode, difficulty):
         "mode": mode,
         "puzzle_date": date,
         "difficulty": difficulty,
+        "daily_slot": daily_slot if mode == "daily" else None,
+        "daily_count": SUDOKU_DAILY_PUZZLE_COUNT,
         "givens": puzzle["puzzle"],
         "run_id": run["id"] if run else None,
         "saved_state": saved,
@@ -889,7 +921,7 @@ def games_overview(user):
         }
 
     # Materialize default daily mappings before checking completion flags.
-    _daily_pick("sudoku", "medium", storage.list_sudoku_puzzle_ids("medium"))
+    _daily_sudoku_pick("medium", 1, storage.list_sudoku_puzzle_ids("medium"))
     idiom_daily = [item["id"] for item in storage.list_idiom_puzzles(True) if item["difficulty"] == "medium"]
     _daily_pick("idiom", "medium", idiom_daily)
     memory_daily_key = "medium:classic"

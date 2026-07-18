@@ -47,7 +47,7 @@ Page({
       });
       setTimeout(() => {
         if (getCurrentPages().length > 1) wx.navigateBack();
-        else wx.reLaunch({ url: "/pages/home/index" });
+        else wx.reLaunch({ url: "/pages/hub/index" });
       }, 450);
     } catch (error) {
       showRequestError(error, "登录失败");

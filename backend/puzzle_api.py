@@ -69,7 +69,10 @@ def register_puzzle_routes(app, get_current_user):
     def sudoku_puzzle():
         return jsonify(
             puzzle_games.get_sudoku(
-                resolved_user(), request.args.get("mode"), request.args.get("difficulty")
+                resolved_user(),
+                request.args.get("mode"),
+                request.args.get("difficulty"),
+                request.args.get("daily_slot", 1),
             )
         )
 
