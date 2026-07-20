@@ -1,0 +1,92 @@
+<view class="page-shell word-search-page">
+  <view class="page-kicker">IDIOM PATH · 字阵寻踪</view>
+  <view class="page-title">成语连线</view>
+  <view class="page-subtitle">沿横、竖或斜线连接四个字，找出全部隐藏成语。</view>
+
+  <view class="search-controls surface">
+    <view class="control-row mode-row">
+      <button
+        class="{{mode === item.value ? 'active' : ''}}"
+        wx:for="{{modeOptions}}"
+        wx:key="value"
+        data-value="{{item.value}}"
+        bindtap="switchMode"
+      >{{item.label}}</button>
+    </view>
+    <view class="control-row difficulty-row">
+      <button
+        class="{{difficulty === item.value ? 'active' : ''}}"
+        wx:for="{{difficultyOptions}}"
+        wx:key="value"
+        data-value="{{item.value}}"
+        bindtap="switchDifficulty"
+      >{{item.label}}</button>
+    </view>
+    <scroll-view class="theme-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="theme-list">
+        <button
+          class="theme-chip {{theme === item.key ? 'active' : ''}}"
+          wx:for="{{themeOptions}}"
+          wx:key="key"
+          data-value="{{item.key}}"
+          bindtap="switchTheme"
+        >{{item.title}}</button>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="loading-state" wx:if="{{loading}}">正在生成成语字阵…</view>
+
+  <block wx:else>
+    <view class="search-status status-strip">
+      <view><text>用时</text><text>{{elapsedText}}</text></view>
+      <view><text>找到</text><text>{{foundCount}} / {{board.word_count}}</text></view>
+      <view><text>错误</text><text>{{mistakes}}</text></view>
+    </view>
+
+    <view class="board-heading">
+      <view class="board-heading-copy">
+        <text>{{board.theme_title}}</text>
+        <text>{{board.rows}}×{{board.columns}} 字阵</text>
+      </view>
+      <view class="board-heading-actions" wx:if="{{!completed}}">
+        <button class="hint-button" bindtap="showHint" disabled="{{loading || submitting}}">提示</button>
+        <button class="refresh-board" bindtap="newBoard" disabled="{{submitting}}">换一盘</button>
+      </view>
+    </view>
+
+    <view
+      class="word-search-board columns-{{board.columns}} {{selectionInvalid ? 'invalid' : ''}}"
+      style="grid-template-columns: repeat({{board.columns}}, minmax(0, 1fr));"
+      bindtouchstart="onBoardTouchStart"
+      catchtouchmove="onBoardTouchMove"
+      bindtouchend="onBoardTouchEnd"
+      bindtouchcancel="onBoardTouchCancel"
+    >
+      <view
+        class="search-cell {{item.found ? 'found' : ''}} {{item.selected ? 'selected' : ''}} {{item.endpoint ? 'endpoint' : ''}}"
+        wx:for="{{cells}}"
+        wx:key="key"
+        data-row="{{item.row}}"
+        data-column="{{item.column}}"
+        bindtap="tapCell"
+        aria-label="第 {{item.row + 1}} 行第 {{item.column + 1}} 列，{{item.character}}"
+      >{{item.character}}</view>
+    </view>
+
+    <view class="selection-feedback {{selectionInvalid ? 'invalid' : ''}} {{selectedPath.length ? 'active' : ''}}">
+      <view class="feedback-dot"></view>
+      <text>{{submitting ? '正在检查这条连线…' : selectionText}}</text>
+    </view>
+
+    <view class="complete-panel surface" wx:if="{{completed && result}}">
+      <view class="complete-title">字阵全部解开</view>
+      <view class="complete-stars">{{result.stars === 3 ? '★★★' : result.stars === 2 ? '★★☆' : '★☆☆'}}</view>
+      <view class="complete-detail">{{result.score}} 分 · {{elapsedText}} · {{mistakes}} 次错误</view>
+      <view class="complete-actions">
+        <button class="secondary-button" bindtap="goHub">返回首页</button>
+        <button class="primary-button" bindtap="newBoard">再来一盘</button>
+      </view>
+    </view>
+  </block>
+</view>

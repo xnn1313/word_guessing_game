@@ -222,6 +222,31 @@ class WordSearchApiTestCase(unittest.TestCase):
         self.assertEqual(unauthenticated.status_code, 401)
         self.assertEqual(unauthenticated.json["code"], "AUTH_REQUIRED")
 
+    def test_daily_completion_appears_in_games_overview(self):
+        payload = self.client.get(
+            "/api/word-search/board?mode=daily&difficulty=easy&theme=classic",
+            headers=self.auth,
+        ).json
+        internal = word_search._board(payload["board_id"])
+        paths = [self._public_path(entry["path"]) for entry in internal["entries"]]
+        completed = self.client.post(
+            "/api/word-search/submit",
+            headers=self.auth,
+            json={
+                "board_id": payload["board_id"],
+                "run_id": payload["run_id"],
+                "found_paths": paths,
+                "elapsed_seconds": 30,
+                "mistakes": 0,
+            },
+        )
+        self.assertEqual(completed.status_code, 200)
+        overview = self.client.get("/api/games/overview", headers=self.auth).json
+        entry = next(item for item in overview["games"] if item["key"] == "word_search")
+        self.assertTrue(entry["daily_completed"])
+        self.assertEqual(entry["progress_percent"], 100)
+        self.assertEqual(overview["summary"]["available_games"], 5)
+
 
 if __name__ == "__main__":
     unittest.main()

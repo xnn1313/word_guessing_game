@@ -3,7 +3,7 @@
     <view class="hub-heading">
       <view class="page-kicker">HELLO · {{loggedIn ? username : 'PLAYER'}}</view>
       <view class="page-title"><text>今天玩点</text><text>不一样的</text></view>
-      <view class="page-subtitle">四款益智游戏，随手挑一块开始。</view>
+      <view class="page-subtitle">五款益智游戏，随手挑一块开始。</view>
     </view>
     <view class="account-button {{loggedIn ? 'signed' : ''}}" bindtap="openProfile" aria-label="打开个人中心">
       <view class="account-avatar">{{avatarText}}</view>
@@ -65,6 +65,15 @@
       <view class="game-action {{memoryGame.availability === 'available' ? '' : 'status-text'}}">
         <view class="arrow-icon" wx:if="{{memoryGame.availability === 'available'}}"></view>
         <text wx:else>{{memoryGame.availability === 'maintenance' ? '维护' : '待开放'}}</text>
+      </view>
+    </view>
+
+    <view class="game-card word-search-card playable {{wordSearchGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openWordSearch" hover-class="card-pressed">
+      <view class="game-icon word-search">连</view>
+      <view class="game-copy"><text class="game-name">成语连线</text><text class="game-description">{{wordSearchGame.progress_text}} · 横竖斜向字阵</text></view>
+      <view class="game-action {{wordSearchGame.availability === 'available' ? '' : 'status-text'}}">
+        <view class="arrow-icon" wx:if="{{wordSearchGame.availability === 'available'}}"></view>
+        <text wx:else>{{wordSearchGame.availability === 'maintenance' ? '维护' : '待开放'}}</text>
       </view>
     </view>
   </view>

@@ -84,10 +84,10 @@
       </view>
     </view>
 
-    <scroll-view class="clue-list" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="clue-list" wx:if="{{visibleEntries.length}}">
       <button
         class="clue-card {{activeEntryId === item.id ? 'active' : ''}}"
-        wx:for="{{entries}}"
+        wx:for="{{visibleEntries}}"
         wx:key="id"
         data-id="{{item.id}}"
         bindtap="selectEntry"
@@ -95,7 +95,7 @@
         <text>{{item.direction === 'across' ? '横向' : '纵向'}}</text>
         <text>{{item.clue}}</text>
       </button>
-    </scroll-view>
+    </view>
 
     <block wx:if="{{!completed}}">
       <view class="character-bank">

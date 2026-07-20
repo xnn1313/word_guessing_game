@@ -113,7 +113,7 @@ export interface BattleState {
   };
 }
 
-export type PuzzleGameKey = "word" | "sudoku" | "idiom" | "memory";
+export type PuzzleGameKey = "word" | "sudoku" | "idiom" | "memory" | "word_search";
 export type PuzzleDifficulty = "easy" | "medium" | "hard";
 export type PuzzleRunMode = "daily" | "practice" | "level";
 export type MemoryTheme =
@@ -259,6 +259,69 @@ export interface MemoryBoardResponse {
   cards: MemoryCard[];
   run_id: string | null;
   saved_state: MemorySavedState | null;
+}
+
+export type WordSearchTheme = "classic" | "nature" | "animals" | "character" | "emotion";
+
+export interface WordSearchPathCell {
+  row: number;
+  column: number;
+}
+
+export interface WordSearchThemeItem {
+  key: WordSearchTheme;
+  title: string;
+  description: string;
+}
+
+export interface WordSearchThemeCatalog {
+  themes: WordSearchThemeItem[];
+  difficulties: Array<{
+    key: PuzzleDifficulty;
+    rows: number;
+    columns: number;
+    word_count: number;
+  }>;
+}
+
+export interface WordSearchEntry {
+  id: string;
+  clue: string;
+  length: number;
+}
+
+export interface WordSearchSavedState {
+  found_entry_ids: string[];
+  found_paths: WordSearchPathCell[][];
+  elapsed_seconds: number;
+  mistakes: number;
+}
+
+export interface WordSearchBoardResponse {
+  board_id: string;
+  mode: "daily" | "practice";
+  puzzle_date: string | null;
+  difficulty: PuzzleDifficulty;
+  theme: WordSearchTheme;
+  theme_title: string;
+  rows: number;
+  columns: number;
+  word_count: number;
+  grid: string[][];
+  entries: WordSearchEntry[];
+  run_id: string | null;
+  saved_state: WordSearchSavedState | null;
+}
+
+export interface WordSearchSubmitResponse {
+  correct: boolean;
+  status: "playing" | "completed" | "incorrect";
+  code?: string;
+  mistakes?: number;
+  found_entry_ids?: string[];
+  found_count?: number;
+  remaining_count?: number;
+  result?: PuzzleCompletionResult;
 }
 
 export interface PuzzleHintResponse {

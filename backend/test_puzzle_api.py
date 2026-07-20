@@ -127,7 +127,10 @@ class PuzzleApiTestCase(unittest.TestCase):
     def test_guest_overview_and_cloud_save_authentication(self):
         overview = self.client.get("/api/games/overview")
         self.assertEqual(overview.status_code, 200)
-        self.assertEqual([item["key"] for item in overview.json["games"]], ["word", "sudoku", "idiom", "memory"])
+        self.assertEqual(
+            [item["key"] for item in overview.json["games"]],
+            ["word", "sudoku", "idiom", "memory", "word_search"],
+        )
         response = self.client.post("/api/sudoku/save", json={})
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.json["code"], "AUTH_REQUIRED")
@@ -437,7 +440,7 @@ class PuzzleApiTestCase(unittest.TestCase):
         self.assertEqual(repeated.json, completed.json)
 
         overview = self.client.get("/api/games/overview", headers=self.auth).json
-        self.assertEqual(overview["summary"]["available_games"], 4)
+        self.assertEqual(overview["summary"]["available_games"], 5)
         self.assertGreaterEqual(overview["summary"]["total_stars"], 3)
 
     def test_memory_fresh_board_does_not_resume_previous_layout(self):

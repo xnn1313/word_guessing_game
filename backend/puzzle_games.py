@@ -907,7 +907,7 @@ def games_overview(user):
         return {
             "server_date": date,
             "summary": {
-                "available_games": 4,
+                "available_games": 5,
                 "completed_today": 0,
                 "total_stars": 0,
                 "last_game_key": None,
@@ -917,6 +917,7 @@ def games_overview(user):
                 {"key": "sudoku", "title": "每日数独", "availability": "available", "progress_text": "今日未完成", "progress_percent": 0, "best_score": None, "daily_completed": False, "last_played_at": None},
                 {"key": "idiom", "title": "成语填字", "availability": "available", "progress_text": f"0 / {idiom_total} 关", "progress_percent": 0, "best_score": None, "daily_completed": False, "last_played_at": None},
                 {"key": "memory", "title": "记忆翻牌", "availability": "available", "progress_text": "尚无记录", "progress_percent": 0, "best_score": None, "daily_completed": False, "last_played_at": None},
+                {"key": "word_search", "title": "成语连线", "availability": "available", "progress_text": "开始连线", "progress_percent": 0, "best_score": None, "daily_completed": False, "last_played_at": None},
             ],
         }
 
@@ -969,12 +970,13 @@ def games_overview(user):
         game_entry("sudoku", "每日数独", "今日已完成" if "sudoku" in flags else "今日未完成", 100 if "sudoku" in flags else 0),
         game_entry("idiom", "成语填字", f"{len(idiom_progress)} / {idiom_total} 关", len(idiom_progress) / idiom_total * 100),
         game_entry("memory", "记忆翻牌", f"最佳 {memory_best} 步" if memory_best is not None else "尚无记录", 0),
+        game_entry("word_search", "成语连线", "今日已完成" if "word_search" in flags else "开始连线", 100 if "word_search" in flags else 0),
     ]
     return {
         "server_date": date,
         "summary": {
-            "available_games": 4,
-            "completed_today": len(flags & {"sudoku", "idiom", "memory"}),
+            "available_games": 5,
+            "completed_today": len(flags & {"sudoku", "idiom", "memory", "word_search"}),
             "total_stars": total_stars,
             "last_game_key": last_game,
         },

@@ -7,6 +7,7 @@ const routes: Record<PuzzleGameKey, string> = {
   sudoku: "/pages/sudoku/index",
   idiom: "/pages/idiom/index",
   memory: "/pages/memory/index",
+  word_search: "/pages/word-search/index",
 };
 
 const marks: Record<PuzzleGameKey, string> = {
@@ -14,6 +15,7 @@ const marks: Record<PuzzleGameKey, string> = {
   sudoku: "数",
   idiom: "成",
   memory: "记",
+  word_search: "连",
 };
 
 function formatPlayedAt(value: string | null): string {
@@ -31,7 +33,7 @@ Page({
     loading: true,
     totalStars: 0,
     completedToday: 0,
-    availableGames: 4,
+    availableGames: 5,
     records: [] as Array<GameOverviewItem & { mark: string; playedText: string }>,
   },
 
@@ -50,7 +52,7 @@ Page({
       this.setData({
         totalStars: Number(overview.summary.total_stars || 0),
         completedToday: Number(overview.summary.completed_today || 0),
-        availableGames: Number(overview.summary.available_games || 4),
+        availableGames: Number(overview.summary.available_games || 5),
         records: overview.games.map((item) => ({
           ...item,
           mark: marks[item.key],

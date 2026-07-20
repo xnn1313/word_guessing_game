@@ -76,6 +76,7 @@
 .record-mark.sudoku { background: var(--color-aqua); }
 .record-mark.idiom { background: var(--color-coral); }
 .record-mark.memory { background: var(--color-violet); }
+.record-mark.word_search { background: var(--color-primary-soft); }
 .record-copy { min-width: 0; flex: 1; margin-top: 15rpx; }
 .record-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8rpx; flex-direction: column; }
 .record-title-row text:first-child { color: var(--color-ink); font-size: 26rpx; font-weight: 900; }

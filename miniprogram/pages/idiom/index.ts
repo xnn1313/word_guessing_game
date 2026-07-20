@@ -116,6 +116,8 @@ Page({
     grid: [] as string[],
     cells: [] as any[],
     entries: [] as IdiomEntry[],
+    visibleEntries: [] as IdiomEntry[],
+    revealedEntryIds: [] as string[],
     characterBank: [] as string[],
     selectedIndex: -1,
     activeEntryId: "entry-1",
@@ -259,6 +261,8 @@ Page({
         cloudSavedState: puzzle.saved_state,
         grid: [...initialGrid],
         entries: puzzle.entries,
+        visibleEntries: [],
+        revealedEntryIds: [],
         characterBank: puzzle.character_bank,
         selectedIndex: puzzle.cells.findIndex((cell) => cell.type === "input"),
         activeEntryId: puzzle.entries[0]?.id || "",
@@ -433,6 +437,10 @@ Page({
       const index = this.data.puzzle.cells.findIndex(
         (cell) => cell.row === hint.row && cell.column === hint.column,
       );
+      const revealedEntryIds = this.data.revealedEntryIds.includes(this.data.activeEntryId)
+        ? this.data.revealedEntryIds
+        : [...this.data.revealedEntryIds, this.data.activeEntryId];
+      const visibleEntries = this.data.entries.filter((entry) => revealedEntryIds.includes(entry.id));
       if (index >= 0) {
         const grid = [...this.data.grid];
         grid[index] = String(hint.value);
@@ -441,9 +449,17 @@ Page({
           selectedIndex: index,
           hintsUsed: hint.hints_used,
           invalidCells: this.data.invalidCells.filter((item: number) => item !== index),
+          revealedEntryIds,
+          visibleEntries,
         });
         this.refreshCells();
         this.queueSave();
+      } else {
+        this.setData({
+          hintsUsed: hint.hints_used,
+          revealedEntryIds,
+          visibleEntries,
+        });
       }
     } catch (error) {
       showRequestError(error, "获取提示失败");

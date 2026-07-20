@@ -20,15 +20,16 @@ Page({
     avatarText: "游",
     loading: false,
     trainingLabel: "今日脑力训练",
-    trainingValue: "0 / 3 完成",
+    trainingValue: "0 / 4 完成",
     trainingNote: "挑一个游戏，为今天的大脑热热身",
-    availableGames: 4,
+    availableGames: 5,
     completedToday: 0,
     totalStars: 0,
     wordGame: fallbackGame("word", "猜词实验室"),
     sudokuGame: fallbackGame("sudoku", "每日数独"),
     idiomGame: fallbackGame("idiom", "成语填字"),
     memoryGame: fallbackGame("memory", "记忆翻牌"),
+    wordSearchGame: fallbackGame("word_search", "成语连线"),
   },
 
   onShow() {
@@ -49,11 +50,11 @@ Page({
       >;
       const completedToday = Number(overview.summary.completed_today || 0);
       this.setData({
-        availableGames: Number(overview.summary.available_games || 4),
+        availableGames: Number(overview.summary.available_games || 5),
         completedToday,
         totalStars: Number(overview.summary.total_stars || 0),
         trainingLabel: completedToday ? "今日训练进度" : "今日脑力训练",
-        trainingValue: `${completedToday} / 3 完成`,
+        trainingValue: `${completedToday} / 4 完成`,
         trainingNote: completedToday
           ? `已获得 ${overview.summary.total_stars || 0} 颗星，继续保持`
           : "挑一个游戏，为今天的大脑热热身",
@@ -61,6 +62,7 @@ Page({
         sudokuGame: games.sudoku || this.data.sudokuGame,
         idiomGame: games.idiom || this.data.idiomGame,
         memoryGame: games.memory || this.data.memoryGame,
+        wordSearchGame: games.word_search || this.data.wordSearchGame,
       });
     } catch (error) {
       // 大厅保留本地入口，具体游戏页会显示网络错误。
@@ -83,6 +85,10 @@ Page({
 
   openMemory() {
     this.openGame(this.data.memoryGame, "/pages/memory/index");
+  },
+
+  openWordSearch() {
+    this.openGame(this.data.wordSearchGame, "/pages/word-search/index");
   },
 
   openGame(game: GameOverviewItem, url: string) {

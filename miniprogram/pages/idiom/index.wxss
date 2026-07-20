@@ -59,8 +59,8 @@
 .idiom-cell.active-entry { background: var(--color-aqua-soft); }
 .idiom-cell.selected { background: var(--color-aqua); box-shadow: 5rpx 5rpx 0 var(--color-ink); }
 .idiom-cell.invalid { background: var(--color-coral-soft); color: var(--color-danger); }
-.clue-list { width: 100%; margin-top: 18rpx; white-space: nowrap; }
-.clue-card { display: inline-flex; width: 78%; min-height: 96rpx; align-items: flex-start; justify-content: center; margin-right: 12rpx; padding: 15rpx 18rpx; border: 3rpx solid var(--color-ink); border-radius: 18rpx; background: #ffffff; text-align: left; flex-direction: column; vertical-align: top; }
+.clue-list { display: grid; width: 100%; margin-top: 18rpx; gap: 10rpx; }
+.clue-card { display: flex; width: 100%; min-height: 96rpx; align-items: flex-start; justify-content: center; padding: 15rpx 18rpx; border: 3rpx solid var(--color-ink); border-radius: 18rpx; background: #ffffff; text-align: left; flex-direction: column; }
 .clue-card.active { background: var(--color-primary-soft); box-shadow: 4rpx 4rpx 0 var(--color-primary); }
 .clue-card text:first-child { color: var(--color-primary-dark); font-size: 18rpx; font-weight: 900; }
 .clue-card text:last-child { margin-top: 3rpx; overflow: hidden; color: var(--color-ink); font-size: 22rpx; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }

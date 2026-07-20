@@ -36,8 +36,9 @@
 .memory-card.flipped { background: #ffffff; color: var(--color-ink); transform: rotateY(180deg); }
 .memory-card.matched { background: var(--color-yellow-soft); opacity: 0.72; box-shadow: 2rpx 2rpx 0 var(--color-ink); }
 .card-back { font-size: 26rpx; }
-.card-face { font-size: 38rpx; transform: rotateY(180deg); }
-.columns-5 .card-face,.columns-6 .card-face { font-size: 29rpx; }
+.card-face { display: grid; width: 100%; height: 100%; place-items: center; font-size: 68rpx; line-height: 1; transform: rotateY(180deg); }
+.columns-5 .card-face { font-size: 54rpx; }
+.columns-6 .card-face { font-size: 46rpx; }
 .columns-6 .memory-card { border-radius: 12rpx; }
 .board-note { margin-top: 17rpx; color: var(--color-muted); font-size: 20rpx; text-align: center; }
 .complete-panel { display: flex; align-items: center; margin-top: 22rpx; padding: 28rpx; flex-direction: column; text-align: center; }
