@@ -4,6 +4,7 @@ from flask import jsonify, request, session as flask_session
 
 import puzzle_games
 import word_search
+import extra_puzzles
 
 
 MAX_JSON_BYTES = 64 * 1024
@@ -55,6 +56,9 @@ def register_puzzle_routes(app, get_current_user):
             "/api/idiom/",
             "/api/memory/",
             "/api/word-search/",
+            "/api/poetry/",
+            "/api/sokoban/",
+            "/api/arrow-maze/",
         )
         if request.path.startswith(puzzle_prefixes):
             app.logger.error("益智游戏接口发生未处理错误: %s", error)
@@ -184,4 +188,68 @@ def register_puzzle_routes(app, get_current_user):
     @app.route("/api/word-search/submit", methods=["POST"])
     def word_search_submit():
         result = word_search.submit_paths(resolved_user(), body())
+        return jsonify(result), 200 if result.get("correct") else 422
+
+    @app.route("/api/poetry/quiz")
+    def poetry_quiz():
+        return jsonify(
+            extra_puzzles.get_poetry(
+                resolved_user(),
+                request.args.get("mode"),
+                request.args.get("difficulty"),
+                request.args.get("fresh") == "1",
+            )
+        )
+
+    @app.route("/api/poetry/save", methods=["POST"])
+    def poetry_save():
+        return jsonify(extra_puzzles.save_poetry(resolved_user(), body()))
+
+    @app.route("/api/poetry/submit", methods=["POST"])
+    def poetry_submit():
+        # A wrong option is normal quiz feedback, not a transport error.
+        return jsonify(extra_puzzles.submit_poetry(resolved_user(), body()))
+
+    @app.route("/api/sokoban/board")
+    def sokoban_board():
+        return jsonify(
+            extra_puzzles.get_sokoban(
+                resolved_user(),
+                request.args.get("mode"),
+                request.args.get("difficulty"),
+                request.args.get("fresh") == "1",
+            )
+        )
+
+    @app.route("/api/sokoban/save", methods=["POST"])
+    def sokoban_save():
+        return jsonify(extra_puzzles.save_sokoban(resolved_user(), body()))
+
+    @app.route("/api/sokoban/submit", methods=["POST"])
+    def sokoban_submit():
+        result = extra_puzzles.submit_sokoban(resolved_user(), body())
+        return jsonify(result), 200 if result.get("correct") else 422
+
+    @app.route("/api/arrow-maze/board")
+    def arrow_maze_board():
+        return jsonify(
+            extra_puzzles.get_arrow_maze(
+                resolved_user(),
+                request.args.get("mode"),
+                request.args.get("difficulty"),
+                request.args.get("fresh") == "1",
+            )
+        )
+
+    @app.route("/api/arrow-maze/save", methods=["POST"])
+    def arrow_maze_save():
+        return jsonify(extra_puzzles.save_arrow_maze(resolved_user(), body()))
+
+    @app.route("/api/arrow-maze/hint", methods=["POST"])
+    def arrow_maze_hint():
+        return jsonify(extra_puzzles.hint_arrow_maze(resolved_user(), body()))
+
+    @app.route("/api/arrow-maze/submit", methods=["POST"])
+    def arrow_maze_submit():
+        result = extra_puzzles.submit_arrow_maze(resolved_user(), body())
         return jsonify(result), 200 if result.get("correct") else 422

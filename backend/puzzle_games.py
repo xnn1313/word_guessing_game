@@ -907,7 +907,8 @@ def games_overview(user):
         return {
             "server_date": date,
             "summary": {
-                "available_games": 5,
+                "available_games": 8,
+                "daily_total": 7,
                 "completed_today": 0,
                 "total_stars": 0,
                 "last_game_key": None,
@@ -918,6 +919,9 @@ def games_overview(user):
                 {"key": "idiom", "title": "成语填字", "availability": "available", "progress_text": f"0 / {idiom_total} 关", "progress_percent": 0, "best_score": None, "daily_completed": False, "last_played_at": None},
                 {"key": "memory", "title": "记忆翻牌", "availability": "available", "progress_text": "尚无记录", "progress_percent": 0, "best_score": None, "daily_completed": False, "last_played_at": None},
                 {"key": "word_search", "title": "成语连线", "availability": "available", "progress_text": "开始连线", "progress_percent": 0, "best_score": None, "daily_completed": False, "last_played_at": None},
+                {"key": "poetry", "title": "诗词大会", "availability": "available", "progress_text": "五题热身", "progress_percent": 0, "best_score": None, "daily_completed": False, "last_played_at": None},
+                {"key": "sokoban", "title": "推箱子", "availability": "available", "progress_text": "仓库待整理", "progress_percent": 0, "best_score": None, "daily_completed": False, "last_played_at": None},
+                {"key": "arrow_maze", "title": "箭头迷宫", "availability": "available", "progress_text": "寻找出口", "progress_percent": 0, "best_score": None, "daily_completed": False, "last_played_at": None},
             ],
         }
 
@@ -930,6 +934,11 @@ def games_overview(user):
         storage.set_daily_puzzle_id(
             "memory", date, memory_daily_key, f"memory-{date}-medium-classic"
         )
+    # Imported lazily to avoid a module cycle: extra_puzzles reuses the shared
+    # validation and scoring helpers above.
+    import extra_puzzles
+
+    extra_puzzles.ensure_daily_puzzles()
 
     flags = storage.get_daily_completion_flags(user["id"], date)
     stats = storage.get_game_run_stats(user["id"])
@@ -971,12 +980,16 @@ def games_overview(user):
         game_entry("idiom", "成语填字", f"{len(idiom_progress)} / {idiom_total} 关", len(idiom_progress) / idiom_total * 100),
         game_entry("memory", "记忆翻牌", f"最佳 {memory_best} 步" if memory_best is not None else "尚无记录", 0),
         game_entry("word_search", "成语连线", "今日已完成" if "word_search" in flags else "开始连线", 100 if "word_search" in flags else 0),
+        game_entry("poetry", "诗词大会", "今日已完成" if "poetry" in flags else "五题热身", 100 if "poetry" in flags else 0),
+        game_entry("sokoban", "推箱子", "今日已完成" if "sokoban" in flags else "仓库待整理", 100 if "sokoban" in flags else 0),
+        game_entry("arrow_maze", "箭头迷宫", "今日已完成" if "arrow_maze" in flags else "寻找出口", 100 if "arrow_maze" in flags else 0),
     ]
     return {
         "server_date": date,
         "summary": {
-            "available_games": 5,
-            "completed_today": len(flags & {"sudoku", "idiom", "memory", "word_search"}),
+            "available_games": 8,
+            "daily_total": 7,
+            "completed_today": len(flags & {"sudoku", "idiom", "memory", "word_search", "poetry", "sokoban", "arrow_maze"}),
             "total_stars": total_stars,
             "last_game_key": last_game,
         },

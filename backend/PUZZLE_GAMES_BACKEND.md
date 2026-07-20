@@ -256,3 +256,30 @@ cd backend
 游客成语目录默认只标记每个分类第一关为已解锁；游客完成状态由小程序本地保存和覆盖，后台允许游客读取任意有效普通关卡。登录用户仍由后台严格校验关卡顺序。
 
 数独和成语存档允许擦除或改写普通输入格，只禁止修改数独给定格和成语固定格。`elapsed_seconds`、`mistakes` 以及翻牌已匹配位置仍不能回退。
+
+## 诗词大会、推箱子与箭头迷宫
+
+三款扩展游戏继续使用 `game_runs`、Bearer Token、每日题映射和 422 业务结果约定：
+
+| 方法 | 路径 | 用途 |
+|---|---|---|
+| GET | `/api/poetry/quiz` | 获取每日或练习题组 |
+| POST | `/api/poetry/save` | 保存题号、答对数和用时 |
+| POST | `/api/poetry/submit` | 提交当前选择并取得下一题或结算 |
+| GET | `/api/sokoban/board` | 获取确定性推箱子关卡 |
+| POST | `/api/sokoban/save` | 保存可回放的 `UDLR` 移动记录 |
+| POST | `/api/sokoban/submit` | 服务端重放移动并验证所有箱子归位 |
+| GET | `/api/arrow-maze/board` | 获取箭头跳格迷宫 |
+| POST | `/api/arrow-maze/save` | 保存可回退路径 |
+| POST | `/api/arrow-maze/hint` | 返回当前位置最短路线的下一格 |
+| POST | `/api/arrow-maze/submit` | 验证路径方向和出口并结算 |
+
+三个 GET 接口均接受 `mode=daily|practice`、`difficulty=easy|medium|hard`，自由练习可加
+`fresh=1` 换题。游客的 `run_id`、`saved_state` 为 `null`，由小程序保存题面和进度；登录用户
+在每次重新进入时恢复未完成运行。推箱子的移动记录和箭头迷宫路径允许因撤回操作而缩短，
+但 `elapsed_seconds`、`hints_used` 和 `mistakes` 不能回退。
+
+诗词题库由 38 首内置基础作品和 `backend/data/poetry_bank.json` 的 1445 首标准化作品合并
+去重，共 1468 首。简单、中等、困难题池为逐级包含关系，规模分别为 427、861、1468 首；
+每局题量分别为 12、20、30。每日题使用固定乱序表按天步进，相邻日期无重复，并返回
+`catalog_size` 与 `rotation_days` 供客户端展示；自由练习使用独立随机题组。

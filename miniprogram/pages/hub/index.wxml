@@ -3,7 +3,7 @@
     <view class="hub-heading">
       <view class="page-kicker">HELLO · {{loggedIn ? username : 'PLAYER'}}</view>
       <view class="page-title"><text>今天玩点</text><text>不一样的</text></view>
-      <view class="page-subtitle">五款益智游戏，随手挑一块开始。</view>
+      <view class="page-subtitle">八款益智游戏，随手挑一块开始。</view>
     </view>
     <view class="account-button {{loggedIn ? 'signed' : ''}}" bindtap="openProfile" aria-label="打开个人中心">
       <view class="account-avatar">{{avatarText}}</view>
@@ -22,9 +22,37 @@
     </view>
   </view>
 
-  <view class="library-heading">
-    <text class="section-title">选择游戏</text>
-    <text class="library-count">{{availableGames}} 款可玩</text>
+  <view class="library-heading spotlight-heading">
+    <view><text class="section-title">新玩法</text><text class="section-note">题签 · 仓库 · 罗盘</text></view>
+    <text class="library-count">NEW</text>
+  </view>
+
+  <scroll-view class="spotlight-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="spotlight-list">
+      <view class="spotlight-card poetry-spotlight" bindtap="openPoetry" hover-class="card-pressed">
+        <view class="spotlight-top"><view class="spotlight-icon">诗</view><text>01</text></view>
+        <view class="spotlight-name">诗词大会</view>
+        <view class="spotlight-desc">{{poetryGame.progress_text}} · 接句辨作者</view>
+        <view class="spotlight-arrow">→</view>
+      </view>
+      <view class="spotlight-card sokoban-spotlight" bindtap="openSokoban" hover-class="card-pressed">
+        <view class="spotlight-top"><view class="spotlight-icon crate-icon">×</view><text>02</text></view>
+        <view class="spotlight-name">推箱子</view>
+        <view class="spotlight-desc">{{sokobanGame.progress_text}} · 步数挑战</view>
+        <view class="spotlight-arrow">→</view>
+      </view>
+      <view class="spotlight-card arrow-spotlight" bindtap="openArrowMaze" hover-class="card-pressed">
+        <view class="spotlight-top"><view class="spotlight-icon">↗</view><text>03</text></view>
+        <view class="spotlight-name">箭头迷宫</view>
+        <view class="spotlight-desc">{{arrowMazeGame.progress_text}} · 罗盘跳格</view>
+        <view class="spotlight-arrow">→</view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="library-heading classic-heading">
+    <view><text class="section-title">经典训练</text><text class="section-note">每天换一种脑力热身</text></view>
+    <text class="library-count">5 款</text>
   </view>
 
   <view class="game-library">

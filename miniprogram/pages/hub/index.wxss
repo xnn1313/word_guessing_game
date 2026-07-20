@@ -165,6 +165,131 @@
   margin: 44rpx 0 20rpx;
 }
 
+.library-heading > view {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.section-note {
+  margin-top: 3rpx;
+  color: var(--color-muted);
+  font-size: 18rpx;
+}
+
+.spotlight-heading {
+  margin-bottom: 16rpx;
+}
+
+.classic-heading {
+  margin-top: 39rpx;
+}
+
+.spotlight-scroll {
+  width: calc(100% + 64rpx);
+  margin-left: -32rpx;
+  white-space: nowrap;
+}
+
+.spotlight-list {
+  display: inline-flex;
+  gap: 17rpx;
+  padding: 0 32rpx 10rpx;
+}
+
+.spotlight-card {
+  position: relative;
+  display: inline-flex;
+  width: 326rpx;
+  min-height: 226rpx;
+  padding: 21rpx;
+  overflow: hidden;
+  border: 3rpx solid var(--color-ink);
+  border-radius: 25rpx;
+  box-shadow: 6rpx 6rpx 0 var(--color-ink);
+  flex-direction: column;
+  white-space: normal;
+  vertical-align: top;
+}
+
+.poetry-spotlight { background: #fff5d9; }
+.sokoban-spotlight { background: var(--color-yellow); }
+.arrow-spotlight { background: var(--color-violet); }
+
+.spotlight-card::after {
+  position: absolute;
+  top: -44rpx;
+  right: -42rpx;
+  width: 130rpx;
+  height: 130rpx;
+  border: 15rpx solid rgba(255,255,255,.35);
+  border-radius: 50%;
+  content: "";
+}
+
+.spotlight-top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.spotlight-top > text {
+  color: rgba(21,27,58,.52);
+  font-size: 18rpx;
+  font-weight: 900;
+  letter-spacing: 2rpx;
+}
+
+.spotlight-icon {
+  display: grid;
+  width: 56rpx;
+  height: 56rpx;
+  place-items: center;
+  border: 3rpx solid var(--color-ink);
+  border-radius: 14rpx;
+  background: rgba(255,255,255,.66);
+  color: var(--color-ink);
+  font-size: 28rpx;
+  font-weight: 900;
+}
+
+.crate-icon {
+  background: #ffe694;
+}
+
+.spotlight-name {
+  margin-top: 20rpx;
+  color: var(--color-ink);
+  font-size: 29rpx;
+  font-weight: 900;
+}
+
+.spotlight-desc {
+  max-width: 245rpx;
+  margin-top: 5rpx;
+  color: rgba(21,27,58,.68);
+  font-size: 19rpx;
+  line-height: 1.35;
+}
+
+.spotlight-arrow {
+  position: absolute;
+  right: 18rpx;
+  bottom: 17rpx;
+  display: grid;
+  width: 43rpx;
+  height: 43rpx;
+  place-items: center;
+  border: 3rpx solid var(--color-ink);
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--color-ink);
+  font-size: 25rpx;
+  font-weight: 900;
+}
+
 .library-count {
   color: var(--color-muted);
   font-size: 22rpx;

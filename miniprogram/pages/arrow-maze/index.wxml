@@ -1,0 +1,75 @@
+<view class="page-shell arrow-page">
+  <view class="game-heading">
+    <view>
+      <view class="page-kicker">VECTOR ROUTE · 罗盘航线</view>
+      <view class="page-title">箭头迷宫</view>
+      <view class="page-subtitle">沿当前箭头方向跳格，选择远近不同的落点抵达出口。</view>
+    </view>
+    <view class="compass-mark"><view class="compass-needle"></view></view>
+  </view>
+
+  <view class="compact-controls surface">
+    <view class="control-row two-columns">
+      <button class="{{mode === item.value ? 'active mode-active' : ''}}" wx:for="{{modeOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="switchMode">{{item.label}}</button>
+    </view>
+    <view class="control-row three-columns">
+      <button class="{{difficulty === item.value ? 'active difficulty-active' : ''}}" wx:for="{{difficultyOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="switchDifficulty">{{item.label}}</button>
+    </view>
+  </view>
+
+  <view class="loading-state" wx:if="{{loading}}">正在校准罗盘与出口…</view>
+
+  <block wx:else>
+    <view class="arrow-status status-strip">
+      <view><text>用时</text><text>{{elapsedText}}</text></view>
+      <view><text>步数</text><text>{{steps}}</text></view>
+      <view><text>偏航</text><text>{{mistakes}}</text></view>
+    </view>
+
+    <view class="route-caption">
+      <view class="route-copy"><text>从 S 到出口</text><text>最短路线约 {{board.optimal_steps}} 步</text></view>
+      <view class="route-actions" wx:if="{{!completed}}">
+        <button class="hint-action" bindtap="showHint" disabled="{{hinting || submitting}}">{{hinting ? '校准中' : '提示'}}</button>
+        <button bindtap="undoStep" disabled="{{!canUndo || submitting}}">撤回</button>
+        <button bindtap="resetPath" disabled="{{submitting}}">重置</button>
+      </view>
+    </view>
+
+    <view class="arrow-board columns-{{board.columns}}" style="grid-template-columns: repeat({{board.columns}}, minmax(0, 1fr));">
+      <button
+        class="arrow-cell {{item.visited ? 'visited' : ''}} {{item.current ? 'current' : ''}} {{item.reachable ? 'reachable' : ''}} {{item.start ? 'start' : ''}} {{item.target ? 'target' : ''}} {{item.hinted ? 'hinted' : ''}}"
+        wx:for="{{cells}}"
+        wx:key="index"
+        data-index="{{item.index}}"
+        bindtap="tapCell"
+        disabled="{{submitting}}"
+      >
+        <text class="arrow-glyph">{{item.start && !item.visited ? 'S' : item.arrow}}</text>
+        <text class="step-dot" wx:if="{{item.visited && !item.current}}">{{item.stepNumber - 1}}</text>
+        <text class="current-dot" wx:if="{{item.current}}">{{item.start && steps === 0 ? 'S' : '●'}}</text>
+      </button>
+    </view>
+
+    <view class="route-feedback {{hintActive ? 'hint-active' : ''}}">
+      <view class="route-pulse"></view>
+      <text>{{instruction}}</text>
+    </view>
+
+    <view class="route-legend" wx:if="{{!completed}}">
+      <view><text class="legend-swatch reachable"></text><text>可落点</text></view>
+      <view><text class="legend-swatch visited"></text><text>已走过</text></view>
+      <view><text class="legend-swatch target"></text><text>出口</text></view>
+    </view>
+
+    <view class="complete-panel route-complete surface" wx:if="{{completed && result}}">
+      <view class="route-finish">◎</view>
+      <view class="complete-title">航线抵达出口</view>
+      <view class="complete-stars">{{result.stars === 3 ? '★★★' : result.stars === 2 ? '★★☆' : '★☆☆'}}</view>
+      <view class="complete-detail">{{result.moves}} 步 · 最短 {{result.optimal_steps}} 步 · {{result.score}} 分</view>
+      <view class="complete-actions">
+        <button class="secondary-button" bindtap="goHub">返回首页</button>
+        <button class="primary-button" bindtap="newBoard">再走一盘</button>
+      </view>
+    </view>
+  </block>
+</view>

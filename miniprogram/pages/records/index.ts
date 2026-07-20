@@ -8,6 +8,9 @@ const routes: Record<PuzzleGameKey, string> = {
   idiom: "/pages/idiom/index",
   memory: "/pages/memory/index",
   word_search: "/pages/word-search/index",
+  poetry: "/pages/poetry/index",
+  sokoban: "/pages/sokoban/index",
+  arrow_maze: "/pages/arrow-maze/index",
 };
 
 const marks: Record<PuzzleGameKey, string> = {
@@ -16,6 +19,9 @@ const marks: Record<PuzzleGameKey, string> = {
   idiom: "成",
   memory: "记",
   word_search: "连",
+  poetry: "诗",
+  sokoban: "箱",
+  arrow_maze: "箭",
 };
 
 function formatPlayedAt(value: string | null): string {
@@ -33,7 +39,7 @@ Page({
     loading: true,
     totalStars: 0,
     completedToday: 0,
-    availableGames: 5,
+    availableGames: 8,
     records: [] as Array<GameOverviewItem & { mark: string; playedText: string }>,
   },
 
@@ -52,7 +58,7 @@ Page({
       this.setData({
         totalStars: Number(overview.summary.total_stars || 0),
         completedToday: Number(overview.summary.completed_today || 0),
-        availableGames: Number(overview.summary.available_games || 5),
+        availableGames: Number(overview.summary.available_games || 8),
         records: overview.games.map((item) => ({
           ...item,
           mark: marks[item.key],

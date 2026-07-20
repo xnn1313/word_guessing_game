@@ -113,7 +113,15 @@ export interface BattleState {
   };
 }
 
-export type PuzzleGameKey = "word" | "sudoku" | "idiom" | "memory" | "word_search";
+export type PuzzleGameKey =
+  | "word"
+  | "sudoku"
+  | "idiom"
+  | "memory"
+  | "word_search"
+  | "poetry"
+  | "sokoban"
+  | "arrow_maze";
 export type PuzzleDifficulty = "easy" | "medium" | "hard";
 export type PuzzleRunMode = "daily" | "practice" | "level";
 export type MemoryTheme =
@@ -145,6 +153,7 @@ export interface GamesOverview {
   server_date: string;
   summary: {
     available_games: number;
+    daily_total: number;
     completed_today: number;
     total_stars: number;
     last_game_key: PuzzleGameKey | null;
@@ -340,10 +349,99 @@ export interface PuzzleCompletionResult {
   mistakes?: number;
   hints_used?: number;
   moves?: number;
+  pushes?: number;
+  optimal_steps?: number;
+  correct_count?: number;
+  total_questions?: number;
   earned_stars?: number;
   total_stars?: number;
   next_level_id?: string | null;
   is_new_best: boolean;
+}
+
+export interface PoetryQuestion {
+  id: string;
+  type: "next" | "previous" | "author" | "title" | "dynasty";
+  prompt: string;
+  context: string;
+  options: string[];
+  index: number;
+  total: number;
+}
+
+export interface PoetrySavedState {
+  question_index: number;
+  correct_count: number;
+  elapsed_seconds: number;
+  hints_used: number;
+  mistakes: number;
+}
+
+export interface PoetryQuizResponse {
+  puzzle_id: string;
+  mode: "daily" | "practice";
+  puzzle_date: string | null;
+  difficulty: PuzzleDifficulty;
+  question_count: number;
+  catalog_size: number;
+  rotation_days: number;
+  question: PoetryQuestion;
+  run_id: string | null;
+  saved_state: PoetrySavedState | null;
+}
+
+export interface PoetryAnswerResponse {
+  correct: boolean;
+  status: "playing" | "completed";
+  correct_answer?: string;
+  explanation?: string;
+  correct_count?: number;
+  mistakes?: number;
+  next_question?: PoetryQuestion;
+  result?: PuzzleCompletionResult;
+}
+
+export interface SokobanSavedState {
+  history: string;
+  elapsed_seconds: number;
+  hints_used: number;
+  mistakes: number;
+}
+
+export interface SokobanBoardResponse {
+  puzzle_id: string;
+  mode: "daily" | "practice";
+  puzzle_date: string | null;
+  difficulty: PuzzleDifficulty;
+  rows: number;
+  columns: number;
+  board: string[];
+  box_count: number;
+  par_pushes: number;
+  run_id: string | null;
+  saved_state: SokobanSavedState | null;
+}
+
+export interface ArrowMazeSavedState {
+  path: number[];
+  elapsed_seconds: number;
+  hints_used: number;
+  mistakes: number;
+}
+
+export interface ArrowMazeBoardResponse {
+  puzzle_id: string;
+  mode: "daily" | "practice";
+  puzzle_date: string | null;
+  difficulty: PuzzleDifficulty;
+  rows: number;
+  columns: number;
+  grid: string[];
+  start_index: number;
+  target_index: number;
+  optimal_steps: number;
+  run_id: string | null;
+  saved_state: ArrowMazeSavedState | null;
 }
 
 export interface PuzzleSubmitResponse {

@@ -1,0 +1,41 @@
+.poetry-page { padding-bottom: calc(48rpx + env(safe-area-inset-bottom)); }
+.game-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 22rpx; }
+.poetry-seal { display: grid; width: 86rpx; height: 86rpx; flex: 0 0 auto; place-items: center; border: 5rpx double #ffffff; border-radius: 18rpx; background: var(--color-coral); box-shadow: 5rpx 5rpx 0 var(--color-ink); color: #ffffff; font-family: "STKaiti", "KaiTi", serif; font-size: 43rpx; font-weight: 900; transform: rotate(3deg); }
+.compact-controls { margin-top: 22rpx; padding: 10rpx; border-radius: 22rpx; box-shadow: 5rpx 5rpx 0 var(--color-ink); }
+.control-row { display: grid; gap: 8rpx; }
+.control-row + .control-row { margin-top: 8rpx; }
+.two-columns { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.three-columns { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.control-row button { display: flex; height: 68rpx; align-items: center; justify-content: center; border: 3rpx solid transparent; border-radius: 13rpx; color: var(--color-muted); font-size: 21rpx; font-weight: 850; }
+.control-row button.active { border-color: var(--color-ink); color: var(--color-ink); box-shadow: 3rpx 3rpx 0 var(--color-ink); }
+.control-row button.mode-active { background: var(--color-primary); color: #ffffff; }
+.control-row button.difficulty-active { background: var(--color-yellow); }
+.poetry-status { margin-top: 19rpx; }
+.quiz-progress { height: 9rpx; margin: 16rpx 8rpx 0; overflow: hidden; border: 2rpx solid var(--color-ink); border-radius: 99rpx; background: #ffffff; }
+.quiz-progress view { height: 100%; border-radius: inherit; background: var(--color-coral); transition: width 220ms ease; }
+.question-sheet { position: relative; margin-top: 20rpx; padding: 32rpx 27rpx 25rpx; border: 3rpx solid var(--color-ink); border-radius: 25rpx; background: #fffdf5; box-shadow: 7rpx 7rpx 0 var(--color-ink); }
+.question-sheet::before { position: absolute; top: 0; right: 28rpx; left: 28rpx; height: 12rpx; border-right: 2rpx solid rgba(21,27,58,.12); border-left: 2rpx solid rgba(21,27,58,.12); background: repeating-linear-gradient(90deg,transparent 0,transparent 22rpx,rgba(21,27,58,.09) 23rpx,transparent 24rpx); content: ""; }
+.sheet-pin { position: absolute; top: -13rpx; left: 50%; width: 65rpx; height: 24rpx; border: 3rpx solid var(--color-ink); border-radius: 99rpx; background: var(--color-aqua); transform: translateX(-50%); }
+.question-meta { display: flex; align-items: center; justify-content: space-between; gap: 14rpx; color: var(--color-muted); font-size: 20rpx; font-weight: 800; }
+.question-meta text:last-child { color: var(--color-coral); }
+.poem-context { min-height: 142rpx; display: flex; align-items: center; justify-content: center; padding: 22rpx 8rpx 18rpx; color: var(--color-ink); font-family: "STKaiti", "KaiTi", "Songti SC", serif; font-size: 39rpx; font-weight: 700; line-height: 1.58; text-align: center; white-space: pre-line; }
+.option-list { display: grid; gap: 11rpx; }
+.option-card { display: flex; width: 100%; min-height: 76rpx; align-items: center; gap: 16rpx; padding: 12rpx 17rpx; border: 3rpx solid var(--color-border); border-radius: 16rpx; background: #ffffff; color: var(--color-ink); font-size: 24rpx; font-weight: 750; line-height: 1.35; text-align: left; }
+.option-marker { display: grid; width: 39rpx; height: 39rpx; flex: 0 0 auto; place-items: center; border: 2rpx solid var(--color-ink); border-radius: 10rpx; background: var(--color-primary-soft); font-size: 19rpx; font-weight: 900; }
+.option-card.selected { border-color: var(--color-primary); background: var(--color-primary-soft); }
+.option-card.correct { border-color: var(--color-success); background: var(--color-aqua-soft); }
+.option-card.wrong { border-color: var(--color-danger); background: var(--color-coral-soft); }
+.answer-feedback { display: flex; min-height: 58rpx; align-items: center; justify-content: center; gap: 10rpx; margin-top: 15rpx; color: var(--color-muted); font-size: 19rpx; font-weight: 700; text-align: center; }
+.feedback-mark { display: grid; width: 30rpx; height: 30rpx; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--color-border); color: #ffffff; font-size: 20rpx; font-weight: 900; }
+.answer-feedback.correct { color: var(--color-success); }
+.answer-feedback.correct .feedback-mark { background: var(--color-success); }
+.answer-feedback.wrong { color: var(--color-danger); }
+.answer-feedback.wrong .feedback-mark { background: var(--color-danger); }
+.poetry-complete { position: relative; margin-top: 26rpx; padding: 38rpx 27rpx 28rpx; text-align: center; }
+.completion-seal { display: grid; width: 72rpx; height: 72rpx; margin: -8rpx auto 16rpx; place-items: center; border: 4rpx double #ffffff; border-radius: 16rpx; background: var(--color-coral); color: #ffffff; font-family: "STKaiti", "KaiTi", serif; font-size: 36rpx; font-weight: 900; }
+.complete-title { color: var(--color-ink); font-size: 34rpx; font-weight: 900; }
+.complete-stars { margin-top: 7rpx; color: var(--color-warning); font-size: 40rpx; letter-spacing: 5rpx; }
+.complete-detail { margin: 7rpx 0 22rpx; color: var(--color-muted); font-size: 21rpx; }
+.complete-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12rpx; }
+@media (max-height: 700px) { .poetry-page .page-subtitle { display: none; } .compact-controls { margin-top: 14rpx; } .control-row button { height: 62rpx; } .poem-context { min-height: 112rpx; font-size: 35rpx; } .option-card { min-height: 68rpx; } }
+@media (prefers-reduced-motion: reduce) { .quiz-progress view { transition-duration: .01ms !important; } }

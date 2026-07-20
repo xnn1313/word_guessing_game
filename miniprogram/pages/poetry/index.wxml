@@ -1,0 +1,63 @@
+<view class="page-shell poetry-page">
+  <view class="game-heading">
+    <view>
+      <view class="page-kicker">POETRY SALON · 今日雅集</view>
+      <view class="page-title">诗词大会</view>
+      <view class="page-subtitle" wx:if="{{quiz}}">{{quiz.catalog_size}} 首分级题库 · 本局 {{quiz.question_count}} 题 · {{quiz.rotation_days}} 天轮换</view>
+      <view class="page-subtitle" wx:else>大题库分级轮换，每天都是一组新题签。</view>
+    </view>
+    <view class="poetry-seal">诗</view>
+  </view>
+
+  <view class="compact-controls surface">
+    <view class="control-row two-columns">
+      <button class="{{mode === item.value ? 'active mode-active' : ''}}" wx:for="{{modeOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="switchMode">{{item.label}}</button>
+    </view>
+    <view class="control-row three-columns">
+      <button class="{{difficulty === item.value ? 'active difficulty-active' : ''}}" wx:for="{{difficultyOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="switchDifficulty">{{item.label}}</button>
+    </view>
+  </view>
+
+  <view class="loading-state" wx:if="{{loading}}">正在展开今日题签…</view>
+
+  <block wx:else>
+    <view class="poetry-status status-strip">
+      <view><text>用时</text><text>{{elapsedText}}</text></view>
+      <view><text>题签</text><text>{{questionNumber}} / {{question.total}}</text></view>
+      <view><text>答对</text><text>{{correctCount}}</text></view>
+    </view>
+
+    <view class="quiz-progress"><view style="width: {{progressPercent}}%"></view></view>
+
+    <view class="question-sheet" wx:if="{{!completed && question}}">
+      <view class="sheet-pin"></view>
+      <view class="question-meta"><text>第 {{questionNumber}} 题</text><text>{{question.prompt}}</text></view>
+      <view class="poem-context">{{question.context}}</view>
+      <view class="option-list">
+        <button
+          class="option-card {{selectedAnswer === item ? 'selected' : ''}} {{correctAnswer === item ? 'correct' : ''}} {{selectedAnswer === item && correctAnswer && correctAnswer !== item ? 'wrong' : ''}}"
+          wx:for="{{question.options}}"
+          wx:key="*this"
+          data-answer="{{item}}"
+          bindtap="chooseAnswer"
+          disabled="{{submitting}}"
+        ><text class="option-marker">{{index + 1}}</text><text>{{item}}</text></button>
+      </view>
+      <view class="answer-feedback {{feedbackTone}}">
+        <view class="feedback-mark">{{feedbackTone === 'correct' ? '✓' : feedbackTone === 'wrong' ? '×' : '·'}}</view>
+        <text>{{feedbackText}}</text>
+      </view>
+    </view>
+
+    <view class="complete-panel poetry-complete surface" wx:if="{{completed && result}}">
+      <view class="completion-seal">成</view>
+      <view class="complete-title">本场雅集完成</view>
+      <view class="complete-stars">{{result.stars === 3 ? '★★★' : result.stars === 2 ? '★★☆' : '★☆☆'}}</view>
+      <view class="complete-detail">答对 {{result.correct_count}} / {{result.total_questions}} · {{result.score}} 分 · {{elapsedText}}</view>
+      <view class="complete-actions">
+        <button class="secondary-button" bindtap="goHub">返回首页</button>
+        <button class="primary-button" bindtap="newQuiz">再来一组</button>
+      </view>
+    </view>
+  </block>
+</view>

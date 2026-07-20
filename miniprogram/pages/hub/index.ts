@@ -20,9 +20,10 @@ Page({
     avatarText: "游",
     loading: false,
     trainingLabel: "今日脑力训练",
-    trainingValue: "0 / 4 完成",
+    trainingValue: "0 / 7 完成",
     trainingNote: "挑一个游戏，为今天的大脑热热身",
-    availableGames: 5,
+    availableGames: 8,
+    dailyTotal: 7,
     completedToday: 0,
     totalStars: 0,
     wordGame: fallbackGame("word", "猜词实验室"),
@@ -30,6 +31,9 @@ Page({
     idiomGame: fallbackGame("idiom", "成语填字"),
     memoryGame: fallbackGame("memory", "记忆翻牌"),
     wordSearchGame: fallbackGame("word_search", "成语连线"),
+    poetryGame: fallbackGame("poetry", "诗词大会"),
+    sokobanGame: fallbackGame("sokoban", "推箱子"),
+    arrowMazeGame: fallbackGame("arrow_maze", "箭头迷宫"),
   },
 
   onShow() {
@@ -49,12 +53,14 @@ Page({
         GameOverviewItem
       >;
       const completedToday = Number(overview.summary.completed_today || 0);
+      const dailyTotal = Number(overview.summary.daily_total || 7);
       this.setData({
-        availableGames: Number(overview.summary.available_games || 5),
+        availableGames: Number(overview.summary.available_games || 8),
+        dailyTotal,
         completedToday,
         totalStars: Number(overview.summary.total_stars || 0),
         trainingLabel: completedToday ? "今日训练进度" : "今日脑力训练",
-        trainingValue: `${completedToday} / 4 完成`,
+        trainingValue: `${completedToday} / ${dailyTotal} 完成`,
         trainingNote: completedToday
           ? `已获得 ${overview.summary.total_stars || 0} 颗星，继续保持`
           : "挑一个游戏，为今天的大脑热热身",
@@ -63,6 +69,9 @@ Page({
         idiomGame: games.idiom || this.data.idiomGame,
         memoryGame: games.memory || this.data.memoryGame,
         wordSearchGame: games.word_search || this.data.wordSearchGame,
+        poetryGame: games.poetry || this.data.poetryGame,
+        sokobanGame: games.sokoban || this.data.sokobanGame,
+        arrowMazeGame: games.arrow_maze || this.data.arrowMazeGame,
       });
     } catch (error) {
       // 大厅保留本地入口，具体游戏页会显示网络错误。
@@ -89,6 +98,18 @@ Page({
 
   openWordSearch() {
     this.openGame(this.data.wordSearchGame, "/pages/word-search/index");
+  },
+
+  openPoetry() {
+    this.openGame(this.data.poetryGame, "/pages/poetry/index");
+  },
+
+  openSokoban() {
+    this.openGame(this.data.sokobanGame, "/pages/sokoban/index");
+  },
+
+  openArrowMaze() {
+    this.openGame(this.data.arrowMazeGame, "/pages/arrow-maze/index");
   },
 
   openGame(game: GameOverviewItem, url: string) {
