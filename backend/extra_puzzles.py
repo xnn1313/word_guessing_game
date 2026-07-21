@@ -22,6 +22,8 @@ import storage
 
 DIFFICULTIES = ("easy", "medium", "hard")
 MODES = ("daily", "practice")
+BOARD_MODES = ("daily", "level", "practice")
+EXTRA_LEVEL_COUNT = 20
 
 
 # Core public-domain works keep the familiar introductory set at the front of
@@ -71,6 +73,16 @@ POETRY_BANK_PATH = Path(__file__).resolve().parent / "data" / "poetry_bank.json"
 POETRY_QUESTION_COUNTS = {"easy": 12, "medium": 20, "hard": 30}
 POETRY_CATALOG_VERSION = "2026.07-xl"
 POETRY_DYNASTIES = ("先秦", "汉", "魏晋", "唐", "宋", "元", "明", "清")
+POETRY_THEME_RULES = (
+    (("故乡", "乡", "归", "客", "独", "明月"), "借异乡见闻、归意或月色寄托思念与羁旅感受"),
+    (("送", "别", "故人", "孤帆", "长亭", "阳关"), "从送别场景落笔，写人与人之间的不舍和牵挂"),
+    (("关", "塞", "征", "沙场", "胡马", "玉门", "金甲"), "描写边塞与征战，表现守卫、思归或战争带来的复杂情感"),
+    (("春", "花", "柳", "莺", "燕", "东风"), "捕捉春日草木与风物的变化，写出生命萌发和时光流转"),
+    (("秋", "霜", "落叶", "雁", "寒", "暮"), "借秋景与寒意营造氛围，寄托感时、怀人或身世之思"),
+    (("山", "水", "江", "湖", "云", "雨", "雪"), "铺展山水气象，把眼前景色与内心感受交织在一起"),
+    (("田", "农", "禾", "耕", "桑", "锄"), "关注田园与劳作，在日常生活中体会劳动、节令和民生"),
+    (("坚", "志", "不怕", "清白", "千磨", "凌云"), "借物或叙事表达志向，突出坚定、不屈和自我期许"),
+)
 
 
 def _load_external_poems() -> list[tuple[str, str, str, tuple[str, ...], int]]:
@@ -181,6 +193,78 @@ def _select_puzzle_id(
     return f"{game_key}-practice{version}-{difficulty}-{secrets.token_hex(5)}", None
 
 
+def _level_puzzle_id(game_key: str, difficulty: str, level_order: int) -> str:
+    return f"{game_key}-level-{difficulty}-{level_order:02d}"
+
+
+def _level_order_from_puzzle_id(puzzle_id: str, game_key: str, difficulty: str) -> int | None:
+    prefix = f"{game_key}-level-{difficulty}-"
+    if not puzzle_id.startswith(prefix):
+        return None
+    try:
+        level_order = int(puzzle_id[len(prefix) :])
+    except ValueError:
+        return None
+    return level_order if 1 <= level_order <= EXTRA_LEVEL_COUNT else None
+
+
+def get_level_catalog(user, game_key: str) -> dict[str, Any]:
+    if game_key not in {"sokoban", "arrow_maze"}:
+        raise puzzle_games.PuzzleError("不支持的闯关游戏", "INVALID_GAME")
+    progress = storage.get_level_progress(user["id"], game_key) if user else {}
+    difficulties = []
+    total_stars = 0
+    for difficulty in DIFFICULTIES:
+        levels = []
+        previous_completed = True
+        completed_levels = 0
+        for level_order in range(1, EXTRA_LEVEL_COUNT + 1):
+            puzzle_id = _level_puzzle_id(game_key, difficulty, level_order)
+            result = progress.get(puzzle_id, {})
+            stars = int(result.get("stars") or 0)
+            unlocked = level_order == 1 or previous_completed
+            levels.append(
+                {
+                    "order": level_order,
+                    "puzzle_id": puzzle_id,
+                    "unlocked": unlocked,
+                    "stars": stars,
+                    "best_score": result.get("best_score"),
+                }
+            )
+            if stars > 0:
+                completed_levels += 1
+                total_stars += stars
+            previous_completed = stars > 0
+        difficulties.append(
+            {
+                "key": difficulty,
+                "completed_levels": completed_levels,
+                "total_levels": EXTRA_LEVEL_COUNT,
+                "levels": levels,
+            }
+        )
+    return {
+        "game_key": game_key,
+        "total_stars": total_stars,
+        "max_stars": EXTRA_LEVEL_COUNT * len(DIFFICULTIES) * 3,
+        "difficulties": difficulties,
+    }
+
+
+def _select_board_puzzle_id(user, game_key: str, mode: str, difficulty: str, fresh: bool, level_order):
+    if mode != "level":
+        puzzle_id, date = _select_puzzle_id(user, game_key, mode, difficulty, fresh)
+        return puzzle_id, date, None
+    order = _integer({"level_order": level_order}, "level_order", 1, EXTRA_LEVEL_COUNT, 1)
+    if user:
+        catalog = get_level_catalog(user, game_key)
+        difficulty_catalog = next(item for item in catalog["difficulties"] if item["key"] == difficulty)
+        if not difficulty_catalog["levels"][order - 1]["unlocked"]:
+            raise puzzle_games.PuzzleError("请先完成上一关", "LEVEL_LOCKED", 403)
+    return _level_puzzle_id(game_key, difficulty, order), None, order
+
+
 def ensure_daily_puzzles() -> None:
     for game_key in ("poetry", "sokoban", "arrow_maze"):
         _daily_id(game_key, "medium")
@@ -283,6 +367,19 @@ def _poetry_questions(puzzle_id: str, difficulty: str) -> list[dict[str, Any]]:
         rng.shuffle(distractors)
         options = [answer, *distractors[:3]]
         rng.shuffle(options)
+        poem_text = "".join(lines)
+        matched_terms = []
+        theme_notes = []
+        for keywords, note in POETRY_THEME_RULES:
+            hits = [keyword for keyword in keywords if keyword in poem_text]
+            if hits:
+                matched_terms.extend(hit for hit in hits if hit not in matched_terms)
+                if note not in theme_notes:
+                    theme_notes.append(note)
+            if len(theme_notes) >= 2:
+                break
+        meaning = "；也".join(theme_notes) if theme_notes else "从具体的人、事、景落笔，把画面、动作和情感凝练在诗句中"
+        excerpt_lines = list(lines[:6])
         questions.append(
             {
                 "id": f"{puzzle_id}:{index}",
@@ -292,6 +389,12 @@ def _poetry_questions(puzzle_id: str, difficulty: str) -> list[dict[str, Any]]:
                 "options": options,
                 "answer": answer,
                 "explanation": f"{dynasty} · {author}《{title}》",
+                "study": {
+                    "source": f"{dynasty} · {author}《{title}》",
+                    "excerpt": "\n".join(excerpt_lines),
+                    "meaning": f"这首作品{meaning}。把本题句子放回完整语境中读，更容易理解句序和作者要表达的情绪。",
+                    "key_terms": "、".join(matched_terms[:5]) if matched_terms else "画面、动作、语气、情感",
+                },
             }
         )
     return questions
@@ -389,6 +492,7 @@ def submit_poetry(user, data):
         "correct": correct,
         "correct_answer": question["answer"],
         "explanation": question["explanation"],
+        "study": question["study"],
         "correct_count": correct_count,
         "mistakes": mistakes,
     }
@@ -560,10 +664,12 @@ def _sokoban_replay(level, history: str):
     return {"player": player, "boxes": boxes, "moves": moves, "pushes": pushes}
 
 
-def get_sokoban(user, mode, difficulty, fresh=False):
-    mode = _choice(mode, MODES, "mode")
+def get_sokoban(user, mode, difficulty, fresh=False, level_order=None):
+    mode = _choice(mode, BOARD_MODES, "mode")
     difficulty = _choice(difficulty, DIFFICULTIES, "difficulty")
-    puzzle_id, date = _select_puzzle_id(user, "sokoban", mode, difficulty, fresh)
+    puzzle_id, date, selected_level = _select_board_puzzle_id(
+        user, "sokoban", mode, difficulty, fresh, level_order
+    )
     level = _generate_sokoban(puzzle_id, difficulty)
     run = puzzle_games._run_for_puzzle(user, "sokoban", puzzle_id, mode, difficulty, {"history": ""})
     return {
@@ -571,6 +677,8 @@ def get_sokoban(user, mode, difficulty, fresh=False):
         "mode": mode,
         "puzzle_date": date,
         "difficulty": difficulty,
+        "level_order": selected_level,
+        "level_count": EXTRA_LEVEL_COUNT if mode == "level" else None,
         "rows": level["size"],
         "columns": level["size"],
         "board": _sokoban_rows(level),
@@ -630,6 +738,10 @@ def submit_sokoban(user, data):
         "mistakes": mistakes,
         "is_new_best": bool(user and puzzle_games._is_new_best(user["id"], "sokoban", score)),
     }
+    level_order = _level_order_from_puzzle_id(puzzle_id, "sokoban", difficulty)
+    if level_order:
+        result["level_order"] = level_order
+        result["next_level_order"] = level_order + 1 if level_order < EXTRA_LEVEL_COUNT else None
     if run:
         completed, saved_run = storage.complete_game_run(
             run["id"], user["id"], {"history": history, "result": result}, elapsed, 0, mistakes, score, stars
@@ -724,10 +836,12 @@ def _validate_arrow_path(path, grid, size):
     return normalized
 
 
-def get_arrow_maze(user, mode, difficulty, fresh=False):
-    mode = _choice(mode, MODES, "mode")
+def get_arrow_maze(user, mode, difficulty, fresh=False, level_order=None):
+    mode = _choice(mode, BOARD_MODES, "mode")
     difficulty = _choice(difficulty, DIFFICULTIES, "difficulty")
-    puzzle_id, date = _select_puzzle_id(user, "arrow_maze", mode, difficulty, fresh)
+    puzzle_id, date, selected_level = _select_board_puzzle_id(
+        user, "arrow_maze", mode, difficulty, fresh, level_order
+    )
     grid, solution = _generate_arrow_maze(puzzle_id, difficulty)
     size = ARROW_SETTINGS[difficulty]["size"]
     run = puzzle_games._run_for_puzzle(user, "arrow_maze", puzzle_id, mode, difficulty, {"path": [0]})
@@ -736,6 +850,8 @@ def get_arrow_maze(user, mode, difficulty, fresh=False):
         "mode": mode,
         "puzzle_date": date,
         "difficulty": difficulty,
+        "level_order": selected_level,
+        "level_count": EXTRA_LEVEL_COUNT if mode == "level" else None,
         "rows": size,
         "columns": size,
         "grid": _arrow_public_grid(grid, size),
@@ -812,6 +928,10 @@ def submit_arrow_maze(user, data):
         "mistakes": mistakes,
         "is_new_best": bool(user and puzzle_games._is_new_best(user["id"], "arrow_maze", score)),
     }
+    level_order = _level_order_from_puzzle_id(puzzle_id, "arrow_maze", difficulty)
+    if level_order:
+        result["level_order"] = level_order
+        result["next_level_order"] = level_order + 1 if level_order < EXTRA_LEVEL_COUNT else None
     if run:
         completed, saved_run = storage.complete_game_run(
             run["id"], user["id"], {"path": path, "result": result}, elapsed, hints, mistakes, score, stars

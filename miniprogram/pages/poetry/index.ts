@@ -3,6 +3,7 @@ import type {
   PoetryQuestion,
   PoetryQuizResponse,
   PoetrySavedState,
+  PoetryStudyNote,
   PuzzleCompletionResult,
   PuzzleDifficulty,
 } from "../../types/api";
@@ -21,13 +22,10 @@ import {
 import { request, showRequestError } from "../../utils/request";
 
 let clockTimer: any = null;
-let feedbackTimer: any = null;
 
 function stopTimers(): void {
   if (clockTimer) clearInterval(clockTimer);
-  if (feedbackTimer) clearTimeout(feedbackTimer);
   clockTimer = null;
-  feedbackTimer = null;
 }
 
 function formatTime(seconds: number): string {
@@ -56,6 +54,11 @@ Page({
     correctAnswer: "",
     feedbackTone: "" as "" | "correct" | "wrong",
     feedbackText: "请选择你认为正确的答案",
+    answerRevealed: false,
+    study: null as PoetryStudyNote | null,
+    pendingNextQuestion: null as PoetryQuestion | null,
+    pendingResult: null as PuzzleCompletionResult | null,
+    continueLabel: "下一题",
     completed: false,
     result: null as PuzzleCompletionResult | null,
     modeOptions: [
@@ -74,7 +77,7 @@ Page({
   },
 
   onShow() {
-    if (this.data.quiz && !this.data.completed) this.startClock();
+    if (this.data.quiz && !this.data.completed && !this.data.answerRevealed) this.startClock();
   },
 
   onHide() {
@@ -108,6 +111,11 @@ Page({
       correctAnswer: "",
       feedbackTone: "",
       feedbackText: "请选择你认为正确的答案",
+      answerRevealed: false,
+      study: null,
+      pendingNextQuestion: null,
+      pendingResult: null,
+      continueLabel: "下一题",
     });
     try {
       const guestSlot = `${this.data.mode}:${this.data.difficulty}`;
@@ -161,18 +169,21 @@ Page({
 
   persistGuestState() {
     if (isLoggedIn() || !this.data.puzzleId || !this.data.question) return;
+    const savedQuestion = this.data.answerRevealed && this.data.pendingNextQuestion
+      ? this.data.pendingNextQuestion
+      : this.data.question;
     saveGuestPuzzleState("poetry", this.data.puzzleId, {
-      question_index: this.data.question.index,
+      question_index: savedQuestion.index,
       correct_count: this.data.correctCount,
       elapsed_seconds: this.data.elapsedSeconds,
       hints_used: 0,
       mistakes: this.data.mistakes,
-      question: this.data.question,
+      question: savedQuestion,
     });
   },
 
   async saveProgress(silent = false) {
-    if (!this.data.puzzleId || this.data.completed) return;
+    if (!this.data.puzzleId || this.data.completed || this.data.answerRevealed) return;
     this.persistGuestState();
     if (!isLoggedIn() || !this.data.runId || !this.data.question) return;
     const state: PoetrySavedState = {
@@ -208,7 +219,7 @@ Page({
   async chooseAnswer(event: any) {
     const question = this.data.question;
     const answer = String(event.currentTarget.dataset.answer || "");
-    if (!question || this.data.submitting || this.data.completed || !answer) return;
+    if (!question || this.data.submitting || this.data.completed || this.data.answerRevealed || !answer) return;
     this.setData({ submitting: true, selectedAnswer: answer });
     try {
       const response = await request<PoetryAnswerResponse>("/poetry/submit", {
@@ -232,10 +243,20 @@ Page({
         mistakes,
         correctAnswer: response.correct_answer || "",
         feedbackTone: response.correct ? "correct" : "wrong",
-        feedbackText: response.correct
-          ? `答对了 · ${response.explanation || "继续保持"}`
-          : `正确答案：${response.correct_answer || ""}`,
+        feedbackText: response.correct ? "答对了，顺便读懂这首诗" : `正确答案：${response.correct_answer || ""}`,
+        answerRevealed: true,
+        study: response.study || {
+          source: response.explanation || "作品出处",
+          excerpt: `${question.context} · ${response.correct_answer || ""}`,
+          meaning: "把上下句放在一起读，先看诗中写了什么画面，再体会作者的语气和情感。",
+          key_terms: "结合题目与完整诗句理解",
+        },
+        pendingNextQuestion: response.next_question || null,
+        pendingResult: response.result || null,
+        continueLabel: response.status === "completed" ? "查看本局成绩" : "读懂了，下一题",
+        submitting: false,
       });
+      stopTimers();
       clearCloudPuzzleShadow("poetry", this.data.puzzleId);
       const confirmedQuestionIndex = response.next_question?.index ?? question.total;
       this.setData({
@@ -248,32 +269,44 @@ Page({
         } : null,
       });
       if (response.status === "completed" && response.result) {
-        feedbackTimer = setTimeout(() => this.finishQuiz(response.result!), 760);
+        this.finishQuiz(response.result, true);
         return;
       }
-      if (response.next_question) {
-        feedbackTimer = setTimeout(() => {
-          const next = response.next_question!;
-          this.setData({
-            question: next,
-            questionNumber: next.index + 1,
-            progressPercent: Math.round((next.index / next.total) * 100),
-            selectedAnswer: "",
-            correctAnswer: "",
-            feedbackTone: "",
-            feedbackText: "请选择你认为正确的答案",
-            submitting: false,
-          });
-          this.persistGuestState();
-        }, 760);
-      }
+      this.persistGuestState();
     } catch (error) {
       this.setData({ submitting: false, selectedAnswer: "" });
       showRequestError(error, "答案提交失败");
     }
   },
 
-  finishQuiz(result: PuzzleCompletionResult) {
+  continueQuiz() {
+    if (!this.data.answerRevealed) return;
+    if (this.data.completed) {
+      this.setData({ answerRevealed: false });
+      return;
+    }
+    const next = this.data.pendingNextQuestion;
+    if (!next) return;
+    this.setData({
+      question: next,
+      questionNumber: next.index + 1,
+      progressPercent: Math.round((next.index / next.total) * 100),
+      selectedAnswer: "",
+      correctAnswer: "",
+      feedbackTone: "",
+      feedbackText: "请选择你认为正确的答案",
+      answerRevealed: false,
+      study: null,
+      pendingNextQuestion: null,
+      pendingResult: null,
+      continueLabel: "下一题",
+      submitting: false,
+    });
+    this.persistGuestState();
+    this.startClock();
+  },
+
+  finishQuiz(result: PuzzleCompletionResult, keepStudy = false) {
     if (clockTimer) clearInterval(clockTimer);
     clockTimer = null;
     clearGuestPuzzleState("poetry", this.data.puzzleId);
@@ -283,6 +316,7 @@ Page({
       result,
       progressPercent: 100,
       submitting: false,
+      answerRevealed: keepStudy,
     });
   },
 

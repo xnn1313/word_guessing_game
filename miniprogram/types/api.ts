@@ -356,6 +356,8 @@ export interface PuzzleCompletionResult {
   earned_stars?: number;
   total_stars?: number;
   next_level_id?: string | null;
+  level_order?: number;
+  next_level_order?: number | null;
   is_new_best: boolean;
 }
 
@@ -390,11 +392,19 @@ export interface PoetryQuizResponse {
   saved_state: PoetrySavedState | null;
 }
 
+export interface PoetryStudyNote {
+  source: string;
+  excerpt: string;
+  meaning: string;
+  key_terms: string;
+}
+
 export interface PoetryAnswerResponse {
   correct: boolean;
   status: "playing" | "completed";
   correct_answer?: string;
   explanation?: string;
+  study?: PoetryStudyNote;
   correct_count?: number;
   mistakes?: number;
   next_question?: PoetryQuestion;
@@ -410,9 +420,11 @@ export interface SokobanSavedState {
 
 export interface SokobanBoardResponse {
   puzzle_id: string;
-  mode: "daily" | "practice";
+  mode: "daily" | "level" | "practice";
   puzzle_date: string | null;
   difficulty: PuzzleDifficulty;
+  level_order: number | null;
+  level_count: number | null;
   rows: number;
   columns: number;
   board: string[];
@@ -431,9 +443,11 @@ export interface ArrowMazeSavedState {
 
 export interface ArrowMazeBoardResponse {
   puzzle_id: string;
-  mode: "daily" | "practice";
+  mode: "daily" | "level" | "practice";
   puzzle_date: string | null;
   difficulty: PuzzleDifficulty;
+  level_order: number | null;
+  level_count: number | null;
   rows: number;
   columns: number;
   grid: string[];
@@ -444,9 +458,31 @@ export interface ArrowMazeBoardResponse {
   saved_state: ArrowMazeSavedState | null;
 }
 
+export interface ExtraLevelItem {
+  order: number;
+  puzzle_id: string;
+  unlocked: boolean;
+  stars: number;
+  best_score: number | null;
+}
+
+export interface ExtraLevelDifficulty {
+  key: PuzzleDifficulty;
+  completed_levels: number;
+  total_levels: number;
+  levels: ExtraLevelItem[];
+}
+
+export interface ExtraLevelCatalog {
+  game_key: "sokoban" | "arrow_maze";
+  total_stars: number;
+  max_stars: number;
+  difficulties: ExtraLevelDifficulty[];
+}
+
 export interface PuzzleSubmitResponse {
   correct: boolean;
-  status: "completed" | "incorrect";
+  status: "completed" | "incorrect" | "playing";
   invalid_cells?: number[];
   unmatched_count?: number;
   result?: PuzzleCompletionResult;

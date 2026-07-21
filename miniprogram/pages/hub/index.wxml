@@ -1,108 +1,85 @@
 <view class="page-shell hub-page">
   <view class="hub-header">
     <view class="hub-heading">
-      <view class="page-kicker">HELLO · {{loggedIn ? username : 'PLAYER'}}</view>
-      <view class="page-title"><text>今天玩点</text><text>不一样的</text></view>
-      <view class="page-subtitle">八款益智游戏，随手挑一块开始。</view>
+      <view class="page-kicker">BRAIN BREAK · {{loggedIn ? username : '随时开玩'}}</view>
+      <view class="page-title"><text>挑一块，</text><text>现在就开动。</text></view>
+      <view class="page-subtitle">八款小游戏，给不同的脑力区域做热身。</view>
     </view>
-    <view class="account-button {{loggedIn ? 'signed' : ''}}" bindtap="openProfile" aria-label="打开个人中心">
-      <view class="account-avatar">{{avatarText}}</view>
+    <view class="header-actions">
+      <button class="share-button" open-type="share" aria-label="分享脑力游乐场">
+        <view class="share-glyph"><view></view><view></view><view></view></view>
+        <text>分享</text>
+      </button>
+      <view class="account-button {{loggedIn ? 'signed' : ''}}" bindtap="openProfile" aria-label="打开个人中心">
+        <view class="account-avatar">{{avatarText}}</view>
+      </view>
     </view>
   </view>
 
   <view class="training-summary">
-    <view class="training-copy">
+    <view class="training-main">
       <text class="training-label">{{trainingLabel}}</text>
       <text class="training-value">{{trainingValue}}</text>
       <text class="training-note">{{trainingNote}}</text>
     </view>
-    <view class="training-ring">
-      <text>{{availableGames}}</text>
-      <text>款可玩</text>
+    <view class="training-stats">
+      <view><text>{{availableGames}}</text><text>款游戏</text></view>
+      <view><text>{{totalStars}}</text><text>颗星星</text></view>
     </view>
   </view>
 
-  <view class="library-heading spotlight-heading">
-    <view><text class="section-title">新玩法</text><text class="section-note">题签 · 仓库 · 罗盘</text></view>
-    <text class="library-count">NEW</text>
-  </view>
-
-  <scroll-view class="spotlight-scroll" scroll-x enhanced show-scrollbar="{{false}}">
-    <view class="spotlight-list">
-      <view class="spotlight-card poetry-spotlight" bindtap="openPoetry" hover-class="card-pressed">
-        <view class="spotlight-top"><view class="spotlight-icon">诗</view><text>01</text></view>
-        <view class="spotlight-name">诗词大会</view>
-        <view class="spotlight-desc">{{poetryGame.progress_text}} · 接句辨作者</view>
-        <view class="spotlight-arrow">→</view>
-      </view>
-      <view class="spotlight-card sokoban-spotlight" bindtap="openSokoban" hover-class="card-pressed">
-        <view class="spotlight-top"><view class="spotlight-icon crate-icon">×</view><text>02</text></view>
-        <view class="spotlight-name">推箱子</view>
-        <view class="spotlight-desc">{{sokobanGame.progress_text}} · 步数挑战</view>
-        <view class="spotlight-arrow">→</view>
-      </view>
-      <view class="spotlight-card arrow-spotlight" bindtap="openArrowMaze" hover-class="card-pressed">
-        <view class="spotlight-top"><view class="spotlight-icon">↗</view><text>03</text></view>
-        <view class="spotlight-name">箭头迷宫</view>
-        <view class="spotlight-desc">{{arrowMazeGame.progress_text}} · 罗盘跳格</view>
-        <view class="spotlight-arrow">→</view>
-      </view>
-    </view>
-  </scroll-view>
-
-  <view class="library-heading classic-heading">
-    <view><text class="section-title">经典训练</text><text class="section-note">每天换一种脑力热身</text></view>
-    <text class="library-count">5 款</text>
+  <view class="library-heading">
+    <view><text class="section-title">游戏积木</text><text class="section-note">每一块，练一种能力</text></view>
+    <text class="library-count">{{availableGames}} 款可玩</text>
   </view>
 
   <view class="game-library">
-    <view class="game-card playable {{wordGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openWordGame" hover-class="card-pressed">
-      <view class="game-icon word">词</view>
-      <view class="game-copy">
-        <text class="game-name">猜词实验室</text>
-        <text class="game-description">{{wordGame.progress_text}} · 好友竞速</text>
-        <view class="game-progress"><view style="width: {{wordGame.progress_percent}}%"></view></view>
-      </view>
-      <view class="game-action {{wordGame.availability === 'available' ? '' : 'status-text'}}">
-        <view class="arrow-icon" wx:if="{{wordGame.availability === 'available'}}"></view>
-        <text wx:else>{{wordGame.availability === 'maintenance' ? '维护' : '待开放'}}</text>
-      </view>
+    <view class="game-card word-card {{wordGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openWordGame" hover-class="card-pressed">
+      <view class="game-card-top"><view class="game-icon">词</view><text>联想</text></view>
+      <view class="game-copy"><text class="game-name">猜词实验室</text><text class="game-description">{{wordGame.progress_text}}</text></view>
+      <view class="game-footer"><view class="game-progress"><view style="width: {{wordGame.progress_percent}}%"></view></view><view class="arrow-icon"></view></view>
     </view>
 
-    <view class="game-card playable {{sudokuGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openSudoku" hover-class="card-pressed">
-      <view class="game-icon sudoku">▦</view>
-      <view class="game-copy"><text class="game-name">每日数独</text><text class="game-description">{{sudokuGame.progress_text}} · 三种难度</text></view>
-      <view class="game-action {{sudokuGame.availability === 'available' ? '' : 'status-text'}}">
-        <view class="arrow-icon" wx:if="{{sudokuGame.availability === 'available'}}"></view>
-        <text wx:else>{{sudokuGame.availability === 'maintenance' ? '维护' : '待开放'}}</text>
-      </view>
+    <view class="game-card sudoku-card {{sudokuGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openSudoku" hover-class="card-pressed">
+      <view class="game-card-top"><view class="game-icon grid-mark"><view></view><view></view><view></view><view></view></view><text>逻辑</text></view>
+      <view class="game-copy"><text class="game-name">每日数独</text><text class="game-description">{{sudokuGame.progress_text}}</text></view>
+      <view class="game-footer"><text>三种难度</text><view class="arrow-icon"></view></view>
     </view>
 
-    <view class="game-card playable {{idiomGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openIdiom" hover-class="card-pressed">
-      <view class="game-icon idiom">成</view>
-      <view class="game-copy"><text class="game-name">成语填字</text><text class="game-description">{{idiomGame.progress_text}} · 连续闯关</text></view>
-      <view class="game-action {{idiomGame.availability === 'available' ? '' : 'status-text'}}">
-        <view class="arrow-icon" wx:if="{{idiomGame.availability === 'available'}}"></view>
-        <text wx:else>{{idiomGame.availability === 'maintenance' ? '维护' : '待开放'}}</text>
-      </view>
+    <view class="game-card idiom-card {{idiomGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openIdiom" hover-class="card-pressed">
+      <view class="game-card-top"><view class="game-icon">成</view><text>词汇</text></view>
+      <view class="game-copy"><text class="game-name">成语填字</text><text class="game-description">{{idiomGame.progress_text}}</text></view>
+      <view class="game-footer"><text>连续闯关</text><view class="arrow-icon"></view></view>
     </view>
 
-    <view class="game-card playable {{memoryGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openMemory" hover-class="card-pressed">
-      <view class="game-icon memory">◫</view>
-      <view class="game-copy"><text class="game-name">记忆翻牌</text><text class="game-description">{{memoryGame.progress_text}} · 专注训练</text></view>
-      <view class="game-action {{memoryGame.availability === 'available' ? '' : 'status-text'}}">
-        <view class="arrow-icon" wx:if="{{memoryGame.availability === 'available'}}"></view>
-        <text wx:else>{{memoryGame.availability === 'maintenance' ? '维护' : '待开放'}}</text>
-      </view>
+    <view class="game-card memory-card {{memoryGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openMemory" hover-class="card-pressed">
+      <view class="game-card-top"><view class="game-icon card-mark"><view></view><view></view></view><text>记忆</text></view>
+      <view class="game-copy"><text class="game-name">记忆翻牌</text><text class="game-description">{{memoryGame.progress_text}}</text></view>
+      <view class="game-footer"><text>专注训练</text><view class="arrow-icon"></view></view>
     </view>
 
-    <view class="game-card word-search-card playable {{wordSearchGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openWordSearch" hover-class="card-pressed">
-      <view class="game-icon word-search">连</view>
-      <view class="game-copy"><text class="game-name">成语连线</text><text class="game-description">{{wordSearchGame.progress_text}} · 横竖斜向字阵</text></view>
-      <view class="game-action {{wordSearchGame.availability === 'available' ? '' : 'status-text'}}">
-        <view class="arrow-icon" wx:if="{{wordSearchGame.availability === 'available'}}"></view>
-        <text wx:else>{{wordSearchGame.availability === 'maintenance' ? '维护' : '待开放'}}</text>
-      </view>
+    <view class="game-card line-card {{wordSearchGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openWordSearch" hover-class="card-pressed">
+      <view class="game-card-top"><view class="game-icon path-mark"><view></view><view></view><view></view></view><text>观察</text></view>
+      <view class="game-copy"><text class="game-name">成语连线</text><text class="game-description">{{wordSearchGame.progress_text}}</text></view>
+      <view class="game-footer"><text>字阵寻踪</text><view class="arrow-icon"></view></view>
+    </view>
+
+    <view class="game-card poetry-card {{poetryGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openPoetry" hover-class="card-pressed">
+      <view class="game-card-top"><view class="game-icon seal-mark">诗</view><text>国学</text></view>
+      <view class="game-copy"><text class="game-name">诗词大会</text><text class="game-description">{{poetryGame.progress_text}}</text></view>
+      <view class="game-footer"><text>答题学习</text><view class="arrow-icon"></view></view>
+    </view>
+
+    <view class="game-card sokoban-card {{sokobanGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openSokoban" hover-class="card-pressed">
+      <view class="game-card-top"><view class="game-icon crate-mark"><view></view><view></view></view><text>规划</text></view>
+      <view class="game-copy"><text class="game-name">推箱子</text><text class="game-description">{{sokobanGame.progress_text}}</text></view>
+      <view class="game-footer"><text>仓库闯关</text><view class="arrow-icon"></view></view>
+    </view>
+
+    <view class="game-card arrow-card {{arrowMazeGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openArrowMaze" hover-class="card-pressed">
+      <view class="game-card-top"><view class="game-icon compass-icon"><view></view></view><text>路线</text></view>
+      <view class="game-copy"><text class="game-name">箭头迷宫</text><text class="game-description">{{arrowMazeGame.progress_text}}</text></view>
+      <view class="game-footer"><text>罗盘闯关</text><view class="arrow-icon"></view></view>
     </view>
   </view>
 

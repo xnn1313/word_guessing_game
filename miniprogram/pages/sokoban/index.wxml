@@ -5,15 +5,30 @@
       <view class="page-title">推箱子</view>
       <view class="page-subtitle">把所有木箱推进标记点。可滑动棋盘，也可使用方向键。</view>
     </view>
-    <view class="warehouse-mark"><view></view><view></view><view></view><view></view></view>
+    <view class="warehouse-mark"><view class="mark-roof"></view><view class="mark-door"><view></view></view></view>
   </view>
 
   <view class="compact-controls surface">
-    <view class="control-row two-columns">
+    <view class="control-row three-columns">
       <button class="{{mode === item.value ? 'active mode-active' : ''}}" wx:for="{{modeOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="switchMode">{{item.label}}</button>
     </view>
     <view class="control-row three-columns">
       <button class="{{difficulty === item.value ? 'active difficulty-active' : ''}}" wx:for="{{difficultyOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="switchDifficulty">{{item.label}}</button>
+    </view>
+    <view class="level-drawer" wx:if="{{mode === 'level'}}">
+      <view class="level-drawer-title"><text>仓库路线</text><text>{{levelCompleted}} / {{levelTotal}} 已完成</text></view>
+      <scroll-view class="level-scroll" scroll-x enhanced show-scrollbar="{{false}}" scroll-into-view="sokoban-level-{{levelOrder}}">
+        <view class="level-list">
+          <button
+            id="sokoban-level-{{item.order}}"
+            class="level-chip {{item.order === levelOrder ? 'current' : ''}} {{item.stars > 0 ? 'completed' : ''}} {{!item.unlocked ? 'locked' : ''}}"
+            wx:for="{{levels}}"
+            wx:key="order"
+            data-order="{{item.order}}"
+            bindtap="selectLevel"
+          ><text>{{item.order}}</text><text>{{item.stars > 0 ? (item.stars === 3 ? '★★★' : item.stars === 2 ? '★★' : '★') : item.unlocked ? '可挑战' : '未解锁'}}</text></button>
+        </view>
+      </scroll-view>
     </view>
   </view>
 
@@ -27,7 +42,7 @@
     </view>
 
     <view class="board-caption">
-      <view><text>{{difficulty === 'easy' ? '小仓库' : difficulty === 'medium' ? '中仓库' : '大仓库'}}</text><text>{{board.rows}}×{{board.columns}} · 建议推动 {{board.par_pushes}} 次</text></view>
+      <view><text wx:if="{{mode === 'level'}}">仓库第 {{levelOrder}} 关</text><text wx:else>{{difficulty === 'easy' ? '小仓库' : difficulty === 'medium' ? '中仓库' : '大仓库'}}</text><text>{{board.rows}}×{{board.columns}} · 建议推动 {{board.par_pushes}} 次</text></view>
       <view class="caption-actions" wx:if="{{!completed}}">
         <button bindtap="undoMove" disabled="{{!history || submitting}}">撤回</button>
         <button bindtap="resetBoard" disabled="{{submitting}}">重置</button>
@@ -41,17 +56,18 @@
       bindtouchend="onTouchEnd"
     >
       <view class="warehouse-cell {{item.wall ? 'wall' : 'floor'}} {{item.target ? 'target' : ''}} {{item.box ? 'box' : ''}} {{item.boxDone ? 'box-done' : ''}} {{item.player ? 'player' : ''}}" wx:for="{{cells}}" wx:key="index">
-        <view class="target-ring" wx:if="{{item.target && !item.box}}"></view>
-        <view class="crate" wx:if="{{item.box}}"><text>×</text></view>
-        <view class="worker" wx:if="{{item.player}}"><view></view></view>
+        <view class="wall-bricks" wx:if="{{item.wall}}"><view></view><view></view><view></view></view>
+        <view class="target-ring" wx:if="{{item.target && !item.box}}"><view></view></view>
+        <view class="crate" wx:if="{{item.box}}"><view class="crate-slat horizontal"></view><view class="crate-slat diagonal-a"></view><view class="crate-slat diagonal-b"></view><view class="crate-bolt a"></view><view class="crate-bolt b"></view><view class="crate-bolt c"></view><view class="crate-bolt d"></view></view>
+        <view class="worker" wx:if="{{item.player}}"><view class="hard-hat"></view><view class="worker-face"><view></view><view></view></view><view class="worker-body"></view></view>
       </view>
     </view>
 
     <view class="move-console" wx:if="{{!completed}}">
       <view class="console-copy"><text>方向控制</text><text>滑动棋盘更顺手</text></view>
       <view class="direction-pad">
-        <button class="direction {{item.className}}" wx:for="{{directionButtons}}" wx:key="code" data-code="{{item.code}}" bindtap="move" disabled="{{submitting}}">{{item.label}}</button>
-        <view class="pad-center"></view>
+        <button class="direction {{item.className}}" wx:for="{{directionButtons}}" wx:key="code" data-code="{{item.code}}" bindtap="move" disabled="{{submitting}}" aria-label="向{{item.label}}移动"><view class="pad-arrow"></view></button>
+        <view class="pad-center"><view></view></view>
       </view>
     </view>
 
@@ -62,7 +78,7 @@
       <view class="complete-detail">{{result.moves}} 步 · 推动 {{result.pushes}} 次 · {{result.score}} 分</view>
       <view class="complete-actions">
         <button class="secondary-button" bindtap="goHub">返回首页</button>
-        <button class="primary-button" bindtap="newBoard">再来一关</button>
+        <button class="primary-button" bindtap="newBoard">{{nextActionLabel}}</button>
       </view>
     </view>
   </block>

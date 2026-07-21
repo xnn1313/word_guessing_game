@@ -9,11 +9,26 @@
   </view>
 
   <view class="compact-controls surface">
-    <view class="control-row two-columns">
+    <view class="control-row three-columns">
       <button class="{{mode === item.value ? 'active mode-active' : ''}}" wx:for="{{modeOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="switchMode">{{item.label}}</button>
     </view>
     <view class="control-row three-columns">
       <button class="{{difficulty === item.value ? 'active difficulty-active' : ''}}" wx:for="{{difficultyOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="switchDifficulty">{{item.label}}</button>
+    </view>
+    <view class="level-drawer" wx:if="{{mode === 'level'}}">
+      <view class="level-drawer-title"><text>航线图册</text><text>{{levelCompleted}} / {{levelTotal}} 已完成</text></view>
+      <scroll-view class="level-scroll" scroll-x enhanced show-scrollbar="{{false}}" scroll-into-view="arrow-level-{{levelOrder}}">
+        <view class="level-list">
+          <button
+            id="arrow-level-{{item.order}}"
+            class="level-chip {{item.order === levelOrder ? 'current' : ''}} {{item.stars > 0 ? 'completed' : ''}} {{!item.unlocked ? 'locked' : ''}}"
+            wx:for="{{levels}}"
+            wx:key="order"
+            data-order="{{item.order}}"
+            bindtap="selectLevel"
+          ><text>{{item.order}}</text><text>{{item.stars > 0 ? (item.stars === 3 ? '★★★' : item.stars === 2 ? '★★' : '★') : item.unlocked ? '可挑战' : '未解锁'}}</text></button>
+        </view>
+      </scroll-view>
     </view>
   </view>
 
@@ -27,7 +42,7 @@
     </view>
 
     <view class="route-caption">
-      <view class="route-copy"><text>从 S 到出口</text><text>最短路线约 {{board.optimal_steps}} 步</text></view>
+      <view class="route-copy"><text wx:if="{{mode === 'level'}}">航线第 {{levelOrder}} 关</text><text wx:else>从 S 到出口</text><text>最短路线约 {{board.optimal_steps}} 步</text></view>
       <view class="route-actions" wx:if="{{!completed}}">
         <button class="hint-action" bindtap="showHint" disabled="{{hinting || submitting}}">{{hinting ? '校准中' : '提示'}}</button>
         <button bindtap="undoStep" disabled="{{!canUndo || submitting}}">撤回</button>
@@ -68,7 +83,7 @@
       <view class="complete-detail">{{result.moves}} 步 · 最短 {{result.optimal_steps}} 步 · {{result.score}} 分</view>
       <view class="complete-actions">
         <button class="secondary-button" bindtap="goHub">返回首页</button>
-        <button class="primary-button" bindtap="newBoard">再走一盘</button>
+        <button class="primary-button" bindtap="newBoard">{{nextActionLabel}}</button>
       </view>
     </view>
   </block>

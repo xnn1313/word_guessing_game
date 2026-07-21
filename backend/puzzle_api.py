@@ -218,8 +218,13 @@ def register_puzzle_routes(app, get_current_user):
                 request.args.get("mode"),
                 request.args.get("difficulty"),
                 request.args.get("fresh") == "1",
+                request.args.get("level"),
             )
         )
+
+    @app.route("/api/sokoban/catalog")
+    def sokoban_catalog():
+        return jsonify(extra_puzzles.get_level_catalog(resolved_user(), "sokoban"))
 
     @app.route("/api/sokoban/save", methods=["POST"])
     def sokoban_save():
@@ -238,8 +243,13 @@ def register_puzzle_routes(app, get_current_user):
                 request.args.get("mode"),
                 request.args.get("difficulty"),
                 request.args.get("fresh") == "1",
+                request.args.get("level"),
             )
         )
+
+    @app.route("/api/arrow-maze/catalog")
+    def arrow_maze_catalog():
+        return jsonify(extra_puzzles.get_level_catalog(resolved_user(), "arrow_maze"))
 
     @app.route("/api/arrow-maze/save", methods=["POST"])
     def arrow_maze_save():

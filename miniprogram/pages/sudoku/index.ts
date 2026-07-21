@@ -218,22 +218,29 @@ Page({
 
   refreshCells() {
     const invalid = new Set(this.data.invalidCells);
+    const selectedValue = Number(this.data.selectedValue || 0);
     const cells = this.data.grid.map((value: string, index: number) => {
       const row = Math.floor(index / 9);
       const column = index % 9;
+      const noteValues = this.data.notes[String(index)] || [];
       return {
         index,
         value: value === "0" ? "" : value,
         given: this.data.givens[index] !== "0",
         selected: index === this.data.selectedIndex,
         invalid: invalid.has(index),
-        noteText: (this.data.notes[String(index)] || []).join(""),
+        noteDigits: Array.from({ length: 9 }, (_, digitIndex) => {
+          const digit = digitIndex + 1;
+          const visible = noteValues.includes(digit);
+          return {
+            value: digit,
+            visible,
+            matching: visible && selectedValue === digit,
+          };
+        }),
         boxRight: column === 2 || column === 5,
         boxBottom: row === 2 || row === 5,
-        sameValue:
-          Boolean(value && value !== "0") &&
-          this.data.selectedIndex >= 0 &&
-          this.data.grid[this.data.selectedIndex] === value,
+        sameValue: Boolean(value && value !== "0") && selectedValue > 0 && Number(value) === selectedValue,
       };
     });
     this.setData({ cells });

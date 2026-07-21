@@ -107,6 +107,8 @@ class ExtraPuzzleApiTestCase(unittest.TestCase):
                 },
             )
             self.assertEqual(response.status_code, 200)
+            self.assertIn("meaning", response.json["study"])
+            self.assertIn("excerpt", response.json["study"])
         self.assertEqual(response.json["status"], "completed")
         self.assertEqual(response.json["result"]["stars"], 3)
 
@@ -127,6 +129,71 @@ class ExtraPuzzleApiTestCase(unittest.TestCase):
         overview = self.client.get("/api/games/overview", headers=self.auth).json
         entry = next(item for item in overview["games"] if item["key"] == "poetry")
         self.assertTrue(entry["daily_completed"])
+
+    def test_sokoban_and_arrow_level_catalogs_unlock_in_order(self):
+        for game_key in ("sokoban", "arrow-maze"):
+            catalog = self.client.get(f"/api/{game_key}/catalog", headers=self.auth)
+            self.assertEqual(catalog.status_code, 200)
+            levels = catalog.json["difficulties"][0]["levels"]
+            self.assertEqual(len(levels), extra_puzzles.EXTRA_LEVEL_COUNT)
+            self.assertTrue(levels[0]["unlocked"])
+            self.assertFalse(levels[1]["unlocked"])
+            locked = self.client.get(
+                f"/api/{game_key}/board?mode=level&difficulty=easy&level=2", headers=self.auth
+            )
+            self.assertEqual(locked.status_code, 403)
+
+        sokoban = self.client.get(
+            "/api/sokoban/board?mode=level&difficulty=easy&level=1", headers=self.auth
+        ).json
+        sokoban_level = extra_puzzles._generate_sokoban(sokoban["puzzle_id"], "easy")
+        sokoban_solution = self.solve_sokoban(sokoban_level)
+        completed = self.client.post(
+            "/api/sokoban/submit",
+            headers=self.auth,
+            json={
+                "run_id": sokoban["run_id"],
+                "puzzle_id": sokoban["puzzle_id"],
+                "difficulty": "easy",
+                "history": sokoban_solution,
+                "elapsed_seconds": 10,
+                "mistakes": 0,
+            },
+        )
+        self.assertEqual(completed.status_code, 200)
+        self.assertEqual(completed.json["result"]["next_level_order"], 2)
+        self.assertEqual(
+            self.client.get(
+                "/api/sokoban/board?mode=level&difficulty=easy&level=2", headers=self.auth
+            ).status_code,
+            200,
+        )
+
+        arrow = self.client.get(
+            "/api/arrow-maze/board?mode=level&difficulty=easy&level=1", headers=self.auth
+        ).json
+        _, arrow_solution = extra_puzzles._generate_arrow_maze(arrow["puzzle_id"], "easy")
+        completed = self.client.post(
+            "/api/arrow-maze/submit",
+            headers=self.auth,
+            json={
+                "run_id": arrow["run_id"],
+                "puzzle_id": arrow["puzzle_id"],
+                "difficulty": "easy",
+                "path": arrow_solution,
+                "elapsed_seconds": 10,
+                "hints_used": 0,
+                "mistakes": 0,
+            },
+        )
+        self.assertEqual(completed.status_code, 200)
+        self.assertEqual(completed.json["result"]["next_level_order"], 2)
+        self.assertEqual(
+            self.client.get(
+                "/api/arrow-maze/board?mode=level&difficulty=easy&level=2", headers=self.auth
+            ).status_code,
+            200,
+        )
 
     @staticmethod
     def solve_sokoban(level):

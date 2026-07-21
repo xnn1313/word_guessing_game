@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "脑力游乐场"
+  "navigationBarTitleText": "脑力游乐场",
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true
 }

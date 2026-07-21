@@ -7,7 +7,8 @@
     "validate": "node scripts/validate-project.mjs",
     "test:queue": "node scripts/test-latest-task-queue.mjs",
     "test:storage": "node scripts/test-puzzle-storage.mjs",
-    "check": "npm run typecheck && npm run validate && npm run test:queue && npm run test:storage"
+    "test:levels": "node scripts/test-level-progress.mjs",
+    "check": "npm run typecheck && npm run validate && npm run test:queue && npm run test:storage && npm run test:levels"
   },
   "devDependencies": {
     "typescript": "^5.8.3"

@@ -55,13 +55,20 @@
         bindtap="selectCell"
       >
         <text class="cell-value" wx:if="{{item.value}}">{{item.value}}</text>
-        <text class="cell-notes" wx:else>{{item.noteText}}</text>
+        <view class="cell-notes" wx:else>
+          <text
+            class="note-digit {{note.matching ? 'matching' : ''}}"
+            wx:for="{{item.noteDigits}}"
+            wx:for-item="note"
+            wx:key="value"
+          >{{note.visible ? note.value : ''}}</text>
+        </view>
       </button>
     </view>
 
     <block wx:if="{{!completed}}">
       <view class="number-pad">
-        <button wx:for="{{digits}}" wx:key="*this" data-value="{{item}}" bindtap="inputDigit">{{item}}</button>
+        <button class="{{selectedValue === item ? 'active' : ''}}" wx:for="{{digits}}" wx:key="*this" data-value="{{item}}" bindtap="inputDigit">{{item}}</button>
       </view>
 
       <view class="tool-row">

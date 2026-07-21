@@ -247,7 +247,7 @@ Authorization: Bearer <token>
 
 ```bash
 cd backend
-../.venv/bin/python -m unittest -v test_puzzle_api.py test_external_puzzle_import.py test_word_search_api.py
+../.venv/bin/python -m unittest -v test_puzzle_api.py test_external_puzzle_import.py test_word_search_api.py test_extra_puzzles_api.py
 ```
 
 测试覆盖游客读取、登录云存档、每日题固定、提示恢复、错误提交、成语解锁、翻牌配对校验、后端计分、重复提交幂等，以及外部题库的事务回滚、去重和不可变性。
@@ -267,17 +267,24 @@ cd backend
 | POST | `/api/poetry/save` | 保存题号、答对数和用时 |
 | POST | `/api/poetry/submit` | 提交当前选择并取得下一题或结算 |
 | GET | `/api/sokoban/board` | 获取确定性推箱子关卡 |
+| GET | `/api/sokoban/catalog` | 获取推箱子闯关目录和星级进度 |
 | POST | `/api/sokoban/save` | 保存可回放的 `UDLR` 移动记录 |
 | POST | `/api/sokoban/submit` | 服务端重放移动并验证所有箱子归位 |
 | GET | `/api/arrow-maze/board` | 获取箭头跳格迷宫 |
+| GET | `/api/arrow-maze/catalog` | 获取箭头迷宫闯关目录和星级进度 |
 | POST | `/api/arrow-maze/save` | 保存可回退路径 |
 | POST | `/api/arrow-maze/hint` | 返回当前位置最短路线的下一格 |
 | POST | `/api/arrow-maze/submit` | 验证路径方向和出口并结算 |
 
-三个 GET 接口均接受 `mode=daily|practice`、`difficulty=easy|medium|hard`，自由练习可加
-`fresh=1` 换题。游客的 `run_id`、`saved_state` 为 `null`，由小程序保存题面和进度；登录用户
+诗词 GET 接口接受 `mode=daily|practice`；推箱子和箭头迷宫还支持 `mode=level`，并通过
+`level=1..20` 选择当前难度下的关卡。三个游戏均接受 `difficulty=easy|medium|hard`，自由练习可加
+`fresh=1` 换题。两款棋盘游戏每个难度各 20 关，共 60 关，登录用户按顺序解锁并同步星级；
+游客由小程序保存解锁进度。游客的 `run_id`、`saved_state` 为 `null`，由小程序保存题面和进度；登录用户
 在每次重新进入时恢复未完成运行。推箱子的移动记录和箭头迷宫路径允许因撤回操作而缩短，
 但 `elapsed_seconds`、`hints_used` 和 `mistakes` 不能回退。
+
+诗词提交结果额外返回 `study`，包含作品出处、原诗片段、诗意理解和关键词线索；客户端展示后
+由用户主动进入下一题，不再定时自动切题。
 
 诗词题库由 38 首内置基础作品和 `backend/data/poetry_bank.json` 的 1445 首标准化作品合并
 去重，共 1468 首。简单、中等、困难题池为逐级包含关系，规模分别为 427、861、1468 首；

@@ -32,10 +32,13 @@
 .sudoku-cell.selected { background: var(--color-yellow); box-shadow: inset 0 0 0 4rpx var(--color-ink); }
 .sudoku-cell.invalid { background: var(--color-coral-soft); color: var(--color-danger); }
 .cell-value { font-size: 28rpx; font-weight: 850; }
-.cell-notes { padding: 3rpx; color: var(--color-primary-dark); font-size: 13rpx; line-height: 1.15; text-align: center; word-break: break-all; }
+.cell-notes { display: grid; width: 100%; height: 100%; padding: 3rpx; grid-template-columns: repeat(3,minmax(0,1fr)); grid-template-rows: repeat(3,minmax(0,1fr)); }
+.note-digit { display: grid; min-width: 0; place-items: center; border-radius: 6rpx; color: var(--color-primary-dark); font-size: 14rpx; font-weight: 700; line-height: 1; text-align: center; }
+.note-digit.matching { background: var(--color-primary); color: #ffffff; font-weight: 900; box-shadow: inset 0 0 0 2rpx var(--color-primary-dark); }
 
 .number-pad { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 10rpx; margin-top: 16rpx; }
 .number-pad button { display: grid; min-height: 88rpx; place-items: center; border: 3rpx solid var(--color-ink); border-radius: 15rpx; background: #ffffff; color: var(--color-ink); font-size: 27rpx; font-weight: 900; line-height: 1; text-align: center; }
+.number-pad button.active { background: var(--color-primary); color: #ffffff; box-shadow: 4rpx 4rpx 0 var(--color-ink); }
 .tool-row { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10rpx; margin-top: 10rpx; }
 .tool-button { display: grid; min-height: 88rpx; place-items: center; border: 3rpx solid var(--color-ink); border-radius: 15rpx; background: var(--color-violet-soft); color: var(--color-ink); font-size: 19rpx; font-weight: 800; line-height: 1.2; text-align: center; }
 .tool-button.active { background: var(--color-violet); }

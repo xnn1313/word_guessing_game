@@ -709,6 +709,26 @@ def get_idiom_progress(user_id):
     }
 
 
+def get_level_progress(user_id, game_key):
+    """Return best results for deterministic level-mode puzzles."""
+    if not user_id:
+        return {}
+    with _connect() as connection:
+        rows = connection.execute(
+            """
+            SELECT puzzle_id, MAX(stars) AS stars, MAX(score) AS best_score
+            FROM game_runs
+            WHERE user_id = ? AND game_key = ? AND mode = 'level' AND status = 'completed'
+            GROUP BY puzzle_id
+            """,
+            (user_id, game_key),
+        ).fetchall()
+    return {
+        row["puzzle_id"]: {"stars": row["stars"] or 0, "best_score": row["best_score"]}
+        for row in rows
+    }
+
+
 def get_game_run_stats(user_id):
     with _connect() as connection:
         rows = connection.execute(

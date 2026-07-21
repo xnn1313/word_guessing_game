@@ -29,7 +29,7 @@
 
     <view class="quiz-progress"><view style="width: {{progressPercent}}%"></view></view>
 
-    <view class="question-sheet" wx:if="{{!completed && question}}">
+    <view class="question-sheet {{answerRevealed ? 'studying' : ''}}" wx:if="{{(!completed || answerRevealed) && question}}">
       <view class="sheet-pin"></view>
       <view class="question-meta"><text>第 {{questionNumber}} 题</text><text>{{question.prompt}}</text></view>
       <view class="poem-context">{{question.context}}</view>
@@ -40,16 +40,30 @@
           wx:key="*this"
           data-answer="{{item}}"
           bindtap="chooseAnswer"
-          disabled="{{submitting}}"
+          disabled="{{submitting || answerRevealed}}"
         ><text class="option-marker">{{index + 1}}</text><text>{{item}}</text></button>
       </view>
       <view class="answer-feedback {{feedbackTone}}">
         <view class="feedback-mark">{{feedbackTone === 'correct' ? '✓' : feedbackTone === 'wrong' ? '×' : '·'}}</view>
         <text>{{feedbackText}}</text>
       </view>
+
+      <view class="study-card" wx:if="{{answerRevealed && study}}">
+        <view class="study-heading"><text>答后学习</text><text>{{study.source}}</text></view>
+        <view class="study-section">
+          <text class="study-label">原诗片段</text>
+          <text class="study-excerpt">{{study.excerpt}}</text>
+        </view>
+        <view class="study-section meaning-section">
+          <text class="study-label">诗意理解</text>
+          <text class="study-meaning">{{study.meaning}}</text>
+        </view>
+        <view class="study-terms"><text>理解线索</text><text>{{study.key_terms}}</text></view>
+        <button class="study-continue" bindtap="continueQuiz">{{continueLabel}}</button>
+      </view>
     </view>
 
-    <view class="complete-panel poetry-complete surface" wx:if="{{completed && result}}">
+    <view class="complete-panel poetry-complete surface" wx:if="{{completed && result && !answerRevealed}}">
       <view class="completion-seal">成</view>
       <view class="complete-title">本场雅集完成</view>
       <view class="complete-stars">{{result.stars === 3 ? '★★★' : result.stars === 2 ? '★★☆' : '★☆☆'}}</view>

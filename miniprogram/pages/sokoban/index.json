@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "推箱子"
+  "navigationBarTitleText": "推箱子",
+  "navigationBarBackgroundColor": "#e8e4d9",
+  "backgroundColor": "#e8e4d9"
 }

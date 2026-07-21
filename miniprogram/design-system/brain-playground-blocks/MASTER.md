@@ -6,7 +6,7 @@
 
 ## Signature
 
-每款游戏是一块可以收集的彩色游戏积木。主页面使用 2×2 积木矩阵；进入游戏后，相同颜色仅作为该游戏的身份色，游玩区域统一回到高对比白底，避免影响可读性。
+每款游戏是一块可以收集的彩色游戏积木。主页面使用双列等高积木矩阵承载全部游戏，不再混用横向轮播和异形卡片；进入游戏后，相同颜色仅作为该游戏的身份色，游玩区域统一回到高对比底色，避免影响可读性。
 
 ## Color tokens
 
@@ -56,7 +56,7 @@ Remote fonts are intentionally avoided so the mini program does not depend on fo
 
 ## Page families
 
-- Hub: blue mission block + 2×2 colored game blocks
+- Hub: compact blue mission block + two-column equal-height game blocks
 - Catalogs: compact progress block + expandable white category blocks
 - Play screens: compact title, dark status strip, centered board, controls directly below
 - Records: timeline/progress cards, data-first

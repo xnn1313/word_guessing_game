@@ -1,4 +1,6 @@
 import type {
+  ExtraLevelCatalog,
+  ExtraLevelItem,
   PuzzleCompletionResult,
   PuzzleDifficulty,
   PuzzleSubmitResponse,
@@ -6,6 +8,7 @@ import type {
   SokobanSavedState,
 } from "../../types/api";
 import { isLoggedIn } from "../../utils/auth";
+import { completeGuestLevel, mergeGuestLevelProgress } from "../../utils/level-progress";
 import {
   clearCloudPuzzleShadow,
   clearGuestPuzzleDefinition,
@@ -85,7 +88,7 @@ Page({
   data: {
     loading: true,
     submitting: false,
-    mode: "daily" as "daily" | "practice",
+    mode: "daily" as "daily" | "level" | "practice",
     difficulty: "easy" as PuzzleDifficulty,
     board: null as SokobanBoardResponse | null,
     puzzleId: "",
@@ -103,8 +106,15 @@ Page({
     mistakes: 0,
     completed: false,
     result: null as PuzzleCompletionResult | null,
+    levelCatalog: null as ExtraLevelCatalog | null,
+    levels: [] as ExtraLevelItem[],
+    levelOrder: 1,
+    levelCompleted: 0,
+    levelTotal: 20,
+    nextActionLabel: "再来一关",
     modeOptions: [
       { value: "daily", label: "每日仓库" },
+      { value: "level", label: "闯关模式" },
       { value: "practice", label: "自由练习" },
     ],
     difficultyOptions: [
@@ -113,10 +123,10 @@ Page({
       { value: "hard", label: "大仓库" },
     ],
     directionButtons: [
-      { code: "U", label: "↑", className: "up" },
-      { code: "L", label: "←", className: "left" },
-      { code: "D", label: "↓", className: "down" },
-      { code: "R", label: "→", className: "right" },
+      { code: "U", label: "上", className: "up" },
+      { code: "L", label: "左", className: "left" },
+      { code: "D", label: "下", className: "down" },
+      { code: "R", label: "右", className: "right" },
     ],
   },
 
@@ -155,7 +165,10 @@ Page({
     saveTimer = null;
     this.setData({ loading: true, submitting: false, completed: false, result: null });
     try {
-      const guestSlot = `${this.data.mode}:${this.data.difficulty}`;
+      if (this.data.mode === "level" && !this.data.levelCatalog) {
+        await this.loadLevelCatalog();
+      }
+      const guestSlot = `${this.data.mode}:${this.data.difficulty}:${this.data.mode === "level" ? this.data.levelOrder : 0}`;
       if (!isLoggedIn() && fresh) {
         const previous = loadGuestPuzzleDefinition<SokobanBoardResponse>("sokoban", guestSlot);
         if (previous?.puzzle_id) clearGuestPuzzleState("sokoban", previous.puzzle_id);
@@ -166,7 +179,7 @@ Page({
         : null;
       if (!board) {
         board = await request<SokobanBoardResponse>(
-          `/sokoban/board?mode=${this.data.mode}&difficulty=${this.data.difficulty}${fresh ? "&fresh=1" : ""}`,
+          `/sokoban/board?mode=${this.data.mode}&difficulty=${this.data.difficulty}${this.data.mode === "level" ? `&level=${this.data.levelOrder}` : ""}${fresh ? "&fresh=1" : ""}`,
         );
         if (!isLoggedIn() && this.data.mode === "practice") {
           saveGuestPuzzleDefinition("sokoban", guestSlot, board);
@@ -190,6 +203,8 @@ Page({
         elapsedSeconds,
         elapsedText: formatTime(elapsedSeconds),
         mistakes: Number(saved?.mistakes || 0),
+        levelOrder: Number(board.level_order || this.data.levelOrder),
+        nextActionLabel: this.data.mode === "level" ? "下一关" : "再来一关",
       });
       this.refreshBoard();
       this.persistGuestState();
@@ -378,9 +393,17 @@ Page({
       if (response.correct && response.result) {
         stopClock();
         clearGuestPuzzleState("sokoban", this.data.puzzleId);
-        clearGuestPuzzleDefinition("sokoban", `${this.data.mode}:${this.data.difficulty}`);
+        if (this.data.mode === "practice") clearGuestPuzzleDefinition("sokoban", `${this.data.mode}:${this.data.difficulty}:0`);
         clearCloudPuzzleShadow("sokoban", this.data.puzzleId);
-        this.setData({ completed: true, result: response.result });
+        if (this.data.mode === "level" && !isLoggedIn()) {
+          completeGuestLevel("sokoban", this.data.difficulty, this.data.levelOrder, response.result.stars);
+        }
+        this.setData({
+          completed: true,
+          result: response.result,
+          nextActionLabel: this.data.mode === "level" && this.data.levelOrder >= this.data.levelTotal ? "重玩本关" : this.data.mode === "level" ? "下一关" : "再来一关",
+        });
+        if (this.data.mode === "level") void this.loadLevelCatalog(true);
       }
     } catch (error) {
       showRequestError(error, "关卡结算失败");
@@ -390,11 +413,14 @@ Page({
   },
 
   switchMode(event: any) {
-    const mode = event.currentTarget.dataset.value as "daily" | "practice";
+    const mode = event.currentTarget.dataset.value as "daily" | "level" | "practice";
     if (!mode || mode === this.data.mode) return;
     void this.flushSave(true).finally(() => {
-      this.setData({ mode });
-      void this.loadBoard();
+      const prepare = mode === "level" ? this.loadLevelCatalog() : Promise.resolve();
+      void prepare.then(() => {
+        this.setData({ mode });
+        void this.loadBoard();
+      });
     });
   },
 
@@ -402,13 +428,61 @@ Page({
     const difficulty = event.currentTarget.dataset.value as PuzzleDifficulty;
     if (!difficulty || difficulty === this.data.difficulty) return;
     void this.flushSave(true).finally(() => {
-      this.setData({ difficulty });
+      const levelState = this.levelStateForDifficulty(this.data.levelCatalog, difficulty);
+      this.setData({ difficulty, ...levelState });
       void this.loadBoard();
     });
   },
 
   newBoard() {
+    if (this.data.mode === "level" && this.data.levelOrder < this.data.levelTotal) {
+      this.setData({ levelOrder: this.data.levelOrder + 1 });
+      void this.loadBoard();
+      return;
+    }
     void this.loadBoard(this.data.mode === "practice");
+  },
+
+  levelStateForDifficulty(catalog: ExtraLevelCatalog | null, difficulty: PuzzleDifficulty) {
+    const group = catalog?.difficulties.find((item) => item.key === difficulty);
+    const levels = group?.levels || [];
+    const current = levels.find((item) => item.order === this.data.levelOrder && item.unlocked);
+    const firstIncomplete = levels.find((item) => item.unlocked && item.stars === 0);
+    const lastUnlocked = [...levels].reverse().find((item) => item.unlocked);
+    return {
+      levels,
+      levelOrder: current?.order || firstIncomplete?.order || lastUnlocked?.order || 1,
+      levelCompleted: Number(group?.completed_levels || 0),
+      levelTotal: Number(group?.total_levels || 20),
+    };
+  },
+
+  async loadLevelCatalog(refresh = false) {
+    if (this.data.levelCatalog && !refresh) {
+      this.setData(this.levelStateForDifficulty(this.data.levelCatalog, this.data.difficulty));
+      return;
+    }
+    try {
+      let catalog = await request<ExtraLevelCatalog>("/sokoban/catalog");
+      if (!isLoggedIn()) catalog = mergeGuestLevelProgress(catalog, "sokoban");
+      this.setData({ levelCatalog: catalog, ...this.levelStateForDifficulty(catalog, this.data.difficulty) });
+    } catch (error) {
+      showRequestError(error, "闯关进度加载失败");
+      throw error;
+    }
+  },
+
+  selectLevel(event: any) {
+    const levelOrder = Number(event.currentTarget.dataset.order);
+    const level = this.data.levels.find((item) => item.order === levelOrder);
+    if (!level || !level.unlocked || levelOrder === this.data.levelOrder) {
+      if (level && !level.unlocked) wx.showToast({ title: "请先完成上一关", icon: "none" });
+      return;
+    }
+    void this.flushSave(true).finally(() => {
+      this.setData({ levelOrder });
+      void this.loadBoard();
+    });
   },
 
   goHub() {

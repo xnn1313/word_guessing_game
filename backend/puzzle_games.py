@@ -944,6 +944,8 @@ def games_overview(user):
     stats = storage.get_game_run_stats(user["id"])
     word = storage.get_word_overview(user["id"])
     idiom_progress = storage.get_idiom_progress(user["id"])
+    sokoban_progress = storage.get_level_progress(user["id"], "sokoban")
+    arrow_progress = storage.get_level_progress(user["id"], "arrow_maze")
     word_stars = word.get("total_stars", 0) or 0
     total_stars = word_stars + sum(item.get("total_stars", 0) for item in stats.values())
     last_candidates = [(key, _timestamp(value.get("last_played_at"))) for key, value in stats.items()]
@@ -981,8 +983,8 @@ def games_overview(user):
         game_entry("memory", "记忆翻牌", f"最佳 {memory_best} 步" if memory_best is not None else "尚无记录", 0),
         game_entry("word_search", "成语连线", "今日已完成" if "word_search" in flags else "开始连线", 100 if "word_search" in flags else 0),
         game_entry("poetry", "诗词大会", "今日已完成" if "poetry" in flags else "五题热身", 100 if "poetry" in flags else 0),
-        game_entry("sokoban", "推箱子", "今日已完成" if "sokoban" in flags else "仓库待整理", 100 if "sokoban" in flags else 0),
-        game_entry("arrow_maze", "箭头迷宫", "今日已完成" if "arrow_maze" in flags else "寻找出口", 100 if "arrow_maze" in flags else 0),
+        game_entry("sokoban", "推箱子", f"{len(sokoban_progress)} / 60 关", len(sokoban_progress) / 60 * 100),
+        game_entry("arrow_maze", "箭头迷宫", f"{len(arrow_progress)} / 60 关", len(arrow_progress) / 60 * 100),
     ]
     return {
         "server_date": date,

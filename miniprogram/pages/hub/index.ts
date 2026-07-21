@@ -36,6 +36,12 @@ Page({
     arrowMazeGame: fallbackGame("arrow_maze", "箭头迷宫"),
   },
 
+  onLoad() {
+    wx.showShareMenu({
+      menus: ["shareAppMessage", "shareTimeline"],
+    });
+  },
+
   onShow() {
     const loggedIn = isLoggedIn();
     const username = getUsername();
@@ -129,6 +135,20 @@ Page({
 
   openProfile() {
     wx.navigateTo({ url: this.data.loggedIn ? "/pages/profile/index" : "/pages/auth/index" });
+  },
+
+  onShareAppMessage() {
+    return {
+      title: "八款益智游戏，今天一起练练脑力",
+      path: "/pages/hub/index?from=share",
+    };
+  },
+
+  onShareTimeline() {
+    return {
+      title: "脑力游乐场｜每天十分钟，换一种脑力热身",
+      query: "from=timeline",
+    };
   },
 });
 
