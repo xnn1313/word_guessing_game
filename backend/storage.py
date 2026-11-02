@@ -5,12 +5,21 @@ import secrets
 import sqlite3
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
+from typing import Callable
 
 
 DB_PATH = os.environ.get(
     "WORD_GAME_DB_PATH",
     os.path.join(os.path.dirname(__file__), "word_guessing_game.db"),
 )
+
+# Bump when the schema changes and add the matching callable to MIGRATIONS.
+SCHEMA_VERSION = 1
+
+# {target_version: callable(connection)}.  init_db applies every entry newer
+# than the database's PRAGMA user_version, so an old deployment upgrades in
+# place instead of silently missing columns.
+MIGRATIONS: dict[int, Callable[[sqlite3.Connection], None]] = {}
 
 
 @contextmanager
@@ -201,6 +210,28 @@ def init_db():
         from puzzle_content import seed_puzzle_catalogs
 
         seed_puzzle_catalogs(connection)
+        _apply_schema_version(connection)
+
+
+def _apply_schema_version(connection):
+    """Bring ``PRAGMA user_version`` up to ``SCHEMA_VERSION``.
+
+    Refuses to start against a database written by a newer backend: silently
+    running older code on a newer schema corrupts data in ways that are hard
+    to trace back.
+    """
+    version = int(connection.execute("PRAGMA user_version").fetchone()[0])
+    if version > SCHEMA_VERSION:
+        raise RuntimeError(
+            f"数据库结构版本 {version} 高于程序支持的 {SCHEMA_VERSION}，请升级后端"
+        )
+    for target in sorted(MIGRATIONS):
+        if target > version:
+            MIGRATIONS[target](connection)
+            connection.execute(f"PRAGMA user_version = {int(target)}")
+            version = target
+    if version < SCHEMA_VERSION:
+        connection.execute(f"PRAGMA user_version = {int(SCHEMA_VERSION)}")
 
 
 def create_user(username, password_hash):

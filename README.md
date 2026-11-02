@@ -17,7 +17,29 @@ python app.py
 页面右上角可注册或登录账号。登录后，每次猜词、查看答案和重置游戏都会自动保存到
 `backend/word_guessing_game.db`，再次进入并登录同一账号即可恢复当前轮次和历史记录。
 
-生产运行时请通过环境变量 `WORD_GAME_SECRET_KEY` 配置固定的随机密钥，用于保护登录 Cookie。
+## 配置项
+
+| 环境变量 | 默认值 | 说明 |
+| --- | --- | --- |
+| `WORD_GAME_SECRET_KEY` | 开发用固定值 | 登录 Cookie 签名密钥；`WORD_GAME_ENV=production` 时缺失会拒绝启动 |
+| `WORD_GAME_ENV` | `development` | 设为 `production` 启用生产校验（密钥必填、关闭 debug） |
+| `WORD_GAME_CORS_ORIGINS` | 空 | 逗号分隔的跨域白名单；小程序与同源网页无需配置 |
+| `WORD_GAME_DEBUG` | `0` | 设为 `1` 才开启 Flask debug 与 DEBUG 日志 |
+| `WORD_GAME_DB_PATH` | `backend/word_guessing_game.db` | SQLite 路径，测试时指向临时库 |
+| `WORD_GAME_SESSION_TTL_SECONDS` | `43200` | 内存对局会话的空闲过期时间 |
+| `WORD_GAME_SESSION_MAX_ENTRIES` | `2000` | 内存会话上限，超出后淘汰最久未活跃的会话 |
+
+生产运行使用 `word-guessing-game.service`（gunicorn），不要用 `python app.py`。
+
+## 测试
+
+```bash
+cd backend
+pip install -r requirements-dev.txt
+python -m pytest -q
+```
+
+测试覆盖经典/闯关/对战之外的益智游戏接口、插件注册表契约、SQLite 迁移、会话过期与限流、统一错误协议。新增游戏后 `test_games_registry.py` 会自动带上它。
 
 ## 分类闯关
 

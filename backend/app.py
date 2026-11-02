@@ -4,6 +4,7 @@ import sys
 import os
 import re
 from datetime import timedelta
+from logging.handlers import RotatingFileHandler
 from flask import Flask, g, request, jsonify, send_from_directory, session as flask_session
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,33 +13,56 @@ import storage
 import campaign
 import multiplayer
 import puzzle_api
+from core.expiring_store import ExpiringStore
+from core.errors import install_error_handlers
+from core.ratelimit import SlidingWindowLimiter
 
 # 修复 Windows 下 stdout 中文编码问题
 if sys.stdout.encoding != "utf-8":
     sys.stdout = open(sys.stdout.fileno(), mode="w", encoding="utf-8", buffering=1)
 
+DEBUG_ENABLED = os.environ.get("WORD_GAME_DEBUG") == "1"
+IS_PRODUCTION = os.environ.get("WORD_GAME_ENV", "development").strip().lower() == "production"
+DEFAULT_SECRET = "development-only-change-me"
+
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.DEBUG if DEBUG_ENABLED else logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler(os.path.join(os.path.dirname(__file__), "app.log"), encoding="utf-8"),
+        RotatingFileHandler(
+            os.path.join(os.path.dirname(__file__), "app.log"),
+            maxBytes=10 * 1024 * 1024,
+            backupCount=3,
+            encoding="utf-8",
+        ),
         logging.StreamHandler(sys.stdout),
     ],
 )
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__, static_folder="../frontend", static_url_path="")
-app.secret_key = os.environ.get("WORD_GAME_SECRET_KEY", "development-only-change-me")
+app.secret_key = os.environ.get("WORD_GAME_SECRET_KEY") or DEFAULT_SECRET
 app.permanent_session_lifetime = timedelta(days=30)
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
 )
-CORS(app, supports_credentials=True)
-storage.init_db()
 
-if app.secret_key == "development-only-change-me":
+if app.secret_key == DEFAULT_SECRET:
+    if IS_PRODUCTION:
+        raise RuntimeError("生产环境必须通过 WORD_GAME_SECRET_KEY 配置独立密钥")
     logger.warning("未配置 WORD_GAME_SECRET_KEY，登录会话不适合生产环境")
+
+# 小程序与同源网页不需要跨域；只有显式配置时才开放，避免宽泛 CORS。
+cors_origins = [
+    origin.strip()
+    for origin in os.environ.get("WORD_GAME_CORS_ORIGINS", "").split(",")
+    if origin.strip()
+]
+if cors_origins:
+    CORS(app, supports_credentials=True, origins=cors_origins)
+install_error_handlers(app)
+storage.init_db()
 
 # 启动时预加载BGE模型，避免首次请求等待过久
 import similarity
@@ -46,8 +70,13 @@ import similarity
 similarity.get_model()
 logger.info("BGE模型已预加载完成")
 
-sessions = {}
-mobile_sessions = {}
+SESSION_TTL_SECONDS = int(os.environ.get("WORD_GAME_SESSION_TTL_SECONDS", 12 * 3600))
+SESSION_MAX_ENTRIES = int(os.environ.get("WORD_GAME_SESSION_MAX_ENTRIES", 2000))
+sessions = ExpiringStore(ttl_seconds=SESSION_TTL_SECONDS, max_entries=SESSION_MAX_ENTRIES)
+mobile_sessions = ExpiringStore(
+    ttl_seconds=SESSION_TTL_SECONDS, max_entries=SESSION_MAX_ENTRIES
+)
+login_limiter = SlidingWindowLimiter(limit=8, window_seconds=300)
 
 
 def get_current_api_token():
@@ -146,6 +175,10 @@ def validate_credentials(data):
     return username, password, None
 
 
+def login_attempt_key(username):
+    return f"{request.remote_addr or '-'}:{username}"
+
+
 def mobile_auth_payload(user, saved_state=None):
     token = storage.issue_api_token(user["id"])
     session_id, gm = create_runtime_game(saved_state)
@@ -192,10 +225,14 @@ def mobile_login():
     username, password, error = validate_credentials(data)
     if error:
         return jsonify({"error": error}), 400
+    if login_limiter.is_limited(login_attempt_key(username)):
+        return jsonify({"error": "登录尝试过于频繁，请稍后再试"}), 429
 
     user_record = storage.get_user_by_username(username)
     if not user_record or not check_password_hash(user_record["password_hash"], password):
+        login_limiter.record(login_attempt_key(username))
         return jsonify({"error": "用户名或密码错误"}), 401
+    login_limiter.clear(login_attempt_key(username))
     user = {"id": user_record["id"], "username": user_record["username"]}
     payload = mobile_auth_payload(user, storage.load_game(user_record["id"]))
     logger.info(f"小程序用户登录: {user['username']}")
@@ -387,10 +424,14 @@ def login():
     username, password, error = validate_credentials(data)
     if error:
         return jsonify({"error": error}), 400
+    if login_limiter.is_limited(login_attempt_key(username)):
+        return jsonify({"error": "登录尝试过于频繁，请稍后再试"}), 429
 
     user_record = storage.get_user_by_username(username)
     if not user_record or not check_password_hash(user_record["password_hash"], password):
+        login_limiter.record(login_attempt_key(username))
         return jsonify({"error": "用户名或密码错误"}), 401
+    login_limiter.clear(login_attempt_key(username))
 
     flask_session.clear()
     flask_session.permanent = True
@@ -525,4 +566,4 @@ def reset_game():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=DEBUG_ENABLED)
