@@ -102,6 +102,8 @@
 .game-card.poetry-card { background: #fff1bd; }
 .game-card.sokoban-card { background: #cfe0c4; }
 .game-card.arrow-card { background: #cfc4ff; }
+.game-card.tile-card { background: #ffe0a8; }
+.game-card.mine-card { background: #bfe9e2; }
 .game-card.unavailable { opacity: .55; }
 
 .game-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12rpx; }
@@ -131,6 +133,8 @@
 .crate-mark > view:last-child { position: absolute; width: 25rpx; height: 3rpx; background: var(--color-ink); transform: rotate(45deg); box-shadow: 0 0 0 0 var(--color-ink); }
 .crate-mark::after { position: absolute; width: 25rpx; height: 3rpx; background: var(--color-ink); content: ""; transform: rotate(-45deg); }
 .compass-icon > view { width: 0; height: 0; border-right: 8rpx solid transparent; border-bottom: 28rpx solid var(--color-primary); border-left: 8rpx solid transparent; transform: rotate(35deg); }
+.tile-mark { font-size: 15rpx; letter-spacing: -1rpx; }
+.mine-mark { color: #8a4b1f; font-size: 32rpx; }
 
 .share-button:active,.account-button:active,.game-card:active { box-shadow: 2rpx 2rpx 0 var(--color-ink); transform: translate(4rpx,4rpx); }
 

@@ -3,7 +3,7 @@
     <view class="hub-heading">
       <view class="page-kicker">BRAIN BREAK · {{loggedIn ? username : '随时开玩'}}</view>
       <view class="page-title"><text>挑一块，</text><text>现在就开动。</text></view>
-      <view class="page-subtitle">八款小游戏，给不同的脑力区域做热身。</view>
+      <view class="page-subtitle">十款小游戏，给不同的脑力区域做热身。</view>
     </view>
     <view class="header-actions">
       <button class="share-button" open-type="share" aria-label="分享脑力游乐场">
@@ -80,6 +80,18 @@
       <view class="game-card-top"><view class="game-icon compass-icon"><view></view></view><text>路线</text></view>
       <view class="game-copy"><text class="game-name">箭头迷宫</text><text class="game-description">{{arrowMazeGame.progress_text}}</text></view>
       <view class="game-footer"><text>罗盘闯关</text><view class="arrow-icon"></view></view>
+    </view>
+
+    <view class="game-card tile-card {{tile2048Game.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openTile2048" hover-class="card-pressed">
+      <view class="game-card-top"><view class="game-icon tile-mark">2048</view><text>合并</text></view>
+      <view class="game-copy"><text class="game-name">2048</text><text class="game-description">{{tile2048Game.progress_text}}</text></view>
+      <view class="game-footer"><text>每日同局</text><view class="arrow-icon"></view></view>
+    </view>
+
+    <view class="game-card mine-card {{minesweeperGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openMinesweeper" hover-class="card-pressed">
+      <view class="game-card-top"><view class="game-icon mine-mark">✦</view><text>推理</text></view>
+      <view class="game-copy"><text class="game-name">每日扫雷</text><text class="game-description">{{minesweeperGame.progress_text}}</text></view>
+      <view class="game-footer"><text>9×9 · 10 雷</text><view class="arrow-icon"></view></view>
     </view>
   </view>
 

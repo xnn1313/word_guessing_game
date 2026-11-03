@@ -29,8 +29,10 @@ from . import (  # noqa: E402,F401
     arrow_maze,
     idiom,
     memory,
+    minesweeper,
     poetry,
     sokoban,
     sudoku,
+    tile2048,
     word_search,
 )

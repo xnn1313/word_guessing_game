@@ -1,0 +1,71 @@
+<view class="page-shell mine-page">
+  <view class="game-heading">
+    <view>
+      <view class="page-kicker">MINE FIELD · 每日雷区</view>
+      <view class="page-title">每日扫雷</view>
+      <view class="page-subtitle">点开安全格，长按插旗。每日固定雷区，第一次点击永远安全。</view>
+    </view>
+    <view class="mine-seal">✦</view>
+  </view>
+
+  <view class="login-gate surface" wx:if="{{!loggedIn}}">
+    <view class="gate-icon">!</view>
+    <view class="gate-title">扫雷需要登录</view>
+    <view class="gate-note">雷区与进度保存在云端，登录后即可开始今天的挑战。</view>
+    <button class="primary-button" bindtap="goLogin">去登录</button>
+  </view>
+
+  <block wx:else>
+    <view class="segmented-control two-columns mode-tabs">
+      <button class="{{mode === 'daily' ? 'active' : ''}}" data-value="daily" bindtap="switchMode">每日雷区</button>
+      <button class="{{mode === 'practice' ? 'active' : ''}}" data-value="practice" bindtap="switchMode">自由练习</button>
+    </view>
+
+    <view class="difficulty-tabs" wx:if="{{mode === 'practice'}}">
+      <button class="{{difficulty === item.value ? 'active' : ''}}" wx:for="{{difficultyOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="switchDifficulty">{{item.label}}</button>
+    </view>
+
+    <view class="status-strip mine-status">
+      <view><text>剩余雷</text><text>{{remaining}}</text></view>
+      <view><text>已标记</text><text>{{flags}}</text></view>
+      <view><text>用时</text><text>{{elapsedText}}</text></view>
+    </view>
+
+    <view class="loading-state" wx:if="{{loading}}">正在布置雷区…</view>
+
+    <block wx:else>
+      <view class="mine-board-wrap">
+        <view class="mine-board" style="grid-template-columns: repeat({{cols}}, minmax(0, 1fr));">
+          <view class="cell {{item.cls}}" wx:for="{{cells}}" wx:key="index" data-index="{{item.index}}" bindtap="reveal" bindlongpress="flag">{{item.text}}</view>
+        </view>
+
+        <view class="mine-overlay" wx:if="{{status !== 'playing'}}">
+          <view class="overlay-card">
+            <view class="overlay-seal {{status === 'won' ? 'won' : 'lost'}}">{{status === 'won' ? '✓' : '×'}}</view>
+            <view class="overlay-title">{{status === 'won' ? '雷区已扫清' : '踩到雷了'}}</view>
+            <block wx:if="{{result}}">
+              <view class="overlay-stars">{{result.stars === 3 ? '★★★' : result.stars === 2 ? '★★☆' : '★☆☆'}}</view>
+              <view class="overlay-note">{{result.score}} 分 · {{elapsedText}}</view>
+            </block>
+            <view class="overlay-note" wx:else>{{elapsedText}} · 再来一次，注意第一次点击是安全的</view>
+            <view class="overlay-actions">
+              <button class="secondary-button" bindtap="restart">重新开局</button>
+              <button class="primary-button" bindtap="goHub">返回大厅</button>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="mine-toolbar">
+        <view class="mine-hint">轻点翻开 · 长按插旗</view>
+        <button class="restart-button" bindtap="restart">重新开局</button>
+      </view>
+
+      <view class="mine-tips surface">
+        <view class="tip-row"><text class="tip-index">01</text><text>数字表示相邻八格中的雷数，空白格会自动展开。</text></view>
+        <view class="tip-row"><text class="tip-index">02</text><text>第一次点击永远安全；每日雷区所有玩家一致。</text></view>
+        <view class="tip-row"><text class="tip-index">03</text><text>翻开全部安全格即获胜，用时越短得分越高。</text></view>
+      </view>
+    </block>
+  </block>
+</view>

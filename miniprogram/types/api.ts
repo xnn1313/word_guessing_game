@@ -121,7 +121,9 @@ export type PuzzleGameKey =
   | "word_search"
   | "poetry"
   | "sokoban"
-  | "arrow_maze";
+  | "arrow_maze"
+  | "tile2048"
+  | "minesweeper";
 export type PuzzleDifficulty = "easy" | "medium" | "hard";
 export type PuzzleRunMode = "daily" | "practice" | "level";
 export type MemoryTheme =
@@ -349,6 +351,8 @@ export interface PuzzleCompletionResult {
   mistakes?: number;
   hints_used?: number;
   moves?: number;
+  best_tile?: number;
+  best_score?: number;
   pushes?: number;
   optimal_steps?: number;
   correct_count?: number;
@@ -486,4 +490,68 @@ export interface PuzzleSubmitResponse {
   invalid_cells?: number[];
   unmatched_count?: number;
   result?: PuzzleCompletionResult;
+}
+
+export interface Tile2048StartResponse {
+  puzzle_id: string;
+  mode: "daily" | "practice";
+  puzzle_date: string | null;
+  size: number;
+  goal: number;
+  board: number[];
+  score: number;
+  moves: number;
+  run_id: string | null;
+  elapsed_seconds: number;
+  best_score: number | null;
+}
+
+export interface Tile2048SubmitResponse {
+  correct: boolean;
+  status: "completed" | "incomplete";
+  best_tile?: number;
+  score?: number;
+  result?: PuzzleCompletionResult;
+}
+
+export type MinesweeperCellState = "hidden" | "revealed" | "flagged" | "mine";
+
+export interface MinesweeperCell {
+  index: number;
+  state: MinesweeperCellState;
+  adjacent?: number;
+}
+
+export interface MinesweeperView {
+  rows: number;
+  cols: number;
+  mines: number;
+  cells: MinesweeperCell[];
+  status: "playing" | "won" | "lost";
+  first_click: boolean;
+  flags: number;
+  remaining_mines: number;
+  safe_total: number;
+  safe_revealed: number;
+}
+
+export interface MinesweeperStartResponse {
+  puzzle_id: string;
+  mode: "daily" | "practice";
+  puzzle_date: string | null;
+  difficulty: PuzzleDifficulty;
+  rows: number;
+  cols: number;
+  mines: number;
+  run_id: string | null;
+  elapsed_seconds: number;
+  view: MinesweeperView;
+}
+
+export interface MinesweeperSaveResponse {
+  saved: boolean;
+  run_id: string;
+  view: MinesweeperView;
+  status: "playing" | "won" | "lost";
+  result: PuzzleCompletionResult | null;
 }

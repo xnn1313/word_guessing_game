@@ -8,6 +8,8 @@
     "pages/poetry/index",
     "pages/sokoban/index",
     "pages/arrow-maze/index",
+    "pages/game-2048/index",
+    "pages/minesweeper/index",
     "pages/home/index",
     "pages/auth/index",
     "pages/classic/index",

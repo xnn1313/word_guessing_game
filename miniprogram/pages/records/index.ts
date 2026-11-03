@@ -11,6 +11,8 @@ const routes: Record<PuzzleGameKey, string> = {
   poetry: "/pages/poetry/index",
   sokoban: "/pages/sokoban/index",
   arrow_maze: "/pages/arrow-maze/index",
+  tile2048: "/pages/game-2048/index",
+  minesweeper: "/pages/minesweeper/index",
 };
 
 const marks: Record<PuzzleGameKey, string> = {
@@ -22,6 +24,8 @@ const marks: Record<PuzzleGameKey, string> = {
   poetry: "诗",
   sokoban: "箱",
   arrow_maze: "箭",
+  tile2048: "合",
+  minesweeper: "雷",
 };
 
 function formatPlayedAt(value: string | null): string {
@@ -39,7 +43,7 @@ Page({
     loading: true,
     totalStars: 0,
     completedToday: 0,
-    availableGames: 8,
+    availableGames: 10,
     records: [] as Array<GameOverviewItem & { mark: string; playedText: string }>,
   },
 

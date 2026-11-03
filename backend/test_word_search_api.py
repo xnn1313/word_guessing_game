@@ -7,6 +7,7 @@ from flask import Flask, request
 import puzzle_api
 import storage
 import word_search
+from games import REGISTRY
 
 
 class WordSearchApiTestCase(unittest.TestCase):
@@ -245,7 +246,7 @@ class WordSearchApiTestCase(unittest.TestCase):
         entry = next(item for item in overview["games"] if item["key"] == "word_search")
         self.assertTrue(entry["daily_completed"])
         self.assertEqual(entry["progress_percent"], 100)
-        self.assertEqual(overview["summary"]["available_games"], 8)
+        self.assertEqual(overview["summary"]["available_games"], 1 + len(REGISTRY))
 
 
 if __name__ == "__main__":

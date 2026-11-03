@@ -1,0 +1,60 @@
+<view class="page-shell tile-page">
+  <view class="game-heading">
+    <view>
+      <view class="page-kicker">TILE LAB · 每日方块</view>
+      <view class="page-title">2048</view>
+      <view class="page-subtitle">滑动合并，凑出 2048。每日同一副开局，练习模式自由冲分。</view>
+    </view>
+    <view class="tile-seal">2048</view>
+  </view>
+
+  <view class="segmented-control two-columns mode-tabs">
+    <button class="{{mode === 'daily' ? 'active' : ''}}" data-value="daily" bindtap="switchMode">每日挑战</button>
+    <button class="{{mode === 'practice' ? 'active' : ''}}" data-value="practice" bindtap="switchMode">自由练习</button>
+  </view>
+
+  <view class="status-strip tile-status">
+    <view><text>得分</text><text>{{score}}</text></view>
+    <view><text>最高</text><text>{{bestScore}}</text></view>
+    <view><text>用时</text><text>{{elapsedText}}</text></view>
+  </view>
+
+  <view class="loading-state" wx:if="{{loading}}">正在铺开棋盘…</view>
+
+  <block wx:else>
+    <view class="board-wrap">
+      <view class="board" bindtouchstart="onTouchStart" bindtouchend="onTouchEnd" catchtouchmove="noop">
+        <view class="tile tile-{{item.cls}}" wx:for="{{cells}}" wx:key="id">{{item.value || ''}}</view>
+      </view>
+
+      <view class="board-overlay" wx:if="{{(completed || gameOver) && !dismissResult}}">
+        <view class="overlay-card">
+          <view class="overlay-seal">{{completed ? '2048' : '×'}}</view>
+          <view class="overlay-title">{{completed ? '达成 2048' : '本局结束'}}</view>
+          <view class="overlay-note" wx:if="{{submitting}}">正在提交成绩…</view>
+          <block wx:elif="{{completed && result}}">
+            <view class="overlay-stars">{{result.stars === 3 ? '★★★' : result.stars === 2 ? '★★☆' : '★☆☆'}}</view>
+            <view class="overlay-note">{{result.score}} 分 · {{result.moves}} 步 · {{elapsedText}}</view>
+          </block>
+          <view class="overlay-note" wx:else>{{score}} 分 · {{moves}} 步 · {{elapsedText}}</view>
+          <view class="overlay-actions">
+            <button class="secondary-button" bindtap="startGameTap">再来一局</button>
+            <button class="primary-button" wx:if="{{completed}}" bindtap="continuePlay">继续挑战</button>
+            <button class="primary-button" wx:else bindtap="goHub">返回大厅</button>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="tile-toolbar">
+      <view class="tile-hint">手指滑动棋盘，相同数字合并翻倍</view>
+      <button class="restart-button" bindtap="startGameTap">重新开局</button>
+    </view>
+
+    <view class="tile-tips surface">
+      <view class="tip-row"><text class="tip-index">01</text><text>每次移动后会在空位生成 2 或 4，规划好空格再滑。</text></view>
+      <view class="tip-row"><text class="tip-index">02</text><text>每日挑战使用固定开局，登录后自动保存进度与最高分。</text></view>
+      <view class="tip-row"><text class="tip-index">03</text><text>达成 2048 即完成今日挑战，继续玩到 4096 可获得三星。</text></view>
+    </view>
+  </block>
+</view>

@@ -34,6 +34,8 @@ Page({
     poetryGame: fallbackGame("poetry", "诗词大会"),
     sokobanGame: fallbackGame("sokoban", "推箱子"),
     arrowMazeGame: fallbackGame("arrow_maze", "箭头迷宫"),
+    tile2048Game: fallbackGame("tile2048", "2048"),
+    minesweeperGame: fallbackGame("minesweeper", "每日扫雷"),
   },
 
   onLoad() {
@@ -78,6 +80,8 @@ Page({
         poetryGame: games.poetry || this.data.poetryGame,
         sokobanGame: games.sokoban || this.data.sokobanGame,
         arrowMazeGame: games.arrow_maze || this.data.arrowMazeGame,
+        tile2048Game: games.tile2048 || this.data.tile2048Game,
+        minesweeperGame: games.minesweeper || this.data.minesweeperGame,
       });
     } catch (error) {
       // 大厅保留本地入口，具体游戏页会显示网络错误。
@@ -118,6 +122,14 @@ Page({
     this.openGame(this.data.arrowMazeGame, "/pages/arrow-maze/index");
   },
 
+  openTile2048() {
+    this.openGame(this.data.tile2048Game, "/pages/game-2048/index");
+  },
+
+  openMinesweeper() {
+    this.openGame(this.data.minesweeperGame, "/pages/minesweeper/index");
+  },
+
   openGame(game: GameOverviewItem, url: string) {
     if (game.availability !== "available") {
       wx.showToast({
@@ -139,7 +151,7 @@ Page({
 
   onShareAppMessage() {
     return {
-      title: "八款益智游戏，今天一起练练脑力",
+      title: "十款益智游戏，今天一起练练脑力",
       path: "/pages/hub/index?from=share",
     };
   },
