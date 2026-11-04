@@ -1,71 +1,82 @@
-<view class="page-shell idiom-page {{view === 'game' ? 'game-view' : 'catalog-view'}}">
+<view class="idiom-page">
   <block wx:if="{{view === 'catalog'}}">
-    <view class="page-kicker">IDIOM · 词汇挑战</view>
-    <view class="page-title">成语填字</view>
-    <view class="page-subtitle">顺着释义把两个相交的四字成语补完整。</view>
+    <view class="c-head">
+      <text class="c-eyebrow">IDIOM · 词汇挑战</text>
+      <view class="c-title">成语填字</view>
+      <view class="c-sub">顺着释义，把相交的四字成语补完整。</view>
+    </view>
 
     <view class="daily-card">
       <view class="daily-copy">
-        <text>每日一题</text>
-        <text>同一天、同难度获得相同题目</text>
+        <text class="daily-name">每日一题</text>
+        <text class="daily-note">同一天、同难度，大家拿到同一题</text>
       </view>
-      <button class="daily-start" bindtap="openDaily">开始挑战</button>
+      <view class="daily-start" bindtap="openDaily">开始</view>
       <view class="daily-options">
-        <button
-          class="{{dailyDifficulty === item.value ? 'active' : ''}}"
+        <view
+          class="daily-option {{dailyDifficulty === item.value ? 'active' : ''}}"
           wx:for="{{dailyOptions}}"
           wx:key="value"
           data-value="{{item.value}}"
           bindtap="switchDailyDifficulty"
-        >{{item.label}}</button>
+        >{{item.label}}</view>
       </view>
     </view>
 
-    <view class="catalog-summary">
-      <text>闯关星级</text>
-      <view><text>{{totalStars}}</text> / {{maxStars}} 星</view>
-      <view class="summary-track"><view style="width: {{maxStars ? totalStars / maxStars * 100 : 0}}%"></view></view>
+    <view class="level-summary">
+      <view class="level-summary-top">
+        <text>闯关星级</text>
+        <view><text class="summary-num">{{totalStars}}</text><text class="summary-den"> / {{maxStars}} ★</text></view>
+      </view>
+      <view class="c-track"><view style="width: {{maxStars ? totalStars / maxStars * 100 : 0}}%;"></view></view>
     </view>
 
-    <view class="loading-state" wx:if="{{loading}}">正在读取成语关卡…</view>
-    <view class="category-list" wx:else>
-      <view class="category-card" wx:for="{{categories}}" wx:key="id" wx:for-item="category">
-        <button class="category-header" data-id="{{category.id}}" bindtap="toggleCategory">
-          <view class="category-number">{{index + 1}}</view>
-          <view class="category-copy">
-            <text>{{category.name}}</text>
-            <text>{{category.description}}</text>
+    <view class="loading-line" wx:if="{{loading}}">正在读取成语关卡…</view>
+
+    <view class="chapter-list" wx:else>
+      <view class="chapter" wx:for="{{categories}}" wx:key="id" wx:for-item="category">
+        <view class="chapter-head" data-id="{{category.id}}" bindtap="toggleCategory" hover-class="row-pressed">
+          <view class="chapter-no">{{index + 1}}</view>
+          <view class="chapter-main">
+            <text class="chapter-name">{{category.name}}</text>
+            <text class="chapter-desc">{{category.description}}</text>
           </view>
-          <view class="category-score">{{category.completed_levels}} / {{category.total_levels}}</view>
-          <view class="category-arrow {{category.expanded ? 'open' : ''}}">⌄</view>
-        </button>
-        <view class="level-grid" wx:if="{{category.expanded}}">
-          <button
-            class="level-button {{level.unlocked ? '' : 'locked'}} {{level.stars ? 'completed' : ''}}"
-            wx:for="{{category.levels}}"
-            wx:key="id"
-            wx:for-item="level"
-            data-id="{{level.id}}"
-            data-unlocked="{{level.unlocked}}"
-            bindtap="openLevel"
-          >
-            <text>{{level.order}}</text>
-            <text>{{level.starText || (level.unlocked ? level.difficulty : '锁定')}}</text>
-          </button>
+          <view class="chapter-side">
+            <text class="chapter-count">{{category.completed_levels}} / {{category.total_levels}}</text>
+            <text class="chapter-chev {{category.expanded ? 'open' : ''}}">⌄</text>
+          </view>
+        </view>
+
+        <view class="level-map" wx:if="{{category.expanded}}">
+          <view class="level-node-wrap" wx:for="{{category.levels}}" wx:key="id" wx:for-item="level">
+            <view
+              class="level-node {{level.unlocked ? '' : 'locked'}} {{level.stars ? 'done' : ''}} {{level.current ? 'current' : ''}}"
+              data-id="{{level.id}}"
+              data-unlocked="{{level.unlocked}}"
+              bindtap="openLevel"
+              hover-class="node-pressed"
+            >
+              <text class="node-no">{{level.order}}</text>
+              <text class="node-star">{{level.unlocked ? (level.starText || '☆☆☆') : '锁'}}</text>
+            </view>
+          </view>
         </view>
       </view>
     </view>
   </block>
 
   <block wx:else>
-    <button class="back-button" bindtap="backToCatalog">返回关卡</button>
-    <view class="page-kicker">IDIOM · {{puzzleMode === 'daily' ? '每日挑战' : '连续闯关'}}</view>
-    <view class="game-heading">
-      <view><view class="page-title">{{puzzle.title}}</view><view class="page-subtitle">点击格子，再从字库选择文字。</view></view>
+    <view class="game-top">
+      <view class="back-pill" bindtap="backToCatalog">‹ 关卡</view>
       <view class="difficulty-chip">{{puzzle.difficulty}}</view>
     </view>
+    <view class="c-head game-head">
+      <text class="c-eyebrow">IDIOM · {{puzzleMode === 'daily' ? '每日挑战' : '连续闯关'}}</text>
+      <view class="c-title">{{puzzle.title}}</view>
+      <view class="c-sub">点击格子，再从字库选择文字。</view>
+    </view>
 
-    <view class="game-status">
+    <view class="status-strip">
       <view><text>用时</text><text>{{elapsedText}}</text></view>
       <view><text>错误</text><text>{{mistakes}}</text></view>
       <view><text>提示</text><text>{{hintsUsed}} / {{maxHints}}</text></view>
@@ -112,6 +123,7 @@
     </block>
 
     <view class="complete-panel surface" wx:if="{{completed && result}}">
+      <view class="complete-mark">✓</view>
       <view class="complete-title">成语挑战完成</view>
       <view class="complete-stars">{{result.stars === 3 ? '★★★' : result.stars === 2 ? '★★☆' : '★☆☆'}}</view>
       <view class="complete-detail">{{result.score}} 分 · {{elapsedText}}</view>

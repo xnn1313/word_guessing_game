@@ -2,143 +2,196 @@ import type { GameOverviewItem, GamesOverview } from "../../types/api";
 import { getUsername, isLoggedIn } from "../../utils/auth";
 import { request } from "../../utils/request";
 
-const fallbackGame = (key: GameOverviewItem["key"], title: string): GameOverviewItem => ({
-  key,
-  title,
-  availability: "available",
-  progress_text: "开始挑战",
-  progress_percent: 0,
-  best_score: null,
-  daily_completed: false,
-  last_played_at: null,
-});
+type TaskKey = GameOverviewItem["key"];
+
+interface GameMeta {
+  icon: string;
+  tone: string;
+  url: string;
+  trail?: boolean;
+}
+
+const META: Record<TaskKey, GameMeta> = {
+  word: { icon: "词", tone: "amber", url: "/pages/home/index", trail: true },
+  sudoku: { icon: "数", tone: "blue", url: "/pages/sudoku/index" },
+  idiom: { icon: "成", tone: "pink", url: "/pages/idiom/index", trail: true },
+  memory: { icon: "记", tone: "violet", url: "/pages/memory/index" },
+  word_search: { icon: "连", tone: "cyan", url: "/pages/word-search/index" },
+  poetry: { icon: "诗", tone: "gold", url: "/pages/poetry/index" },
+  sokoban: { icon: "箱", tone: "green", url: "/pages/sokoban/index", trail: true },
+  arrow_maze: { icon: "迷", tone: "indigo", url: "/pages/arrow-maze/index", trail: true },
+  tile2048: { icon: "2048", tone: "amber", url: "/pages/game-2048/index" },
+  minesweeper: { icon: "雷", tone: "mint", url: "/pages/minesweeper/index" },
+};
+
+const ORDER: TaskKey[] = [
+  "word",
+  "sudoku",
+  "idiom",
+  "memory",
+  "word_search",
+  "poetry",
+  "sokoban",
+  "arrow_maze",
+  "tile2048",
+  "minesweeper",
+];
+
+const TRAIL_TITLES: Partial<Record<TaskKey, string>> = {
+  word: "猜词 · 分类闯关",
+  idiom: "成语 · 字里行间",
+  sokoban: "推箱子 · 仓库路线",
+  arrow_maze: "箭头迷宫 · 罗盘航线",
+};
+
+function buildTask(game: GameOverviewItem | undefined, key: TaskKey): any {
+  const meta = META[key];
+  const fallbackTitle = {
+    word: "猜词实验室",
+    sudoku: "每日数独",
+    idiom: "成语填字",
+    memory: "记忆翻牌",
+    word_search: "成语连线",
+    poetry: "诗词大会",
+    sokoban: "推箱子",
+    arrow_maze: "箭头迷宫",
+    tile2048: "2048",
+    minesweeper: "每日扫雷",
+  }[key];
+  return {
+    key,
+    title: game?.title || fallbackTitle,
+    icon: meta.icon,
+    tone: meta.tone,
+    url: meta.url,
+    trail: Boolean(meta.trail),
+    trailTitle: TRAIL_TITLES[key] || fallbackTitle,
+    available: (game?.availability || "available") === "available",
+    progressText: game?.progress_text || "开始挑战",
+    percent: Math.max(0, Math.min(100, Number(game?.progress_percent || 0))),
+    completed: Boolean(game?.daily_completed),
+    bestScore: game?.best_score ?? null,
+    lastPlayedAt: game?.last_played_at || "",
+    started: Number(game?.progress_percent || 0) > 0 || Boolean(game?.last_played_at),
+  };
+}
 
 Page({
   data: {
+    statusBarHeight: 20,
+    navHeight: 44,
+    dateText: "",
+    tab: "today",
     loggedIn: false,
     username: "",
     avatarText: "游",
-    loading: false,
-    trainingLabel: "今日脑力训练",
-    trainingValue: "0 / 7 完成",
-    trainingNote: "挑一个游戏，为今天的大脑热热身",
-    availableGames: 8,
-    dailyTotal: 7,
     completedToday: 0,
+    dailyTotal: 10,
     totalStars: 0,
-    wordGame: fallbackGame("word", "猜词实验室"),
-    sudokuGame: fallbackGame("sudoku", "每日数独"),
-    idiomGame: fallbackGame("idiom", "成语填字"),
-    memoryGame: fallbackGame("memory", "记忆翻牌"),
-    wordSearchGame: fallbackGame("word_search", "成语连线"),
-    poetryGame: fallbackGame("poetry", "诗词大会"),
-    sokobanGame: fallbackGame("sokoban", "推箱子"),
-    arrowMazeGame: fallbackGame("arrow_maze", "箭头迷宫"),
-    tile2048Game: fallbackGame("tile2048", "2048"),
-    minesweeperGame: fallbackGame("minesweeper", "每日扫雷"),
+    trailPercent: 0,
+    tasks: [] as any[],
+    trails: [] as any[],
+    lastTask: null as any,
+    loading: true,
   },
 
   onLoad() {
-    wx.showShareMenu({
-      menus: ["shareAppMessage", "shareTimeline"],
+    this.setupNav();
+    this.setDateText();
+    const fallbackTasks = ORDER.map((key) => buildTask(undefined, key));
+    this.setData({
+      tasks: fallbackTasks,
+      trails: fallbackTasks.filter((task) => task.trail),
+      lastTask: fallbackTasks[0],
     });
+    wx.showShareMenu({ menus: ["shareAppMessage", "shareTimeline"] });
   },
 
   onShow() {
-    const loggedIn = isLoggedIn();
     const username = getUsername();
-    this.setData({ loggedIn, username, avatarText: username.slice(0, 1) || "游" });
+    this.setData({ loggedIn: isLoggedIn(), username, avatarText: username.slice(0, 1) || "游" });
     this.loadOverview();
   },
 
+  setupNav() {
+    try {
+      const info = wx.getWindowInfo();
+      const capsule = wx.getMenuButtonBoundingClientRect();
+      const statusBarHeight = Number(info.statusBarHeight || 20);
+      const navHeight = Math.max(40, (capsule.top - statusBarHeight) * 2 + capsule.height);
+      this.setData({ statusBarHeight, navHeight });
+    } catch (error) {
+      this.setData({ statusBarHeight: 20, navHeight: 44 });
+    }
+  },
+
+  setDateText() {
+    const now = new Date();
+    const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+    this.setData({
+      dateText: `${now.getMonth() + 1}月${now.getDate()}日 · 周${weekdays[now.getDay()]}`,
+    });
+  },
+
   async loadOverview() {
-    if (this.data.loading) return;
-    this.setData({ loading: true });
     try {
       const overview = await request<GamesOverview>("/games/overview");
-      const games = Object.fromEntries(overview.games.map((item) => [item.key, item])) as Record<
-        GameOverviewItem["key"],
-        GameOverviewItem
-      >;
-      const completedToday = Number(overview.summary.completed_today || 0);
-      const dailyTotal = Number(overview.summary.daily_total || 7);
+      const byKey = Object.fromEntries(overview.games.map((item) => [item.key, item]));
+      const tasks = ORDER.map((key) => buildTask(byKey[key], key));
+      const trails = tasks.filter((task) => task.trail);
+      const lastKey = overview.summary.last_game_key;
+      const lastTask =
+        tasks.find((task) => task.key === lastKey) ||
+        tasks.find((task) => task.started && !task.completed) ||
+        tasks[0];
       this.setData({
-        availableGames: Number(overview.summary.available_games || 8),
-        dailyTotal,
-        completedToday,
+        tasks,
+        trails,
+        lastTask,
+        trailPercent: trails.length
+          ? Math.round(trails.reduce((sum, task) => sum + task.percent, 0) / trails.length)
+          : 0,
+        completedToday: Number(overview.summary.completed_today || 0),
+        dailyTotal: Number(overview.summary.daily_total || 10),
         totalStars: Number(overview.summary.total_stars || 0),
-        trainingLabel: completedToday ? "今日训练进度" : "今日脑力训练",
-        trainingValue: `${completedToday} / ${dailyTotal} 完成`,
-        trainingNote: completedToday
-          ? `已获得 ${overview.summary.total_stars || 0} 颗星，继续保持`
-          : "挑一个游戏，为今天的大脑热热身",
-        wordGame: games.word || this.data.wordGame,
-        sudokuGame: games.sudoku || this.data.sudokuGame,
-        idiomGame: games.idiom || this.data.idiomGame,
-        memoryGame: games.memory || this.data.memoryGame,
-        wordSearchGame: games.word_search || this.data.wordSearchGame,
-        poetryGame: games.poetry || this.data.poetryGame,
-        sokobanGame: games.sokoban || this.data.sokobanGame,
-        arrowMazeGame: games.arrow_maze || this.data.arrowMazeGame,
-        tile2048Game: games.tile2048 || this.data.tile2048Game,
-        minesweeperGame: games.minesweeper || this.data.minesweeperGame,
+        loading: false,
       });
     } catch (error) {
-      // 大厅保留本地入口，具体游戏页会显示网络错误。
-    } finally {
+      // 离线时保留本地入口，具体页面会提示网络错误。
       this.setData({ loading: false });
     }
   },
 
-  openWordGame() {
-    this.openGame(this.data.wordGame, "/pages/home/index");
+  switchTab(event: any) {
+    this.setData({ tab: event.currentTarget.dataset.tab });
   },
 
-  openSudoku() {
-    this.openGame(this.data.sudokuGame, "/pages/sudoku/index");
+  openTask(event: any) {
+    const task = this.findTask(event.currentTarget.dataset.key);
+    this.navigateToTask(task);
   },
 
-  openIdiom() {
-    this.openGame(this.data.idiomGame, "/pages/idiom/index");
+  openTrail(event: any) {
+    const task = this.findTask(event.currentTarget.dataset.key);
+    if (!task) return;
+    this.navigateToTask({ ...task, url: task.key === "word" ? "/pages/campaign/index" : task.url });
   },
 
-  openMemory() {
-    this.openGame(this.data.memoryGame, "/pages/memory/index");
+  openContinue() {
+    this.navigateToTask(this.data.lastTask);
   },
 
-  openWordSearch() {
-    this.openGame(this.data.wordSearchGame, "/pages/word-search/index");
+  findTask(key: string) {
+    return (this.data.tasks as any[]).find((task) => task.key === key);
   },
 
-  openPoetry() {
-    this.openGame(this.data.poetryGame, "/pages/poetry/index");
-  },
-
-  openSokoban() {
-    this.openGame(this.data.sokobanGame, "/pages/sokoban/index");
-  },
-
-  openArrowMaze() {
-    this.openGame(this.data.arrowMazeGame, "/pages/arrow-maze/index");
-  },
-
-  openTile2048() {
-    this.openGame(this.data.tile2048Game, "/pages/game-2048/index");
-  },
-
-  openMinesweeper() {
-    this.openGame(this.data.minesweeperGame, "/pages/minesweeper/index");
-  },
-
-  openGame(game: GameOverviewItem, url: string) {
-    if (game.availability !== "available") {
-      wx.showToast({
-        title: game.availability === "maintenance" ? "游戏维护中，请稍后再试" : "游戏即将上线",
-        icon: "none",
-      });
+  navigateToTask(task: any) {
+    if (!task) return;
+    if (!task.available) {
+      wx.showToast({ title: "这个游戏正在维护中", icon: "none" });
       return;
     }
-    wx.navigateTo({ url });
+    wx.navigateTo({ url: task.url });
   },
 
   openRecords() {
@@ -158,7 +211,7 @@ Page({
 
   onShareTimeline() {
     return {
-      title: "脑力游乐场｜每天十分钟，换一种脑力热身",
+      title: "脑力游乐场｜今天也来做一页任务",
       query: "from=timeline",
     };
   },

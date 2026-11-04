@@ -3,15 +3,19 @@ import { requireLogin } from "../../utils/auth";
 import { request, showRequestError } from "../../utils/request";
 
 function decorateCategories(categories: CampaignCategory[]): any[] {
-  return categories.map((category, index) => ({
-    ...category,
-    expanded: index === 0,
-    progressText: `${category.stars}/${category.max_stars} 星`,
-    levels: category.levels.map((level) => ({
+  return categories.map((category, index) => {
+    const levels = category.levels.map((level) => ({
       ...level,
       starText: level.stars ? "★".repeat(level.stars) + "☆".repeat(3 - level.stars) : "☆☆☆",
-    })),
-  }));
+    }));
+    const current = levels.find((level) => level.unlocked && !level.stars);
+    return {
+      ...category,
+      expanded: index === 0,
+      progressText: `${category.stars}/${category.max_stars} 星`,
+      levels: levels.map((level) => ({ ...level, current: current ? level.id === current.id : false })),
+    };
+  });
 }
 
 Page({

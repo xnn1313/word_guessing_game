@@ -1,50 +1,42 @@
 <view class="page-shell campaign-page">
-  <view class="campaign-header">
-    <view>
-      <view class="page-kicker">CAMPAIGN · 挑战路线</view>
-      <view class="page-title">分类闯关</view>
-      <view class="page-subtitle">完成当前关，沿着难度路线继续前进。</view>
-    </view>
-  </view>
+  <view class="page-kicker">CAMPAIGN · 分类闯关</view>
+  <view class="page-title">闯关</view>
+  <view class="page-subtitle">选一个分类，沿着难度一路往上走。</view>
 
   <view class="campaign-progress">
     <view class="progress-copy">
-      <view><text>{{totalStars}}</text> / {{maxStars}} 星</view>
-      <text>13 个分类 · 260 个关卡</text>
+      <view><text>{{totalStars}}</text><text> / {{maxStars}} 星</text></view>
+      <text>13 类 · 260 关</text>
     </view>
     <view class="progress-track">
       <view class="progress-fill" style="width: {{maxStars ? totalStars / maxStars * 100 : 0}}%"></view>
     </view>
+    <view class="progress-note">完成当前关，下一关自动解锁</view>
   </view>
 
   <view class="loading-state" wx:if="{{loading && !categories.length}}">正在读取关卡…</view>
 
   <view class="category-list" wx:else>
-    <view class="category" wx:for="{{categories}}" wx:key="id" wx:for-item="category">
-      <view class="category-header {{category.expanded ? 'expanded' : ''}}" data-id="{{category.id}}" bindtap="toggleCategory" hover-class="card-pressed">
+    <view class="category {{category.expanded ? 'open' : ''}}" wx:for="{{categories}}" wx:key="id" wx:for-item="category">
+      <view class="category-header" data-id="{{category.id}}" bindtap="toggleCategory" hover-class="card-pressed">
         <view class="category-emoji">{{category.emoji}}</view>
         <view class="category-copy">
-          <text class="category-name">{{category.name}}</text>
+          <view class="category-title-row">
+            <text class="category-name">{{category.name}}</text>
+            <text class="category-stars">{{category.progressText}}</text>
+          </view>
           <text class="category-description">{{category.description}}</text>
           <view class="category-track">
             <view style="width: {{category.max_stars ? category.stars / category.max_stars * 100 : 0}}%"></view>
           </view>
         </view>
-        <view class="category-right">
-          <text class="category-stars">{{category.progressText}}</text>
-          <text class="category-chevron {{category.expanded ? 'open' : ''}}">⌄</text>
-        </view>
+        <text class="category-chevron {{category.expanded ? 'open' : ''}}">⌄</text>
       </view>
 
       <view class="level-area" wx:if="{{category.expanded}}">
-        <view class="difficulty-line">
-          <text>入门</text>
-          <view class="difficulty-dots"><view></view><view></view><view></view><view></view><view></view></view>
-          <text>高手</text>
-        </view>
         <view class="level-grid">
           <view
-            class="level-button difficulty-{{level.difficulty}} {{level.unlocked ? '' : 'locked'}}"
+            class="level-button difficulty-{{level.difficulty}} {{level.unlocked ? '' : 'locked'}} {{level.current ? 'current' : ''}}"
             wx:for="{{category.levels}}"
             wx:key="id"
             wx:for-item="level"
@@ -54,8 +46,8 @@
             hover-class="level-pressed"
           >
             <text class="level-number">{{level.order}}</text>
-            <text class="level-label">{{level.difficulty_label}}</text>
-            <text class="level-stars">{{level.unlocked ? level.starText : '未解锁'}}</text>
+            <text class="level-stars">{{level.unlocked ? level.starText : '锁'}}</text>
+            <text class="level-label">{{level.unlocked ? level.difficulty_label : '未解锁'}}</text>
           </view>
         </view>
       </view>

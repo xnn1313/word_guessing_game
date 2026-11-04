@@ -1,5 +1,6 @@
 {
-  "navigationBarTitleText": "脑力游乐场",
+  "navigationStyle": "custom",
+  "navigationBarTitleText": "今日任务",
   "enableShareAppMessage": true,
   "enableShareTimeline": true
 }

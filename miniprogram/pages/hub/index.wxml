@@ -1,101 +1,119 @@
-<view class="page-shell hub-page">
-  <view class="hub-header">
-    <view class="hub-heading">
-      <view class="page-kicker">BRAIN BREAK · {{loggedIn ? username : '随时开玩'}}</view>
-      <view class="page-title"><text>挑一块，</text><text>现在就开动。</text></view>
-      <view class="page-subtitle">十款小游戏，给不同的脑力区域做热身。</view>
+<view class="hub-page">
+  <view style="height: {{statusBarHeight}}px;"></view>
+  <view class="hub-nav" style="height: {{navHeight}}px;">
+    <text class="hub-date">{{dateText}}</text>
+    <view class="hub-account" bindtap="openProfile">
+      <text>{{avatarText}}</text>
     </view>
-    <view class="header-actions">
-      <button class="share-button" open-type="share" aria-label="分享脑力游乐场">
-        <view class="share-glyph"><view></view><view></view><view></view></view>
-        <text>分享</text>
-      </button>
-      <view class="account-button {{loggedIn ? 'signed' : ''}}" bindtap="openProfile" aria-label="打开个人中心">
-        <view class="account-avatar">{{avatarText}}</view>
+  </view>
+
+  <view class="hub-hero">
+    <view class="hub-hero-copy">
+      <text class="hub-kicker">{{tab === 'today' ? 'TODAY' : 'TRAIL'}}</text>
+      <view class="hub-title">{{tab === 'today' ? '今日任务' : '闯关'}}</view>
+      <view class="hub-sub">{{tab === 'today' ? '十款小游戏，今天挑几项练练' : '挑一条路线，接着上次往前推'}}</view>
+    </view>
+    <view class="hero-stars">
+      <text class="hero-stars-value">{{totalStars}}</text>
+      <text class="hero-stars-label">总星数</text>
+    </view>
+  </view>
+
+  <view class="seg">
+    <view class="seg-item {{tab === 'today' ? 'on' : ''}}" data-tab="today" bindtap="switchTab">今日任务</view>
+    <view class="seg-item {{tab === 'trail' ? 'on' : ''}}" data-tab="trail" bindtap="switchTab">闯关</view>
+  </view>
+
+  <block wx:if="{{tab === 'today'}}">
+    <view class="summary-card">
+      <view class="summary-top">
+        <text class="summary-title">已完成 {{completedToday}} / {{dailyTotal}}</text>
+        <text class="summary-star">+{{totalStars}} ★</text>
+      </view>
+      <view class="track">
+        <view class="track-fill" style="width: {{dailyTotal ? completedToday / dailyTotal * 100 : 0}}%;"></view>
+      </view>
+      <view class="summary-meta">
+        <text>每天一页，做完就收工</text>
+        <text>{{dailyTotal > completedToday ? dailyTotal - completedToday : 0}} 项待完成</text>
       </view>
     </view>
+
+    <view class="loading-line" wx:if="{{loading}}">正在整理今天的任务…</view>
+
+    <view class="task-list">
+      <view
+        class="task {{item.completed ? 'done' : ''}} {{item.available ? '' : 'offline'}}"
+        wx:for="{{tasks}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="openTask"
+        hover-class="row-pressed"
+      >
+        <view class="task-icon tone-{{item.tone}}">{{item.icon}}</view>
+        <view class="task-main">
+          <text class="task-title">{{item.title}}</text>
+          <text class="task-sub">{{item.progressText}}</text>
+        </view>
+        <view class="task-side">
+          <view class="check" wx:if="{{item.completed}}">✓</view>
+          <view class="go" wx:elif="{{item.started}}">继续</view>
+          <text class="task-state" wx:else>开始</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="summary-card">
+      <view class="summary-top">
+        <text class="summary-title">闯关路线</text>
+        <text class="summary-star">{{totalStars}} ★</text>
+      </view>
+      <view class="track">
+        <view class="track-fill indigo" style="width: {{trailPercent}}%;"></view>
+      </view>
+      <view class="summary-meta">
+        <text>四段路线，进度各自独立</text>
+        <text>慢慢来</text>
+      </view>
+    </view>
+
+    <view class="trail-list">
+      <view
+        class="trail"
+        wx:for="{{trails}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="openTrail"
+        hover-class="row-pressed"
+      >
+        <view class="trail-icon tone-{{item.tone}}">{{item.icon}}</view>
+        <view class="trail-main">
+          <text class="trail-title">{{item.trailTitle}}</text>
+          <text class="trail-sub">{{item.progressText}}</text>
+          <view class="trail-bar">
+            <view style="width: {{item.percent}}%;"></view>
+          </view>
+        </view>
+        <view class="trail-side">
+          <text>{{item.percent}}%</text>
+          <text class="trail-arrow">→</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view class="continue-bar" wx:if="{{lastTask && tab === 'today'}}" bindtap="openContinue" hover-class="row-pressed">
+    <view class="continue-icon tone-{{lastTask.tone}}">{{lastTask.icon}}</view>
+    <view class="continue-main">
+      <text class="continue-title">继续 · {{lastTask.title}}</text>
+      <text class="continue-sub">{{lastTask.progressText}}</text>
+    </view>
+    <text class="continue-arrow">→</text>
   </view>
 
-  <view class="training-summary">
-    <view class="training-main">
-      <text class="training-label">{{trainingLabel}}</text>
-      <text class="training-value">{{trainingValue}}</text>
-      <text class="training-note">{{trainingNote}}</text>
-    </view>
-    <view class="training-stats">
-      <view><text>{{availableGames}}</text><text>款游戏</text></view>
-      <view><text>{{totalStars}}</text><text>颗星星</text></view>
-    </view>
-  </view>
-
-  <view class="library-heading">
-    <view><text class="section-title">游戏积木</text><text class="section-note">每一块，练一种能力</text></view>
-    <text class="library-count">{{availableGames}} 款可玩</text>
-  </view>
-
-  <view class="game-library">
-    <view class="game-card word-card {{wordGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openWordGame" hover-class="card-pressed">
-      <view class="game-card-top"><view class="game-icon">词</view><text>联想</text></view>
-      <view class="game-copy"><text class="game-name">猜词实验室</text><text class="game-description">{{wordGame.progress_text}}</text></view>
-      <view class="game-footer"><view class="game-progress"><view style="width: {{wordGame.progress_percent}}%"></view></view><view class="arrow-icon"></view></view>
-    </view>
-
-    <view class="game-card sudoku-card {{sudokuGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openSudoku" hover-class="card-pressed">
-      <view class="game-card-top"><view class="game-icon grid-mark"><view></view><view></view><view></view><view></view></view><text>逻辑</text></view>
-      <view class="game-copy"><text class="game-name">每日数独</text><text class="game-description">{{sudokuGame.progress_text}}</text></view>
-      <view class="game-footer"><text>三种难度</text><view class="arrow-icon"></view></view>
-    </view>
-
-    <view class="game-card idiom-card {{idiomGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openIdiom" hover-class="card-pressed">
-      <view class="game-card-top"><view class="game-icon">成</view><text>词汇</text></view>
-      <view class="game-copy"><text class="game-name">成语填字</text><text class="game-description">{{idiomGame.progress_text}}</text></view>
-      <view class="game-footer"><text>连续闯关</text><view class="arrow-icon"></view></view>
-    </view>
-
-    <view class="game-card memory-card {{memoryGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openMemory" hover-class="card-pressed">
-      <view class="game-card-top"><view class="game-icon card-mark"><view></view><view></view></view><text>记忆</text></view>
-      <view class="game-copy"><text class="game-name">记忆翻牌</text><text class="game-description">{{memoryGame.progress_text}}</text></view>
-      <view class="game-footer"><text>专注训练</text><view class="arrow-icon"></view></view>
-    </view>
-
-    <view class="game-card line-card {{wordSearchGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openWordSearch" hover-class="card-pressed">
-      <view class="game-card-top"><view class="game-icon path-mark"><view></view><view></view><view></view></view><text>观察</text></view>
-      <view class="game-copy"><text class="game-name">成语连线</text><text class="game-description">{{wordSearchGame.progress_text}}</text></view>
-      <view class="game-footer"><text>字阵寻踪</text><view class="arrow-icon"></view></view>
-    </view>
-
-    <view class="game-card poetry-card {{poetryGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openPoetry" hover-class="card-pressed">
-      <view class="game-card-top"><view class="game-icon seal-mark">诗</view><text>国学</text></view>
-      <view class="game-copy"><text class="game-name">诗词大会</text><text class="game-description">{{poetryGame.progress_text}}</text></view>
-      <view class="game-footer"><text>答题学习</text><view class="arrow-icon"></view></view>
-    </view>
-
-    <view class="game-card sokoban-card {{sokobanGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openSokoban" hover-class="card-pressed">
-      <view class="game-card-top"><view class="game-icon crate-mark"><view></view><view></view></view><text>规划</text></view>
-      <view class="game-copy"><text class="game-name">推箱子</text><text class="game-description">{{sokobanGame.progress_text}}</text></view>
-      <view class="game-footer"><text>仓库闯关</text><view class="arrow-icon"></view></view>
-    </view>
-
-    <view class="game-card arrow-card {{arrowMazeGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openArrowMaze" hover-class="card-pressed">
-      <view class="game-card-top"><view class="game-icon compass-icon"><view></view></view><text>路线</text></view>
-      <view class="game-copy"><text class="game-name">箭头迷宫</text><text class="game-description">{{arrowMazeGame.progress_text}}</text></view>
-      <view class="game-footer"><text>罗盘闯关</text><view class="arrow-icon"></view></view>
-    </view>
-
-    <view class="game-card tile-card {{tile2048Game.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openTile2048" hover-class="card-pressed">
-      <view class="game-card-top"><view class="game-icon tile-mark">2048</view><text>合并</text></view>
-      <view class="game-copy"><text class="game-name">2048</text><text class="game-description">{{tile2048Game.progress_text}}</text></view>
-      <view class="game-footer"><text>每日同局</text><view class="arrow-icon"></view></view>
-    </view>
-
-    <view class="game-card mine-card {{minesweeperGame.availability !== 'available' ? 'unavailable' : ''}}" bindtap="openMinesweeper" hover-class="card-pressed">
-      <view class="game-card-top"><view class="game-icon mine-mark">✦</view><text>推理</text></view>
-      <view class="game-copy"><text class="game-name">每日扫雷</text><text class="game-description">{{minesweeperGame.progress_text}}</text></view>
-      <view class="game-footer"><text>9×9 · 10 雷</text><view class="arrow-icon"></view></view>
-    </view>
-  </view>
-
-  <view class="app-tabbar">
+  <view class="app-tabbar hub-tabbar">
     <view class="app-tab-item active"><view class="nav-icon nav-games"></view><text>游戏</text></view>
     <view class="app-tab-item" bindtap="openRecords" hover-class="nav-pressed"><view class="nav-icon nav-records"></view><text>记录</text></view>
     <view class="app-tab-item" bindtap="openProfile" hover-class="nav-pressed"><view class="nav-icon nav-profile"></view><text>我的</text></view>

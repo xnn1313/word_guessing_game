@@ -15,20 +15,17 @@
     <view class="control-row three-columns">
       <button class="{{difficulty === item.value ? 'active difficulty-active' : ''}}" wx:for="{{difficultyOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="switchDifficulty">{{item.label}}</button>
     </view>
-    <view class="level-drawer" wx:if="{{mode === 'level'}}">
-      <view class="level-drawer-title"><text>航线图册</text><text>{{levelCompleted}} / {{levelTotal}} 已完成</text></view>
-      <scroll-view class="level-scroll" scroll-x enhanced show-scrollbar="{{false}}" scroll-into-view="arrow-level-{{levelOrder}}">
-        <view class="level-list">
-          <button
-            id="arrow-level-{{item.order}}"
-            class="level-chip {{item.order === levelOrder ? 'current' : ''}} {{item.stars > 0 ? 'completed' : ''}} {{!item.unlocked ? 'locked' : ''}}"
-            wx:for="{{levels}}"
-            wx:key="order"
-            data-order="{{item.order}}"
-            bindtap="selectLevel"
-          ><text>{{item.order}}</text><text>{{item.stars > 0 ? (item.stars === 3 ? '★★★' : item.stars === 2 ? '★★' : '★') : item.unlocked ? '可挑战' : '未解锁'}}</text></button>
-        </view>
-      </scroll-view>
+    <view class="level-map" wx:if="{{mode === 'level'}}">
+      <view class="level-map-head"><text>航线图册</text><text>{{levelCompleted}} / {{levelTotal}} 已完成</text></view>
+      <view class="level-grid">
+        <button
+          class="level-node {{item.order === levelOrder ? 'current' : ''}} {{item.stars > 0 ? 'done' : ''}} {{!item.unlocked ? 'locked' : ''}}"
+          wx:for="{{levels}}"
+          wx:key="order"
+          data-order="{{item.order}}"
+          bindtap="selectLevel"
+        ><text class="node-no">{{item.order}}</text><text class="node-stars">{{item.stars > 0 ? (item.stars === 3 ? '★★★' : item.stars === 2 ? '★★☆' : '★☆☆') : item.unlocked ? '☆☆☆' : '锁'}}</text></button>
+      </view>
     </view>
   </view>
 

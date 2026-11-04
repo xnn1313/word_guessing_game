@@ -170,7 +170,7 @@ Page({
       const guestProgress = isLoggedIn() ? {} : getGuestIdiomProgress();
       let guestStars = 0;
       const categories = catalog.categories.map((category, categoryIndex) => {
-        const levels = category.levels.map((level, index) => {
+        const visible = category.levels.map((level, index) => {
           const local = guestProgress[level.id];
           const previous = index > 0 ? guestProgress[category.levels[index - 1].id] : null;
           if (local) guestStars += Number(local.stars || 0);
@@ -184,6 +184,8 @@ Page({
               : "",
           };
         });
+        const current = visible.find((level) => level.unlocked && level.stars === 0);
+        const levels = visible.map((level) => ({ ...level, current: level.id === current?.id }));
         return {
           ...category,
           expanded: categoryIndex === 0,
