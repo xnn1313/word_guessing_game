@@ -69,3 +69,18 @@
 }
 
 .auth-footnote text { width: 12rpx; height: 12rpx; border: 3rpx solid var(--color-ink); border-radius: 50%; background: var(--color-aqua); }
+
+/* ---- 2026 interaction refresh ---- */
+page { background: #f6f7fb; }
+.auth-page { background: #f6f7fb; }
+.auth-mark { border: 0; border-radius: 24rpx; background: #eef0ff; color: #4f5bff; transform: none; }
+.auth-title { color: #1b2236; font-size: 42rpx; font-weight: 900; letter-spacing: -1rpx; }
+.auth-subtitle { color: #7c8399; }
+.auth-panel { border: 0; border-radius: 28rpx; background: #ffffff; box-shadow: 0 12rpx 32rpx rgba(35,42,66,0.06); }
+.auth-tabs { padding: 6rpx; border: 0; border-radius: 20rpx; background: #e9ebf3; }
+.auth-tab { min-height: 72rpx; border-radius: 15rpx; color: #7c8399; }
+.auth-tab.active { background: #ffffff; color: #1b2236; box-shadow: 0 4rpx 12rpx rgba(35,42,66,0.08); }
+.field-label { color: #1b2236; }
+.auth-page .text-input { border: 2rpx solid #e9ecf3; border-radius: 16rpx; background: #f9fafc; }
+.auth-page .primary-button { border: 0; border-radius: 18rpx; background: #1b2236; box-shadow: none; color: #ffffff; }
+.auth-footnote { color: #9299b0; }

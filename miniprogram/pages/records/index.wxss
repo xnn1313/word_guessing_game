@@ -85,3 +85,23 @@
 .record-track > view { min-width: 4rpx; height: 100%; background: var(--color-primary); }
 .record-meta { display: flex; margin-top: 12rpx; color: var(--color-muted); font-size: 18rpx; line-height: 1.35; flex-direction: column; }
 .record-arrow { position: absolute; right: 18rpx; top: 22rpx; width: 16rpx; height: 16rpx; border-top: 3rpx solid var(--color-ink); border-right: 3rpx solid var(--color-ink); transform: rotate(45deg); }
+
+/* ---- 2026 interaction refresh ---- */
+page { background: #f6f7fb; }
+.records-page { background: #f6f7fb; }
+.records-page .page-kicker { color: #9aa1b4; font-size: 20rpx; letter-spacing: 3rpx; }
+.records-page .page-title { color: #1b2236; font-size: 60rpx; font-weight: 900; letter-spacing: -2rpx; }
+.records-page .page-subtitle { color: #7c8399; font-size: 23rpx; }
+.records-summary { border: 0; border-radius: 28rpx; background: #ffffff; box-shadow: 0 12rpx 32rpx rgba(35,42,66,0.06); }
+.records-summary > view { border-color: #eef0f6; }
+.records-summary .summary-main > text { color: #9299b0; }
+.records-summary .summary-main > view { color: #1b2236; }
+.records-summary .summary-main > view text { color: #4f5bff; font-size: 46rpx; font-weight: 900; }
+.records-summary .summary-stat text:first-child { color: #1b2236; font-size: 36rpx; font-weight: 900; }
+.records-summary .summary-stat text:last-child { color: #9299b0; }
+.record-card { border: 0; border-radius: 24rpx; background: #ffffff; box-shadow: 0 6rpx 20rpx rgba(35,42,66,0.04); }
+.record-mark { border: 0; border-radius: 16rpx; }
+.record-track { border: 0; background: #eef0f6; }
+.record-track > view { background: #4f5bff; }
+.records-page .app-tabbar { border: 0; border-radius: 34rpx 34rpx 0 0; box-shadow: 0 -8rpx 30rpx rgba(35,42,66,0.08); }
+.records-page .app-tab-item.active { background: #eef0ff; color: #4f5bff; }

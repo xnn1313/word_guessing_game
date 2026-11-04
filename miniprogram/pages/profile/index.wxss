@@ -64,3 +64,21 @@
 .profile-tips > view:first-child { background: var(--color-aqua-soft); }
 .profile-tips > view text:first-child { color: var(--color-ink); font-size: 25rpx; font-weight: 850; }
 .profile-tips > view text:last-child { max-width: 360rpx; color: var(--color-muted); font-size: 20rpx; text-align: right; }
+
+/* ---- 2026 interaction refresh ---- */
+page { background: #f6f7fb; }
+.profile-page { background: #f6f7fb; }
+.profile-hero { border: 0; border-radius: 30rpx; background: linear-gradient(135deg,#eef0ff,#e4e8ff); box-shadow: 0 12rpx 32rpx rgba(79,91,255,0.08); }
+.profile-hero.guest { background: #eef0ff; }
+.profile-avatar { border: 0; border-radius: 26rpx; background: #ffffff; color: #4f5bff; transform: none; box-shadow: 0 8rpx 20rpx rgba(35,42,66,0.06); }
+.profile-name { color: #1b2236; }
+.profile-state { color: #7c8399; }
+.progress-panel { border: 0; border-radius: 26rpx; background: #ffffff; box-shadow: 0 12rpx 32rpx rgba(35,42,66,0.06); }
+.progress-track { border: 0; background: #eef0f6; }
+.progress-fill { background: #4f5bff; }
+.profile-page .primary-button { border: 0; border-radius: 18rpx; background: #1b2236; box-shadow: none; }
+.profile-page .danger-button { border: 0; border-radius: 18rpx; background: #ffecec; color: #d14343; box-shadow: none; }
+.profile-tips > view { border: 0; border-radius: 20rpx; background: #ffffff; box-shadow: 0 6rpx 18rpx rgba(35,42,66,0.04); }
+.profile-tips > view:first-child { background: #f2fbf6; }
+.profile-page .app-tabbar { border: 0; border-radius: 34rpx 34rpx 0 0; box-shadow: 0 -8rpx 30rpx rgba(35,42,66,0.08); }
+.profile-page .app-tab-item.active { background: #eef0ff; color: #4f5bff; }
