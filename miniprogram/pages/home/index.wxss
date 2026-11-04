@@ -213,3 +213,22 @@
   .hero { min-height: 280rpx; }
   .mode-heading { margin-top: 34rpx; }
 }
+
+/* ---- 2026 interaction refresh ---- */
+page { background: #f6f7fb; }
+.home-page { background: #f6f7fb; }
+.home-page .page-kicker { color: #9aa1b4; font-size: 20rpx; letter-spacing: 3rpx; }
+.home-page .page-title { color: #1b2236; font-size: 60rpx; font-weight: 900; letter-spacing: -2rpx; }
+.home-page .page-subtitle { color: #7c8399; font-size: 23rpx; }
+.hero { border: 0; border-radius: 34rpx; background: linear-gradient(135deg,#4f5bff,#2f3ac9); box-shadow: 0 18rpx 40rpx rgba(47,58,201,0.22); }
+.hero-cta { border-radius: 99rpx; }
+.mode-heading text:first-child { color: #1b2236; font-weight: 900; }
+.mode-heading text:last-child { color: #9299b0; }
+.mode-row { border: 0; border-radius: 26rpx; background: #ffffff; box-shadow: 0 8rpx 24rpx rgba(35,42,66,0.05); }
+.mode-title { color: #1b2236; font-weight: 800; }
+.mode-description { color: #9299b0; }
+.mode-icon { border: 0; border-radius: 18rpx; }
+.save-hint { border: 0; background: transparent; color: #9299b0; }
+.lab-rules > view { border: 0; background: transparent; border-bottom: 1rpx solid #eef0f6; }
+.lab-rules text:first-child { color: #b3b9c9; font-weight: 900; }
+.lab-rules text:last-child { color: #7c8399; }

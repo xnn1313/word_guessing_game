@@ -56,3 +56,30 @@
 @keyframes study-rise { from { opacity: 0; transform: translateY(12rpx); } to { opacity: 1; transform: translateY(0); } }
 @media (max-height: 700px) { .poetry-page .page-subtitle { display: none; } .compact-controls { margin-top: 14rpx; } .control-row button { height: 62rpx; } .poem-context { min-height: 112rpx; font-size: 35rpx; } .option-card { min-height: 68rpx; } }
 @media (prefers-reduced-motion: reduce) { .quiz-progress view { transition-duration: .01ms !important; } .study-card { animation: none !important; } }
+
+/* ---- 2026 interaction refresh ---- */
+page { background: #f6f7fb; }
+.poetry-page { background: #f6f7fb; }
+.poetry-page .page-kicker { color: #9aa1b4; font-size: 20rpx; letter-spacing: 3rpx; }
+.poetry-page .page-title { color: #1b2236; font-size: 60rpx; font-weight: 900; letter-spacing: -2rpx; }
+.poetry-page .page-subtitle { color: #7c8399; font-size: 23rpx; }
+.compact-controls { border: 0; border-radius: 26rpx; background: #ffffff; box-shadow: 0 8rpx 26rpx rgba(35,42,66,0.05); }
+.control-row button { border: 0; border-radius: 14rpx; color: #7c8399; }
+.control-row button.active { background: #f2f4fa; color: #1b2236; box-shadow: none; border: 0; }
+.control-row button.mode-active { background: #1b2236; color: #ffffff; }
+.control-row button.difficulty-active { background: #eef0ff; color: #4f5bff; }
+.poetry-status { overflow: hidden; border: 0; border-radius: 22rpx; background: #ffffff; box-shadow: 0 6rpx 18rpx rgba(35,42,66,0.04); }
+.poetry-status > view { border-color: #eef0f6; }
+.poetry-status text:first-child { color: #9299b0; }
+.poetry-status text:last-child { color: #1b2236; }
+.quiz-progress { height: 10rpx; margin: 16rpx 4rpx 0; border: 0; background: #eef0f6; }
+.quiz-progress view { background: #4f5bff; }
+.question-sheet { border: 0; border-radius: 28rpx; background: #ffffff; box-shadow: 0 12rpx 32rpx rgba(35,42,66,0.06); }
+.question-sheet::before { display: none; }
+.option-card { border: 2rpx solid #e9ecf3; border-radius: 16rpx; }
+.option-card.selected { border-color: #4f5bff; background: #eef0ff; }
+.option-card.correct { border-color: #12b76a; background: #e9f9f0; }
+.option-card.wrong { border-color: #e05252; background: #ffecec; }
+.study-continue { border: 0; border-radius: 18rpx; background: #1b2236; box-shadow: none; }
+.poetry-complete { border: 0; border-radius: 28rpx; background: #ffffff; box-shadow: 0 12rpx 32rpx rgba(35,42,66,0.06); }
+.complete-stars { color: #f0a92c; }

@@ -53,3 +53,16 @@
 .result-history { margin-top: 26rpx; }
 .finished-history { height: 350rpx; }
 @media (max-height: 700px) { .waiting-panel { min-height: 420rpx; } .battle-history { height: 340rpx; } }
+
+/* ---- 2026 interaction refresh ---- */
+page { background: #f6f7fb; }
+.room-page { background: #f6f7fb; }
+.room-code { border: 0; border-radius: 20rpx; background: #fff1d6; }
+.room-status { border: 0; border-radius: 15rpx; background: #ffffff; box-shadow: 0 4rpx 12rpx rgba(35,42,66,0.05); }
+.player-card { border: 0; border-radius: 24rpx; background: #ffffff; box-shadow: 0 8rpx 24rpx rgba(35,42,66,0.05); }
+.player-card.self { background: #eef0ff; }
+.player-card.opponent { background: #fff8e6; }
+.player-card.empty { background: #f1f3f8; }
+.winner-badge { border: 0; background: #f0a92c; color: #ffffff; }
+.player-track { border: 0; background: #eef0f6; }
+.waiting-panel { border: 0; border-radius: 28rpx; background: #ffffff; box-shadow: 0 12rpx 32rpx rgba(35,42,66,0.06); }

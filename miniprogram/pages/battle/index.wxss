@@ -24,3 +24,15 @@
 .battle-rules > view > view { display: grid; grid-template-columns: 150rpx minmax(0, 1fr); align-items: center; gap: 12rpx; }
 .battle-rules > view > view text:first-child { color: var(--color-ink); font-size: 24rpx; font-weight: 850; }
 .battle-rules > view > view text:last-child { color: var(--color-muted); font-size: 20rpx; }
+
+/* ---- 2026 interaction refresh ---- */
+page { background: #f6f7fb; }
+.battle-lobby { background: #f6f7fb; }
+.battle-lobby .page-kicker { color: #9aa1b4; font-size: 20rpx; letter-spacing: 3rpx; }
+.battle-lobby .page-title { color: #1b2236; font-size: 60rpx; font-weight: 900; letter-spacing: -2rpx; }
+.battle-lobby .page-subtitle { color: #7c8399; font-size: 23rpx; }
+.battle-visual { border: 0; border-radius: 30rpx; background: #1b2236; box-shadow: 0 18rpx 40rpx rgba(27,34,54,0.2); }
+.create-button { border: 0; border-radius: 22rpx; background: #1b2236; color: #ffffff; box-shadow: 0 14rpx 30rpx rgba(27,34,54,0.18); }
+.room-input { border: 2rpx solid #e9ecf3; border-radius: 18rpx; }
+.join-button { border: 0; border-radius: 18rpx; background: #4f5bff; }
+.battle-rules > view { border: 0; border-radius: 20rpx; background: #ffffff; box-shadow: 0 6rpx 18rpx rgba(35,42,66,0.04); }

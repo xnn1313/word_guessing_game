@@ -56,3 +56,39 @@
   .sudoku-modes { margin-top: 16rpx; }
   .sudoku-cell { height: 70rpx; }
 }
+
+/* ---- 2026 interaction refresh ---- */
+page { background: #f6f7fb; }
+.sudoku-page { background: #f6f7fb; }
+.sudoku-page .page-kicker { color: #9aa1b4; font-size: 20rpx; letter-spacing: 3rpx; }
+.sudoku-page .page-title { color: #1b2236; font-size: 60rpx; font-weight: 900; letter-spacing: -2rpx; }
+.sudoku-page .page-subtitle { color: #7c8399; font-size: 23rpx; }
+.sudoku-modes { margin-top: 20rpx; gap: 12rpx; }
+.option-bar, .difficulty-bar { padding: 6rpx; border: 0; border-radius: 20rpx; background: #ffffff; box-shadow: 0 6rpx 18rpx rgba(35,42,66,0.04); }
+.option-button, .difficulty-button { min-height: 64rpx; border-radius: 14rpx; color: #7c8399; font-size: 21rpx; }
+.option-button.active { background: #1b2236; color: #ffffff; }
+.difficulty-button.active { background: #eef0ff; color: #4f5bff; box-shadow: none; }
+.daily-slot-section { padding: 18rpx; border: 0; border-radius: 22rpx; background: #ffffff; box-shadow: 0 6rpx 18rpx rgba(35,42,66,0.04); }
+.daily-slot-heading { color: #9299b0; font-size: 19rpx; }
+.daily-slot-heading text:first-child { color: #1b2236; }
+.daily-slot-heading text:last-child { color: #4f5bff; }
+.daily-slot-button { min-height: 64rpx; border: 0; border-radius: 14rpx; background: #f4f5fa; color: #7c8399; }
+.daily-slot-button.active { background: #1b2236; color: #ffffff; box-shadow: none; }
+.game-status { border: 0; border-radius: 22rpx; background: #ffffff; box-shadow: 0 6rpx 18rpx rgba(35,42,66,0.04); }
+.game-status > view { border-color: #eef0f6; }
+.game-status text:first-child { color: #9299b0; }
+.game-status text:last-child { color: #1b2236; }
+.sudoku-board { border: 3rpx solid #1b2236; border-radius: 18rpx; }
+.sudoku-cell.selected { background: #dfe4ff; box-shadow: inset 0 0 0 3rpx #4f5bff; }
+.sudoku-cell.same-value { background: #eef2ff; box-shadow: none; }
+.sudoku-cell.invalid { background: #ffecec; color: #d14343; }
+.number-pad button { border: 0; border-radius: 16rpx; background: #f4f5fa; }
+.number-pad button.active { background: #1b2236; box-shadow: none; }
+.tool-button { border: 0; border-radius: 16rpx; background: #f4f5fa; }
+.tool-button.active { background: #eef0ff; color: #4f5bff; }
+.tool-button.danger { background: #ffecec; color: #d14343; }
+.sudoku-page .primary-button { min-height: 92rpx; margin-top: 16rpx; border: 0; border-radius: 20rpx; background: #1b2236; box-shadow: none; color: #ffffff; font-size: 25rpx; font-weight: 800; }
+.complete-panel { border: 0; border-radius: 26rpx; background: #ffffff; box-shadow: 0 12rpx 32rpx rgba(35,42,66,0.06); }
+.complete-mark { border: 0; border-radius: 50%; background: #e4f7ee; color: #12b76a; }
+.complete-stars { color: #f0a92c; }
+.complete-detail { color: #7c8399; }

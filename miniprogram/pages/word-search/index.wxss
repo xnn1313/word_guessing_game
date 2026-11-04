@@ -43,3 +43,30 @@
 .complete-actions { display: grid; width: 100%; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12rpx; }
 @media (max-height: 700px) { .word-search-page .page-subtitle { display: none; } .search-controls { margin-top: 14rpx; } .control-row button { height: 68rpx; } .theme-chip { height: 66rpx; } }
 @media (prefers-reduced-motion: reduce) { .word-search-board,.search-cell { transition-duration: 0.01ms !important; } }
+
+/* ---- 2026 interaction refresh ---- */
+page { background: #f6f7fb; }
+.word-search-page { background: #f6f7fb; }
+.word-search-page .page-kicker { color: #9aa1b4; font-size: 20rpx; letter-spacing: 3rpx; }
+.word-search-page .page-title { color: #1b2236; font-size: 60rpx; font-weight: 900; letter-spacing: -2rpx; }
+.word-search-page .page-subtitle { color: #7c8399; font-size: 23rpx; }
+.search-controls { border: 0; border-radius: 26rpx; background: #ffffff; box-shadow: 0 8rpx 26rpx rgba(35,42,66,0.05); }
+.search-controls .control-row button { height: 64rpx; border: 0; border-radius: 14rpx; background: #f4f5fa; color: #7c8399; }
+.search-controls .control-row button.active { background: #1b2236; color: #ffffff; box-shadow: none; }
+.theme-chip { border: 0; border-radius: 14rpx; background: #f4f5fa; color: #7c8399; }
+.theme-chip.active { background: #eef0ff; color: #4f5bff; }
+.search-status { overflow: hidden; border: 0; border-radius: 22rpx; background: #ffffff; box-shadow: 0 6rpx 18rpx rgba(35,42,66,0.04); }
+.search-status > view { border-color: #eef0f6; }
+.search-status text:first-child { color: #9299b0; }
+.search-status text:last-child { color: #1b2236; }
+.board-heading-actions button { border: 0; border-radius: 15rpx; background: #ffffff; box-shadow: 0 4rpx 12rpx rgba(35,42,66,0.06); }
+.word-search-board { border: 3rpx solid #1b2236; border-radius: 22rpx; box-shadow: none; }
+.word-search-board.invalid { border-color: #e05252; box-shadow: none; }
+.search-cell { border-color: #eef0f6; }
+.search-cell.found { background: #fff3d6; color: #9a6a00; }
+.search-cell.selected { background: #dfe4ff; color: #1b2236; box-shadow: inset 0 0 0 3rpx #4f5bff; }
+.search-cell.selected.endpoint { background: #1b2236; color: #ffffff; }
+.selection-feedback { border: 1rpx dashed #dfe3ee; border-radius: 16rpx; background: #ffffff; }
+.selection-feedback.active { border-color: #4f5bff; background: #eef0ff; color: #4f5bff; }
+.complete-panel { border: 0; border-radius: 26rpx; background: #ffffff; box-shadow: 0 12rpx 32rpx rgba(35,42,66,0.06); }
+.complete-stars { color: #f0a92c; }

@@ -36,15 +36,15 @@
 
   <view class="level-section" wx:else>
     <view class="level-heading"><text>训练关卡</text><text>第 {{selectedLevel}} / {{levelCount}} 关</text></view>
-    <scroll-view class="level-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="level-grid">
       <button
-        class="level-chip {{item.selected ? 'active' : ''}} {{item.unlocked ? '' : 'locked'}} {{item.stars ? 'completed' : ''}}"
+        class="level-node {{item.selected ? 'current' : ''}} {{item.unlocked ? '' : 'locked'}} {{item.stars ? 'done' : ''}}"
         wx:for="{{levelOptions}}"
         wx:key="level"
         data-level="{{item.level}}"
         bindtap="switchLevel"
-      ><text>{{item.level}}</text><text>{{item.unlocked ? item.detail : '锁定'}}</text></button>
-    </scroll-view>
+      ><text class="node-no">{{item.level}}</text><text class="node-stars">{{item.unlocked ? (item.stars ? '★★★' : '☆☆☆') : '锁'}}</text></button>
+    </view>
   </view>
 
   <view class="loading-state" wx:if="{{loading}}">正在洗牌…</view>
