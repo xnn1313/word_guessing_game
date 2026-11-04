@@ -133,7 +133,11 @@ Page({
     result: null as PuzzleCompletionResult | null,
   },
 
-  onLoad() {
+  onLoad(options: Record<string, string> = {}) {
+    if (options.daily === "1") {
+      this.openDaily();
+      return;
+    }
     this.loadCatalog();
   },
 

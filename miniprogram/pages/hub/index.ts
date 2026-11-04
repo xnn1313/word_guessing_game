@@ -12,9 +12,9 @@ interface GameMeta {
 }
 
 const META: Record<TaskKey, GameMeta> = {
-  word: { icon: "词", tone: "amber", url: "/pages/home/index", trail: true },
+  word: { icon: "词", tone: "amber", url: "/pages/classic/index", trail: true },
   sudoku: { icon: "数", tone: "blue", url: "/pages/sudoku/index" },
-  idiom: { icon: "成", tone: "pink", url: "/pages/idiom/index", trail: true },
+  idiom: { icon: "成", tone: "pink", url: "/pages/idiom/index?daily=1", trail: true },
   memory: { icon: "记", tone: "violet", url: "/pages/memory/index" },
   word_search: { icon: "连", tone: "cyan", url: "/pages/word-search/index" },
   poetry: { icon: "诗", tone: "gold", url: "/pages/poetry/index" },
@@ -42,6 +42,22 @@ const TRAIL_TITLES: Partial<Record<TaskKey, string>> = {
   idiom: "成语 · 字里行间",
   sokoban: "推箱子 · 仓库路线",
   arrow_maze: "箭头迷宫 · 罗盘航线",
+};
+
+
+const BATTLE_TRAIL = {
+  key: "battle",
+  title: "双人竞速",
+  icon: "战",
+  tone: "rose",
+  url: "/pages/battle/index",
+  trail: true,
+  trailTitle: "对战 · 双人竞速",
+  available: true,
+  progressText: "好友对决 · 90 秒",
+  percent: 0,
+  completed: false,
+  started: false,
 };
 
 function buildTask(game: GameOverviewItem | undefined, key: TaskKey): any {
@@ -101,7 +117,7 @@ Page({
     const fallbackTasks = ORDER.map((key) => buildTask(undefined, key));
     this.setData({
       tasks: fallbackTasks,
-      trails: fallbackTasks.filter((task) => task.trail),
+      trails: [...fallbackTasks.filter((task) => task.trail), BATTLE_TRAIL],
       lastTask: fallbackTasks[0],
     });
     wx.showShareMenu({ menus: ["shareAppMessage", "shareTimeline"] });
@@ -138,7 +154,7 @@ Page({
       const overview = await request<GamesOverview>("/games/overview");
       const byKey = Object.fromEntries(overview.games.map((item) => [item.key, item]));
       const tasks = ORDER.map((key) => buildTask(byKey[key], key));
-      const trails = tasks.filter((task) => task.trail);
+      const trails = [...tasks.filter((task) => task.trail), BATTLE_TRAIL];
       const lastKey = overview.summary.last_game_key;
       const lastTask =
         tasks.find((task) => task.key === lastKey) ||
@@ -172,7 +188,9 @@ Page({
   },
 
   openTrail(event: any) {
-    const task = this.findTask(event.currentTarget.dataset.key);
+    const key = event.currentTarget.dataset.key;
+    const task =
+      this.findTask(key) || (this.data.trails as any[]).find((item) => item.key === key);
     if (!task) return;
     this.navigateToTask({ ...task, url: task.key === "word" ? "/pages/campaign/index" : task.url });
   },

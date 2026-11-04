@@ -44,3 +44,23 @@
 .tip-row + .tip-row { margin-top: 10rpx; padding-top: 10rpx; border-top: 2rpx dashed rgba(21,27,58,.16); }
 .tip-index { flex: 0 0 auto; color: var(--color-primary-dark); font-size: 18rpx; font-weight: 900; letter-spacing: 1rpx; }
 @media (max-height: 720px) { .page-subtitle { display: none; } .cell { font-size: 19rpx; } .mine-tips { display: none; } }
+
+/* task-board skin */
+.mine-page { background: #f6f7fb; padding-top: 16rpx; }
+.mine-seal { border: none; background: #eef1ff; color: #4f5bff; box-shadow: none; transform: none; }
+.page-title { color: #1b2236; }
+.page-subtitle { color: #7c8399; }
+.login-gate, .mine-tips { border: none; border-radius: 28rpx; box-shadow: 0 6rpx 20rpx rgba(35,42,66,.04); }
+.gate-icon { border: none; background: #fff4e5; }
+.primary-button { border: none; border-radius: 18rpx; background: #1b2236; color: #ffffff; }
+.secondary-button { border: none; border-radius: 18rpx; background: #f1f3f9; color: #4f5bff; }
+.difficulty-tabs button { border: none; border-radius: 14rpx; background: #eef1f7; }
+.difficulty-tabs button.active { background: #1b2236; color: #ffffff; box-shadow: none; }
+.mine-board { border: none; border-radius: 22rpx; background: #e9edf5; box-shadow: none; padding: 12rpx; gap: 5rpx; }
+.cell { border-radius: 8rpx; background: #ffffff; color: #4f5bff; }
+.cell-revealed { background: #f0f2f7; color: #1b2236; }
+.cell-flagged { background: #fff3d6; }
+.cell-mine { background: #ffe3e3; }
+.overlay-card { border: none; border-radius: 28rpx; background: #ffffff; box-shadow: 0 12rpx 40rpx rgba(27,34,54,.14); }
+.overlay-seal { border: none; box-shadow: none; }
+.restart-button { border: none; background: #f1f3f9; color: #4f5bff; }

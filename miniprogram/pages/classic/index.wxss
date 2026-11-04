@@ -52,3 +52,28 @@
 .action-text.danger { color: var(--color-danger); }
 
 @media (max-height: 700px) { .history-scroll { height: 390rpx; } }
+
+/* task-board skin */
+.game-topbar { padding-top: 8rpx; }
+.page-kicker { color: #4f5bff; font-weight: 800; letter-spacing: 2rpx; }
+.page-title { color: #1b2236; font-size: 60rpx; font-weight: 900; }
+.game-hint { margin-top: 6rpx; color: #7c8399; font-size: 22rpx; }
+.live-state { border: none; border-radius: 99rpx; background: #eef1ff; color: #4f5bff; padding: 0 20rpx; }
+.live-state text { width: 12rpx; height: 12rpx; border: none; background: #12b76a; }
+.round-summary { border: none; border-radius: 28rpx; background: #1b2236; box-shadow: none; }
+.summary-number { color: #ffffff; }
+.summary-label, .summary-side > text, .summary-tip { color: #aeb6cc; }
+.summary-side > view text { color: #8f9bff; }
+.summary-divider { background: rgba(255,255,255,.12); }
+.history-panel { border: none; border-radius: 28rpx; box-shadow: 0 6rpx 20rpx rgba(35,42,66,.04); }
+.history-toolbar { border-bottom: 1rpx solid #eef0f6; padding: 16rpx 20rpx; }
+.sort-control { border: none; background: #f1f3f9; border-radius: 14rpx; }
+.sort-button { min-height: 64rpx; color: #7c8399; font-weight: 700; }
+.sort-button.active { background: #ffffff; color: #1b2236; box-shadow: 0 2rpx 8rpx rgba(35,42,66,.08); }
+.result-banner { border: none; border-radius: 16rpx; background: #fff4f4; color: #e5484d; }
+.result-banner.success { background: #e9f9f1; color: #12b76a; }
+.guess-dock { border: none; border-radius: 28rpx; box-shadow: 0 6rpx 20rpx rgba(35,42,66,.04); padding: 20rpx; }
+.guess-dock .text-input { border: none; background: #f4f6fb; }
+.submit-guess { border: none; border-radius: 18rpx; background: #1b2236; color: #ffffff; }
+.action-text { color: #7c8399; font-weight: 700; }
+.action-text.danger { color: #e5484d; }

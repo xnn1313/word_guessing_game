@@ -489,3 +489,36 @@
   }
   .progress-fill { transition: none; }
 }
+
+/* task-board skin */
+.tile-page { --tile-paper: #f6f7fb; background: #f6f7fb; padding-top: 16rpx; }
+.eyebrow { background: #eef1ff; color: #4f5bff; letter-spacing: 1rpx; }
+.tile-title { color: #1b2236; font-size: 68rpx; }
+.tile-subtitle { color: #7c8399; }
+.goal-chip { border: none; border-radius: 20rpx; background: #1b2236; box-shadow: none; }
+.goal-chip-num { color: #ffffff; }
+.goal-chip-label { color: #aeb6cc; }
+.mode-switch { border: none; border-radius: 16rpx; background: #eef1f7; padding: 6rpx; gap: 6rpx; }
+.mode-pill { border: none; border-radius: 12rpx; background: transparent; color: #7c8399; box-shadow: none; }
+.mode-pill.active { background: #ffffff; color: #1b2236; box-shadow: 0 2rpx 8rpx rgba(35,42,66,.08); }
+.stat-card { border: none; border-radius: 24rpx; background: #ffffff; box-shadow: 0 6rpx 20rpx rgba(35,42,66,.04); }
+.stat-label { color: #9299b0; }
+.stat-value { color: #1b2236; }
+.stat-divider { background: #eef0f6; }
+.progress-track { background: #e9ecf4; }
+.progress-fill { background: #4f5bff; }
+.progress-meta { color: #7c8399; }
+.board { border: none; border-radius: 26rpx; background: #e9edf5; box-shadow: none; padding: 12rpx; }
+.cell { background: transparent; }
+.tile { border: none; border-radius: 12rpx; box-shadow: none; }
+.tile.value-2 { background: #f7f8fc; color: #1b2236; }
+.tile.value-4 { background: #eef1ff; color: #1b2236; }
+.ghost-button { border: none; border-radius: 99rpx; background: #f1f3f9; color: #4f5bff; }
+.daily-note { color: #9299b0; }
+.sheet { border: none; border-radius: 32rpx 32rpx 0 0; box-shadow: 0 -10rpx 40rpx rgba(27,34,54,.12); }
+.sheet-seal { border: none; box-shadow: none; }
+.sheet-title { color: #1b2236; }
+.sheet-score { color: #1b2236; }
+.sheet-meta { color: #7c8399; }
+.cta { border: none; border-radius: 18rpx; background: #1b2236; color: #ffffff; }
+.cta-ghost { border: none; border-radius: 18rpx; background: #f1f3f9; color: #4f5bff; }
