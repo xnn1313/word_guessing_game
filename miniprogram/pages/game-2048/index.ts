@@ -8,6 +8,7 @@ import { request, showRequestError } from "../../utils/request";
 
 let saveTimer: any = null;
 let clockTimer: any = null;
+let mergeTimer: any = null;
 
 type Direction = "left" | "right" | "up" | "down";
 
@@ -16,30 +17,37 @@ function formatTime(seconds: number): string {
   return `${String(Math.floor(safe / 60)).padStart(2, "0")}:${String(safe % 60).padStart(2, "0")}`;
 }
 
-function slide(line: number[]): { line: number[]; gained: number } {
+function slide(line: number[]): { line: number[]; gained: number; merged: number[] } {
   const compact = line.filter((value) => value !== 0);
+  const resultLine: number[] = [];
   const merged: number[] = [];
   let gained = 0;
   for (let index = 0; index < compact.length; index += 1) {
     if (compact[index] === compact[index + 1]) {
       const value = compact[index] * 2;
-      merged.push(value);
+      resultLine.push(value);
+      merged.push(resultLine.length - 1);
       gained += value;
       index += 1;
     } else {
-      merged.push(compact[index]);
+      resultLine.push(compact[index]);
     }
   }
-  while (merged.length < line.length) merged.push(0);
-  return { line: merged, gained };
+  while (resultLine.length < line.length) resultLine.push(0);
+  return { line: resultLine, gained, merged };
 }
 
-function moveBoard(board: number[], direction: Direction): { board: number[]; gained: number; moved: boolean } {
+function moveBoard(
+  board: number[],
+  direction: Direction,
+): { board: number[]; gained: number; moved: boolean; merged: number[] } {
   const next = board.slice();
+  const merged: number[] = [];
   let gained = 0;
   const apply = (indices: number[]) => {
     const result = slide(indices.map((index) => next[index]));
     gained += result.gained;
+    result.merged.forEach((offset) => merged.push(indices[offset]));
     indices.forEach((index, offset) => {
       next[index] = result.line[offset];
     });
@@ -52,7 +60,7 @@ function moveBoard(board: number[], direction: Direction): { board: number[]; ga
     if (direction === "up") apply(column);
     if (direction === "down") apply(column.slice().reverse());
   }
-  return { board: next, gained, moved: next.some((value, index) => value !== board[index]) };
+  return { board: next, gained, moved: next.some((value, index) => value !== board[index]), merged };
 }
 
 function addRandomTile(board: number[]): { board: number[]; index: number } {
@@ -86,7 +94,8 @@ Page({
     loading: true,
     mode: "daily" as "daily" | "practice",
     board: [] as number[],
-    cells: [] as Array<{ id: number; value: number; cls: string; spawn: boolean }>,
+    goalProgress: 0,
+    cells: [] as Array<{ id: number; value: number; cls: string; spawn: boolean; merge: boolean }>,
     score: 0,
     bestScore: 0,
     moves: 0,
@@ -120,6 +129,7 @@ Page({
   onUnload() {
     this.stopClock();
     if (saveTimer) clearTimeout(saveTimer);
+    if (mergeTimer) clearTimeout(mergeTimer);
     void this.saveProgress();
   },
 
@@ -162,16 +172,30 @@ Page({
     }
   },
 
-  setBoard(board: number[], spawnIndex = -1) {
+  setBoard(board: number[], spawnIndex = -1, mergedIndices: number[] = []) {
+    const max = board.reduce((best, value) => (value > best ? value : best), 0);
+    const goalProgress = max >= 2048 ? 100 : Math.min(100, Math.round((Math.log2(Math.max(2, max)) / 11) * 100));
+    if (mergeTimer) clearTimeout(mergeTimer);
+    mergeTimer = null;
     this.setData({
       board,
+      goalProgress,
       cells: board.map((value, index) => ({
         id: index,
         value,
         cls: tileClass(value),
         spawn: index === spawnIndex,
+        merge: mergedIndices.includes(index),
       })),
     });
+    if (mergedIndices.length) {
+      mergeTimer = setTimeout(() => {
+        mergeTimer = null;
+        this.setData({
+          cells: this.data.cells.map((cell) => (cell.merge ? { ...cell, merge: false } : cell)),
+        });
+      }, 240);
+    }
   },
 
   switchMode(event: any) {
@@ -205,13 +229,20 @@ Page({
   },
 
   move(direction: Direction) {
-    const { board, gained, moved } = moveBoard(this.data.board, direction);
+    const { board, gained, moved, merged } = moveBoard(this.data.board, direction);
     if (!moved) return;
     const added = addRandomTile(board);
     const withTile = added.board;
     const score = this.data.score + gained;
-    this.setBoard(withTile, added.index);
+    this.setBoard(withTile, added.index, merged);
     this.setData({ score, moves: this.data.moves + 1 });
+    if (merged.length) {
+      try {
+        wx.vibrateShort({ type: "light" });
+      } catch (error) {
+        // 部分基础库不支持轻震动，忽略即可。
+      }
+    }
     if (withTile.some((value) => value >= 2048) && !this.data.completed) {
       this.finishWin(withTile, score, this.data.moves + 1);
       return;
