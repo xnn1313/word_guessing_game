@@ -55,12 +55,13 @@ function moveBoard(board: number[], direction: Direction): { board: number[]; ga
   return { board: next, gained, moved: next.some((value, index) => value !== board[index]) };
 }
 
-function addRandomTile(board: number[]): number[] {
+function addRandomTile(board: number[]): { board: number[]; index: number } {
   const empty = board.map((value, index) => (value === 0 ? index : -1)).filter((index) => index >= 0);
-  if (!empty.length) return board;
+  if (!empty.length) return { board, index: -1 };
   const next = board.slice();
-  next[empty[Math.floor(Math.random() * empty.length)]] = Math.random() < 0.1 ? 4 : 2;
-  return next;
+  const index = empty[Math.floor(Math.random() * empty.length)];
+  next[index] = Math.random() < 0.1 ? 4 : 2;
+  return { board: next, index };
 }
 
 function isGameOver(board: number[]): boolean {
@@ -85,7 +86,7 @@ Page({
     loading: true,
     mode: "daily" as "daily" | "practice",
     board: [] as number[],
-    cells: [] as Array<{ id: number; value: number; cls: string }>,
+    cells: [] as Array<{ id: number; value: number; cls: string; spawn: boolean }>,
     score: 0,
     bestScore: 0,
     moves: 0,
@@ -161,10 +162,15 @@ Page({
     }
   },
 
-  setBoard(board: number[]) {
+  setBoard(board: number[], spawnIndex = -1) {
     this.setData({
       board,
-      cells: board.map((value, index) => ({ id: index, value, cls: tileClass(value) })),
+      cells: board.map((value, index) => ({
+        id: index,
+        value,
+        cls: tileClass(value),
+        spawn: index === spawnIndex,
+      })),
     });
   },
 
@@ -201,9 +207,10 @@ Page({
   move(direction: Direction) {
     const { board, gained, moved } = moveBoard(this.data.board, direction);
     if (!moved) return;
-    const withTile = addRandomTile(board);
+    const added = addRandomTile(board);
+    const withTile = added.board;
     const score = this.data.score + gained;
-    this.setBoard(withTile);
+    this.setBoard(withTile, added.index);
     this.setData({ score, moves: this.data.moves + 1 });
     if (withTile.some((value) => value >= 2048) && !this.data.completed) {
       this.finishWin(withTile, score, this.data.moves + 1);

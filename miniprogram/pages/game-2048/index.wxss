@@ -5,21 +5,23 @@
 .mode-tabs button { min-height: 72rpx; font-size: 23rpx; }
 .tile-status { margin-top: 18rpx; }
 .board-wrap { position: relative; margin-top: 20rpx; }
-.board { display: grid; padding: 14rpx; border: 3rpx solid var(--color-ink); border-radius: 26rpx; background: #bbada0; box-shadow: 7rpx 7rpx 0 var(--color-ink); gap: 12rpx; grid-template-columns: repeat(4,minmax(0,1fr)); }
-.tile { display: grid; aspect-ratio: 1; place-items: center; border-radius: 14rpx; background: rgba(238,228,218,.38); color: var(--color-ink); font-size: 46rpx; font-weight: 900; line-height: 1; transition: background-color 120ms ease, color 120ms ease; }
-.tile.empty { background: rgba(238,228,218,.34); }
-.tile.value-2 { background: #eee4da; font-size: 46rpx; }
-.tile.value-4 { background: #ede0c8; font-size: 46rpx; }
-.tile.value-8 { background: #f2b179; color: #ffffff; font-size: 44rpx; }
-.tile.value-16 { background: #f59563; color: #ffffff; font-size: 42rpx; }
-.tile.value-32 { background: #f67c5f; color: #ffffff; font-size: 40rpx; }
-.tile.value-64 { background: #f65e3b; color: #ffffff; font-size: 38rpx; }
-.tile.value-128 { background: #edcf72; font-size: 34rpx; }
-.tile.value-256 { background: #edcc61; font-size: 34rpx; }
-.tile.value-512 { background: #edc850; font-size: 32rpx; }
-.tile.value-1024 { background: #edc53f; font-size: 27rpx; }
-.tile.value-2048 { background: #edc22e; font-size: 27rpx; }
-.tile.super { background: #3c3a32; color: #ffffff; font-size: 24rpx; }
+.board { display: grid; padding: 14rpx; border: 3rpx solid var(--color-ink); border-radius: 26rpx; background: #b7a697; box-shadow: 7rpx 7rpx 0 var(--color-ink), inset 0 0 0 6rpx rgba(255,255,255,.10); gap: 12rpx; grid-template-columns: repeat(4,minmax(0,1fr)); }
+.tile { display: grid; aspect-ratio: 1; place-items: center; border-radius: 14rpx; background: #cdc1b4; color: var(--color-ink); font-size: 46rpx; font-weight: 900; line-height: 1; box-shadow: inset 0 -4rpx 0 rgba(21,27,58,.10); transition: background-color 120ms ease, color 120ms ease, box-shadow 120ms ease; }
+.tile.empty { background: rgba(21,27,58,.13); box-shadow: inset 0 3rpx 8rpx rgba(21,27,58,.12); }
+.tile.value-2 { background: linear-gradient(155deg,#faf4ec,#eee4da); color: #5f544a; }
+.tile.value-4 { background: linear-gradient(155deg,#f4e8d2,#ede0c8); color: #5f544a; font-size: 46rpx; }
+.tile.value-8 { background: linear-gradient(155deg,#f7c08b,#f2b179); color: #ffffff; font-size: 44rpx; }
+.tile.value-16 { background: linear-gradient(155deg,#f8a578,#f59563); color: #ffffff; font-size: 42rpx; }
+.tile.value-32 { background: linear-gradient(155deg,#f98d72,#f67c5f); color: #ffffff; font-size: 40rpx; }
+.tile.value-64 { background: linear-gradient(155deg,#fa7452,#f65e3b); color: #ffffff; font-size: 38rpx; }
+.tile.value-128 { background: linear-gradient(155deg,#f6dc8b,#edcf72); font-size: 34rpx; box-shadow: inset 0 -4rpx 0 rgba(21,27,58,.14), 0 0 0 2rpx rgba(237,207,114,.45); }
+.tile.value-256 { background: linear-gradient(155deg,#f5d97a,#edcc61); font-size: 34rpx; box-shadow: inset 0 -4rpx 0 rgba(21,27,58,.14), 0 0 0 2rpx rgba(237,204,97,.45); }
+.tile.value-512 { background: linear-gradient(155deg,#f3d266,#edc850); font-size: 32rpx; box-shadow: inset 0 -4rpx 0 rgba(21,27,58,.14), 0 0 0 2rpx rgba(237,200,80,.45); }
+.tile.value-1024 { background: linear-gradient(155deg,#f1ca4c,#edc53f); font-size: 27rpx; box-shadow: inset 0 -4rpx 0 rgba(21,27,58,.16), 0 0 0 3rpx rgba(237,197,63,.5); }
+.tile.value-2048 { background: linear-gradient(155deg,#f6d34a,#edc22e); font-size: 27rpx; box-shadow: inset 0 -4rpx 0 rgba(21,27,58,.18), 0 0 0 4rpx rgba(237,194,46,.55); }
+.tile.super { background: linear-gradient(155deg,#4a4741,#2f2d29); color: #ffffff; font-size: 24rpx; box-shadow: inset 0 -4rpx 0 rgba(0,0,0,.3), 0 0 0 4rpx rgba(60,58,50,.35); }
+.tile.spawn { animation: tile-spawn 180ms ease-out; }
+@keyframes tile-spawn { 0% { transform: scale(.72); opacity: .4; } 100% { transform: scale(1); opacity: 1; } }
 .board-overlay { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: grid; place-items: center; padding: 22rpx; border-radius: 26rpx; background: rgba(21,27,58,.55); }
 .overlay-card { width: 100%; max-width: 520rpx; padding: 30rpx 24rpx 24rpx; border: 3rpx solid var(--color-ink); border-radius: 22rpx; background: #fffdf5; box-shadow: 7rpx 7rpx 0 var(--color-ink); text-align: center; }
 .overlay-seal { display: grid; width: 76rpx; height: 76rpx; margin: 0 auto 12rpx; place-items: center; border: 3rpx solid var(--color-ink); border-radius: 16rpx; background: #edc22e; font-size: 24rpx; font-weight: 900; }

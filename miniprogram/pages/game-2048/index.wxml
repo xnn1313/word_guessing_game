@@ -24,7 +24,7 @@
   <block wx:else>
     <view class="board-wrap">
       <view class="board" bindtouchstart="onTouchStart" bindtouchend="onTouchEnd" catchtouchmove="noop">
-        <view class="tile tile-{{item.cls}}" wx:for="{{cells}}" wx:key="id">{{item.value || ''}}</view>
+        <view class="tile {{item.cls}}{{item.spawn ? ' spawn' : ''}}" wx:for="{{cells}}" wx:key="id">{{item.value || ''}}</view>
       </view>
 
       <view class="board-overlay" wx:if="{{(completed || gameOver) && !dismissResult}}">
